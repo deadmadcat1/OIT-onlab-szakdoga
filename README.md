@@ -3,7 +3,6 @@
 ##To-do:
     - Camera
     - Light
-    - Texture
     - Geometry
         - Sphere
         - Plane

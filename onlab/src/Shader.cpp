@@ -8,28 +8,27 @@
 
 using namespace std;
 
-Shader::Shader(GLenum shaderType, const char* const path) {
+Shader::Shader(GLenum shaderType) {
 	this->type = shaderType;
-	this->pathToSource = path;
 }
 
 unsigned int Shader::getID() {
 	return (shaderID > -1) ? shaderID : NULL;
 }
 
-unsigned int Shader::create() {
-	unsigned int shader = glCreateShader(type);
-	if (!shader) {
-		fprintf(stderr, "Shader creation failed: %s\n", pathToSource);
-		glDeleteShader(shader);
-		return -1;
+unsigned int Shader::create(const char* const path) {
+	shaderID = glCreateShader(type);
+	if (!shaderID) {
+		fprintf(stderr, "Shader creation failed: %s\n", path);
+		glDeleteShader(shaderID);
+		return NULL;
 	}
-	ifstream sourcefile(pathToSource);
+	ifstream sourcefile(path);
 	if (!sourcefile.is_open()) {
-		fprintf(stderr, "Cannot open file: %s\n", pathToSource);
-		glDeleteShader(shader);
+		fprintf(stderr, "Cannot open file: %s\n", path);
+		glDeleteShader(shaderID);
 		sourcefile.close();
-		return -1;
+		return NULL;
 	}
 	sourcefile.seekg(ios::end);
 	streamsize size = sourcefile.tellg();
@@ -37,15 +36,15 @@ unsigned int Shader::create() {
 	char* source = new char[size + 1];
 
 	if (!sourcefile.read(source, size)) {
-		fprintf(stderr, "Error reading file: %s\n", pathToSource);
-		glDeleteShader(shader);
+		fprintf(stderr, "Error reading file: %s\n", path);
+		glDeleteShader(shaderID);
 		sourcefile.close();
 		delete[] source;
 		return -1;
 	}
 	source[size] = '\0';
 
-	glShaderSource(shader, 1, (const GLchar**)&source, NULL);
-	glCompileShader(shader);
-	return shader;
+	glShaderSource(shaderID, 1, (const GLchar**)&source, NULL);
+	glCompileShader(shaderID);
+	return shaderID;
 }

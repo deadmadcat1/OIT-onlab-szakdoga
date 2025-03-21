@@ -9,14 +9,19 @@
 const int windowWidth = 640;
 const int windowHeight = 480;
 
+static void resize_callback(GLFWwindow* window, int width, int height) {
+	glViewport(0, 0, width, height);
+}
+
 static void error_callback(int error, const char* desc) {
 	fprintf(stderr, "Error: %s\n", desc);
 }
 
 static void key_callback(GLFWwindow* window, int key,
 	int scancode, int action, int mods) {
-	if (key == GLFW_KEY_G && action == GLFW_PRESS) {
-		fprintf(stdout, "G key pressed\n");
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+		fprintf(stdout, "Exiting...\n");
+		glfwSetWindowShouldClose(window, true);
 	}
 }
 

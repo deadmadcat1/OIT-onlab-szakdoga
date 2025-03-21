@@ -4,9 +4,8 @@
 class Shader {
 	unsigned int shaderID = -1;
 	GLenum type;
-	const char* pathToSource;
 public:
-	Shader(GLenum shaderType, const char* const path);
+	Shader(GLenum shaderType);
 	unsigned int getID();
-	unsigned int create();
+	unsigned int create(const char* const path);
 };
