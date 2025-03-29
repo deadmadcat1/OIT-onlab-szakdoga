@@ -1,12 +1,8 @@
 # Sorrendfüggetlen átlátszóság önálló laboratórium
 
 ##To-do:
-    - Camera
-    - Light
-    - Geometry
-        - Sphere
-        - Plane
-            - Billboard
+    - Object, hogy legyen mibe összecsomagolni a dolgokat
+    - Billboard
     - Shaderek
         - Egyszerű vs
         - Phong ps

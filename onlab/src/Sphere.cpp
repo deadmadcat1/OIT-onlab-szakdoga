@@ -5,63 +5,130 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-class Sphere : protected Geometry {
-public:
-	int create() override {
-		if (!Geometry::create()) {
-			return NULL;
-		}
+Sphere::Sphere(unsigned int _nStrips, unsigned int _nVtxPerRing) {
+    if (_nStrips > 0) {
+        nStrips = _nStrips;
+    }
+    if (_nVtxPerRing > 0) {
+        nVtxPerRing = _nVtxPerRing;
+    }
+}
 
-        int nStrips = 16; //2^n strips need 2^n-1 rings of vtx
-        int nVtxPerRing = 32;
+int Sphere::create() {
+    if (!Geometry::create()) {
+        return NULL;
+    }
 
-        /*VERTICES*/
-        std::vector<glm::vec3> vertices;
-        glm::vec3 vtxProbe(0.0, 0.0, 1.0);
+    /*VERTICES*/
+    std::vector<glm::vec3> vertices;
+    glm::vec3 vtxProbe(0.0, 0.0, 1.0);
 
-        vertices.push_back(vtxProbe);
+    vertices.push_back(vtxProbe);
 
-        double rotAngle = 2 * M_PI / nVtxPerRing;
-        glm::mat4 rot(1.0);
+    float rotAngle = 2 * (float)M_PI / nVtxPerRing;
+    glm::mat4 rot(1.0);
 
-        for (int i = 1; i < nStrips; i++)
-        {
-            double pitchAngle = i * (M_PI / nStrips);
-            
-            rot = glm::rotate(rot, (float)pitchAngle, glm::vec3(0.0, 0.0, 1.0));
+    for (unsigned int i = 1; i < nStrips; i++)
+    {
+        float pitchAngle = i * ((float)M_PI / nStrips);
+
+        rot = glm::rotate(rot, pitchAngle, glm::vec3(0.0, 0.0, 1.0));
+        vtxProbe *= rot;
+        for (unsigned int j = 0; j < nVtxPerRing; j++) {
+            vertices.push_back(vtxProbe);
+            rot = glm::rotate(rot, rotAngle, glm::vec3(0.0, 1.0, 0.0));
             vtxProbe *= rot;
-            for (int j = 0; j < nVtxPerRing; j++) {
-                vertices.push_back(vtxProbe);
-                rot = glm::rotate(rot, (float)rotAngle, glm::vec3(0.0, 1.0, 0.0));
-                vtxProbe *= rot;
-            }
         }
+    }
 
-        vtxProbe = glm::vec3(0.0, 0.0, -1.0);
-        vertices.push_back(vtxProbe);
+    vtxProbe = glm::vec3(0.0, 0.0, -1.0);
+    vertices.push_back(vtxProbe);
 
-        glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
-        glBufferData(GL_ARRAY_BUFFER, nStrips * nVtxPerRing * sizeof(glm::vec3), vertices.data(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, vtxVBO);
+    glBufferData(GL_ARRAY_BUFFER, nStrips * nVtxPerRing * sizeof(glm::vec3), vertices.data(), GL_STATIC_DRAW);
 
-        /*NORMALS*/
-        // le magic of the unit sphere
-        glBindBuffer(GL_ARRAY_BUFFER, buffers[1]);
-        glBufferData(GL_ARRAY_BUFFER, nStrips * nVtxPerRing * sizeof(glm::vec3), vertices.data(), GL_STATIC_DRAW);
+    /*NORMALS*/
+    // le magic of the unit sphere
+    glBindBuffer(GL_ARRAY_BUFFER, normalVBO);
+    glBufferData(GL_ARRAY_BUFFER, nStrips * nVtxPerRing * sizeof(glm::vec3), vertices.data(), GL_STATIC_DRAW);
 
-        /*UVs*/
-        //unused
-        glBindBuffer(GL_ARRAY_BUFFER, buffers[1]);
-        glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
+    /*UVs*/
+    //unused
+    glBindBuffer(GL_ARRAY_BUFFER, uvVBO);
+    glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
 
-        /*INDICES*/
-        std::vector<unsigned int> indices;
+    /*INDICES*/
+    std::vector<unsigned int> indices;
 
-        //TODO
+    for (unsigned int i = 2; i < nVtxPerRing + 2; i++)
+    {
+        indices.push_back(0);
+        indices.push_back(i - 1);
+        indices.push_back(i % nVtxPerRing);
+    }
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[4]);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+    for (unsigned int i = 0; i < nStrips - 1; i++)
+    {
+        unsigned int oldRingOffset = i * nVtxPerRing;
+        unsigned int newRingOffset = oldRingOffset + nVtxPerRing;
+        for (unsigned int j = 1; j < nVtxPerRing + 1; j++)
+        {
+            indices.push_back(oldRingOffset + j);
+            indices.push_back(newRingOffset + j);
+            indices.push_back(newRingOffset + ((j + 1) % nVtxPerRing));
 
-        /*LAYOUT*/
-        //TODO
-	}
-};
+            indices.push_back(newRingOffset + ((j + 1) % nVtxPerRing));
+            indices.push_back(oldRingOffset + ((j + 1) % nVtxPerRing));
+            indices.push_back(oldRingOffset + j);
+        }
+    }
+
+    unsigned int lastRingOffset = (nStrips - 2) * nVtxPerRing;
+    unsigned int lastVtxIdx = lastRingOffset + nVtxPerRing + 1;
+
+    for (unsigned int i = 2; i < nVtxPerRing + 2; i++)
+    {
+        indices.push_back(lastRingOffset + (i % nVtxPerRing));
+        indices.push_back(lastRingOffset + i - 1);
+        indices.push_back(lastVtxIdx);
+    }
+
+    nIdx = indices.size();
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+
+    /*LAYOUT*/
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vtxVBO);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(
+        0,
+        3, GL_FLOAT,
+        GL_FALSE,
+        0, NULL);
+    glBindBuffer(GL_ARRAY_BUFFER, normalVBO);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(
+        1,
+        3, GL_FLOAT,
+        GL_FALSE,
+        0, NULL);
+    glBindBuffer(GL_ARRAY_BUFFER, uvVBO);  //unused
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(
+        2,
+        2, GL_FLOAT,
+        GL_FALSE,
+        0, NULL);
+
+    glBindVertexArray(NULL);
+}
+
+void Sphere::draw() {
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+
+    glDrawElements(GL_TRIANGLES, nIdx, GL_UNSIGNED_INT, NULL);
+}
