@@ -6,11 +6,8 @@
 class Geometry {
 public:
 	Geometry();
-	unsigned int VAO;
-	unsigned int EBO;
-	unsigned int vtxVBO;
-	unsigned int uvVBO;
-	unsigned int normalVBO;
+	std::vector<unsigned int> buffers;//EBO, vtx, normal, uv
+	unsigned int VAO = -1;
 	
 	virtual void draw() = 0;
 	virtual int create();

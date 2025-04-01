@@ -1,4 +1,5 @@
 #include "Main.h"
+#include "Scene.h"
 
 int main(void)
 {
@@ -34,12 +35,13 @@ int main(void)
     //glfwSetScrollCallback(window, mouseScroll_callback);
 
     glfwSwapInterval(1);
-
+    Scene* scene = new Scene();
+    if (!scene || !scene->set()) {
+        glfwTerminate();
+        exit(EXIT_FAILURE);
+    }
     while (!glfwWindowShouldClose(window))
-    {
-        int width, height;
-        glfwGetFramebufferSize(window, &width, &height);
-        glViewport(0, 0, width, height);
+    {   
         glClearColor(0.1f, 0.2f, 0.3f, 1.0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
@@ -49,8 +51,10 @@ int main(void)
         tend = glfwGetTime() / 1000.0;
         for (double t = tstart; t < tend; t += dt) {
             double delta = fmin(dt, tend - t);
+            //scene->animate(delta);
         }
 
+        //scene->render();
 
         glfwSwapBuffers(window);
 

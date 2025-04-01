@@ -14,7 +14,7 @@ int Plane::create() {
 	vertices.push_back(glm::vec3(1, -1, 0));
 	vertices.push_back(glm::vec3(1, 1, 0));
 
-	glBindBuffer(GL_ARRAY_BUFFER, vtxVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, buffers[1]);
 	glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(glm::vec3), vertices.data(), GL_STATIC_DRAW);
 	/*NORMALS*/
 	std::vector<glm::vec3> normals;
@@ -24,7 +24,7 @@ int Plane::create() {
 	normals.push_back(glm::vec3(0, 0, 1));
 	normals.push_back(glm::vec3(0, 0, 1));
 
-	glBindBuffer(GL_ARRAY_BUFFER, normalVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, buffers[2]);
 	glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(glm::vec3), normals.data(), GL_STATIC_DRAW);
 	/*UVs*/
 	std::vector<glm::vec2> uvs;
@@ -34,7 +34,7 @@ int Plane::create() {
 	uvs.push_back(glm::vec2(1, 0));
 	uvs.push_back(glm::vec2(1, 1));
 
-	glBindBuffer(GL_ARRAY_BUFFER, uvVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, buffers[3]);
 	glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(glm::vec2), uvs.data(), GL_STATIC_DRAW);
 	/*INDICES*/
 	std::vector<unsigned short> indices;
@@ -45,12 +45,12 @@ int Plane::create() {
 	indices.push_back(3);
 
 	nIdx = indices.size();
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[0]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, nIdx * sizeof(unsigned short), indices.data(), GL_STATIC_DRAW);
 	/*LAYOUT*/
 	glBindVertexArray(VAO);
 
-	glBindBuffer(GL_ARRAY_BUFFER, vtxVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, buffers[1]);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(
 		0,
@@ -58,7 +58,7 @@ int Plane::create() {
 		GL_FALSE,
 		0, NULL);
 
-	glBindBuffer(GL_ARRAY_BUFFER, normalVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, buffers[2]);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(
 		1,
@@ -66,7 +66,7 @@ int Plane::create() {
 		GL_FALSE,
 		0, NULL);
 
-	glBindBuffer(GL_ARRAY_BUFFER, uvVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, buffers[3]);
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(
 		2,
@@ -79,7 +79,7 @@ int Plane::create() {
 
 void Plane::draw() {
 	glBindVertexArray(VAO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[0]);
 
 	glDrawElements(GL_TRIANGLE_STRIP, nIdx, GL_UNSIGNED_SHORT, NULL);
 }

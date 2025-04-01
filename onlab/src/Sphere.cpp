@@ -33,28 +33,28 @@ int Sphere::create() {
         float pitchAngle = i * ((float)M_PI / nStrips);
 
         rot = glm::rotate(rot, pitchAngle, glm::vec3(0.0, 0.0, 1.0));
-        vtxProbe *= rot;
+        vtxProbe = glm::vec3(glm::vec4(vtxProbe, 1) * rot);
         for (unsigned int j = 0; j < nVtxPerRing; j++) {
             vertices.push_back(vtxProbe);
             rot = glm::rotate(rot, rotAngle, glm::vec3(0.0, 1.0, 0.0));
-            vtxProbe *= rot;
+            vtxProbe = glm::vec3(glm::vec4(vtxProbe, 1) * rot);
         }
     }
 
     vtxProbe = glm::vec3(0.0, 0.0, -1.0);
     vertices.push_back(vtxProbe);
 
-    glBindBuffer(GL_ARRAY_BUFFER, vtxVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, buffers[1]);
     glBufferData(GL_ARRAY_BUFFER, nStrips * nVtxPerRing * sizeof(glm::vec3), vertices.data(), GL_STATIC_DRAW);
 
     /*NORMALS*/
     // le magic of the unit sphere
-    glBindBuffer(GL_ARRAY_BUFFER, normalVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, buffers[2]);
     glBufferData(GL_ARRAY_BUFFER, nStrips * nVtxPerRing * sizeof(glm::vec3), vertices.data(), GL_STATIC_DRAW);
 
     /*UVs*/
     //unused
-    glBindBuffer(GL_ARRAY_BUFFER, uvVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, buffers[3]);
     glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
 
     /*INDICES*/
@@ -95,27 +95,27 @@ int Sphere::create() {
 
     nIdx = indices.size();
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[0]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 
     /*LAYOUT*/
     glBindVertexArray(VAO);
 
-    glBindBuffer(GL_ARRAY_BUFFER, vtxVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, buffers[1]);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(
         0,
         3, GL_FLOAT,
         GL_FALSE,
         0, NULL);
-    glBindBuffer(GL_ARRAY_BUFFER, normalVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, buffers[2]);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(
         1,
         3, GL_FLOAT,
         GL_FALSE,
         0, NULL);
-    glBindBuffer(GL_ARRAY_BUFFER, uvVBO);  //unused
+    glBindBuffer(GL_ARRAY_BUFFER, buffers[3]);  //unused
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(
         2,
@@ -128,7 +128,7 @@ int Sphere::create() {
 
 void Sphere::draw() {
     glBindVertexArray(VAO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[0]);
 
     glDrawElements(GL_TRIANGLES, nIdx, GL_UNSIGNED_INT, NULL);
 }

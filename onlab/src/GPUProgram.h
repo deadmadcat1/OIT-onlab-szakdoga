@@ -2,6 +2,7 @@
 #include <glm/glm.hpp>
 #include "Shader.h"
 #include "Texture.h"
+#include <vector>
 
 class GPUProgram {
 	unsigned int progID;

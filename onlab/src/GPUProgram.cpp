@@ -3,7 +3,6 @@
 #include <vector>
 #include <glm/glm.hpp>
 #include "GPUProgram.h"
-#include "Shader.h"
 
 using namespace std;
 using namespace glm;

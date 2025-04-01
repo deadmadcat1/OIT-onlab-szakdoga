@@ -10,12 +10,12 @@ unsigned int Framebuffer::getID() const{
 }
 
 unsigned int Framebuffer::create(
-	unsigned int targetCount = 1,
-	unsigned int width = 512,
-	unsigned int height = 512,
-	unsigned int format = GL_RGBA,
-	unsigned int sourceFormat = GL_RGBA,
-	unsigned int sourceType = GL_UNSIGNED_BYTE)
+	unsigned int targetCount,
+	unsigned int width,
+	unsigned int height,
+	unsigned int format,
+	unsigned int sourceFormat,
+	unsigned int sourceType)
 {
 	
 	if (framebufferID > -1) {
@@ -70,9 +70,13 @@ unsigned int Framebuffer::create(
 
 }
 
-void Framebuffer::bind(const GLFWwindow* window) {
+void Framebuffer::bind() {
 	glBindFramebuffer(GL_FRAMEBUFFER, framebufferID);
-	glViewport(0, 0, _w, _h);
+	glBindRenderbuffer(GL_RENDERBUFFER, depthbufferID);
+	GLint viewportDimensions[4];
+	glGetIntegerv(GL_VIEWPORT, viewportDimensions);
+	_w = viewportDimensions[2];
+	_h = viewportDimensions[3];
 }
 
 Framebuffer::~Framebuffer(){

@@ -21,6 +21,6 @@ public:
 		unsigned int sourceFormat = GL_RGBA,
 		unsigned int sourceType = GL_UNSIGNED_BYTE);
 
-	void bind(const GLFWwindow* window);
+	void bind();
 	~Framebuffer();
 };

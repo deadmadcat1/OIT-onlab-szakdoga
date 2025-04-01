@@ -1,9 +1,10 @@
 #include <GL/glew.h>
+#include "Scene.h"
 
-class Scene {
-public:
-	void render() {
+bool Scene::set() {
+	return true;
+}
 
-	}
-private:
-};
+void Scene::render() {}
+
+void Scene::animate(double dt) {}
