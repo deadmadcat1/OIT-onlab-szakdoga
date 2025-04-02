@@ -14,7 +14,7 @@ static void resize_callback(GLFWwindow* window, int width, int height) {
 }
 
 static void error_callback(int error, const char* desc) {
-	fprintf(stderr, "Error: %s\n", desc);
+	fprintf(stderr, "GLFW Error: %s\n", desc);
 }
 
 static void key_callback(GLFWwindow* window, int key,

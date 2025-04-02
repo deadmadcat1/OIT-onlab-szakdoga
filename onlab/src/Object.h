@@ -14,8 +14,12 @@ class Object {
 	glm::vec3 scale;
 public:
 	Object(Material* _material, Geometry* _geometry);
+
 	void addMaterial(Material* material);
+
 	const glm::mat4 modelMatrix() const;
+
 	const glm::mat4 modelMatrixInverse() const;
+
 	void draw() const;
 };

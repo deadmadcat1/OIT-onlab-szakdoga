@@ -1,4 +1,5 @@
 #include "Camera.h"
+#include "GPUProgram.h"
 #include <glm/ext.hpp>
 
 void Camera::update() {
@@ -15,4 +16,9 @@ void Camera::update() {
 		0, 1 / tan(fov * 0.5), 0, 0,
 		0, 0, -(fp + bp) / (bp - fp), -2 * fp * bp / (bp - fp),
 		0, 0, -1, 0);
+}
+
+void Camera::bindUniforms(GPUProgram* program) {
+	program->activate();
+	program->setUniform(&pos, "wCamPos");
 }

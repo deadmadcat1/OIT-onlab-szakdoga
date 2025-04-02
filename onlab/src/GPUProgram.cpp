@@ -7,22 +7,16 @@
 using namespace std;
 using namespace glm;
 
-void GPUProgram::getErrorInfo(unsigned int handle) {
+void GPUProgram::getErrorInfo(unsigned int program) {
 	int logLen, written;
-	glGetShaderiv(handle, GL_INFO_LOG_LENGTH, &logLen);
+	glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLen);
 	if (logLen > 0) {
-		char* log = new char[logLen+1];
+		char* log = new char[logLen + 1];
 		log[logLen] = '\0';
-		glGetShaderInfoLog(handle, logLen, &written, &log[0]);
+		glGetProgramInfoLog(program, logLen, &written, &log[0]);
 		printf("Shader log:\n%s", log);
 		delete[] log;
 	}
-}
-
-void GPUProgram::checkShader(unsigned int shader, const char* const message) {
-	int OK;
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &OK);
-	if (!OK) { printf("%s!\n", message); getErrorInfo(shader); getchar(); }
 }
 
 void GPUProgram::checkLinking(unsigned int program) {
@@ -49,7 +43,6 @@ void GPUProgram::create(const char* const fragOut) {
 	}
 
 	for (Shader* s : shaders) {
-		checkShader(s->getID(), "Shader compilation error");
 		glAttachShader(progID, s->getID());
 	}
 

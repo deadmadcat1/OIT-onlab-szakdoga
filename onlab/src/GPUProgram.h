@@ -8,12 +8,13 @@ class GPUProgram {
 	unsigned int progID;
 	std::vector<Shader*> shaders;
 	void getErrorInfo(unsigned int handle);
-	void checkShader(unsigned int shader, const char* const message);
 	void checkLinking(unsigned int program);
 	int getLocation(const char* const name);
 public:
 	void addShader(Shader* shader);
+
 	void create(const char* const fragOut);
+
 	void activate();
 
 	void setUniform(int i, const char* const name);

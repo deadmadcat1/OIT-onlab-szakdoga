@@ -8,4 +8,6 @@ public:
 	float fov, asp, fp, bp;
 
 	void update();
+
+	void bindUniforms(GPUProgram* program);
 };

@@ -5,7 +5,8 @@ class Shader {
 	unsigned int shaderID = -1;
 	GLenum type;
 public:
-	Shader(GLenum shaderType);
+	explicit Shader(GLenum shaderType);
 	unsigned int getID();
-	unsigned int create(const char* const path);
+	void getErrorInfo(unsigned int handle);
+	bool create(const char* const path);
 };

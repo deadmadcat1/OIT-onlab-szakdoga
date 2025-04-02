@@ -11,6 +11,7 @@ public:
 	Material(GPUProgram* _gpuprogram) : gpuProgram(_gpuprogram) {}
 
 	void bindUniforms() {
+		gpuProgram->activate();
 		gpuProgram->setUniform(&kd, "Material.kd");
 		gpuProgram->setUniform(&ka, "Material.ka");
 		gpuProgram->setUniform(&ks, "Material.ks");

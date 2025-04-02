@@ -16,19 +16,31 @@ unsigned int Shader::getID() {
 	return (shaderID > -1) ? shaderID : NULL;
 }
 
-unsigned int Shader::create(const char* const path) {
+void Shader::getErrorInfo(unsigned int handle) {
+	int logLen, written;
+	glGetShaderiv(handle, GL_INFO_LOG_LENGTH, &logLen);
+	if (logLen > 0) {
+		char* log = new char[logLen + 1];
+		log[logLen] = '\0';
+		glGetShaderInfoLog(handle, logLen, &written, &log[0]);
+		printf("Shader log:\n%s", log);
+		delete[] log;
+	}
+}
+
+bool Shader::create(const char* const path) {
 	shaderID = glCreateShader(type);
 	if (!shaderID) {
 		fprintf(stderr, "Shader creation failed: %s\n", path);
 		glDeleteShader(shaderID);
-		return NULL;
+		return false;
 	}
 	ifstream sourcefile(path);
 	if (!sourcefile.is_open()) {
 		fprintf(stderr, "Cannot open file: %s\n", path);
 		glDeleteShader(shaderID);
 		sourcefile.close();
-		return NULL;
+		return false;
 	}
 	sourcefile.seekg(ios::end);
 	streamsize size = sourcefile.tellg();
@@ -40,11 +52,16 @@ unsigned int Shader::create(const char* const path) {
 		glDeleteShader(shaderID);
 		sourcefile.close();
 		delete[] source;
-		return -1;
+		return false;
 	}
 	source[size] = '\0';
 
 	glShaderSource(shaderID, 1, (const GLchar**)&source, NULL);
 	glCompileShader(shaderID);
-	return shaderID;
+
+	int OK;
+	glGetShaderiv(shaderID, GL_COMPILE_STATUS, &OK);
+	if (!OK) { printf("%s!\n", "Shader compilation error"); getErrorInfo(shaderID); getchar(); }
+	
+	return true;
 }

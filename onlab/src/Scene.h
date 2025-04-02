@@ -9,8 +9,11 @@
 class Scene {
 	Camera camera;
 	std::vector<Light*> lights;
+	std::vector<Object*> objects;
 public:
 	bool set();
+
 	void render();
+
 	void animate(double dt);
 };
