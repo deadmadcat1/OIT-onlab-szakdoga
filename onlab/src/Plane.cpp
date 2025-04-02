@@ -1,9 +1,9 @@
 #include "Geometry.h"
 #include "glm/glm.hpp"
 
-int Plane::create() {
+bool Plane::create() {
 	if (!Geometry::create()) {
-		return NULL;
+		return false;
 	}
 
 	/*VERTICES*/
@@ -75,6 +75,7 @@ int Plane::create() {
 		0, NULL);
 
 	glBindVertexArray(NULL);
+	return true;
 }
 
 void Plane::draw() {

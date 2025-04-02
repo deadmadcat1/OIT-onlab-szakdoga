@@ -5,10 +5,6 @@ unsigned int Framebuffer::getID() {
 	return (framebufferID> -1) ? framebufferID: NULL;
 }
 
-unsigned int Framebuffer::getID() const{
-	return (framebufferID> -1) ? framebufferID : NULL;
-}
-
 unsigned int Framebuffer::create(
 	unsigned int targetCount,
 	unsigned int width,
@@ -42,8 +38,8 @@ unsigned int Framebuffer::create(
 
 	for (size_t i = 0; i < targetCount; i++)
 	{
-		Texture* target = new Texture();
-		target->create(width, height, format, sourceFormat, sourceType, TextureParams(GL_LINEAR));
+		std::unique_ptr<Texture> target = std::make_unique<Texture>();
+		target.get()->create(width, height, format, sourceFormat, sourceType, TextureParams(GL_LINEAR));
 		targets.push_back(target);
 	}
 

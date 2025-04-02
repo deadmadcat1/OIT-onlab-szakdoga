@@ -24,21 +24,29 @@ bool Scene::set() {
 	if (!success) return false;
 
 	std::unique_ptr<GPUProgram> simpleProgram = std::make_unique<GPUProgram>();
-	simpleProgram.get()->create("fragColor");
-	simpleProgram.get()->addShader(vertexShader.get());
-	simpleProgram.get()->addShader(phongShader.get());
+	success = simpleProgram.get()->create("fragColor");
+
+	if (!success) return false;
+
+	simpleProgram.get()->addShader(vertexShader);
+	simpleProgram.get()->addShader(phongShader);
 
 	std::unique_ptr<Material> simpleMaterial = std::make_unique<Material>(simpleProgram);
 	simpleMaterial.get()->ka = glm::vec3(0.1f, 0.1f, 0.1f);
 	simpleMaterial.get()->kd = glm::vec3(0.2f, 0.2f, 0.2f);
 	simpleMaterial.get()->ks = glm::vec3(0.3f, 0.3f, 0.3f);
 	simpleMaterial.get()->shine = 0.9f;
-	simpleMaterial.get()->bindUniforms();
+
+	std::unique_ptr<Plane> plane = std::make_unique<Plane>();
+	success = plane.get()->create();
+
+	std::unique_ptr<Object> fullscreenQuad = std::make_unique<Object>(simpleMaterial, plane);
+	fullscreenQuad.get().
 
 
 	return true;
 }
 
-void Scene::render() {}
+void Scene::render(){}
 
 void Scene::animate(double dt) {}

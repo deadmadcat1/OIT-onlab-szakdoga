@@ -5,11 +5,12 @@
 #include "Geometry.h"
 #include "Object.h"
 #include <vector>
+#include <memory>
 
 class Scene {
-	Camera camera;
-	std::vector<Light*> lights;
-	std::vector<Object*> objects;
+	std::unique_ptr<Camera> camera;
+	std::vector<std::unique_ptr<Light>> lights;
+	std::vector<std::unique_ptr<Object>> objects;
 public:
 	bool set();
 

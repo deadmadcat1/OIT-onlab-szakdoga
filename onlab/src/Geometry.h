@@ -6,11 +6,11 @@
 class Geometry {
 public:
 	Geometry();
-	std::vector<unsigned int> buffers;//EBO, vtx, normal, uv
+	std::vector<unsigned int> buffers;	//EBO, vtx, normal, uv
 	unsigned int VAO = -1;
 	
 	virtual void draw() = 0;
-	virtual int create();
+	virtual bool create();
 	virtual ~Geometry();
 };
 
@@ -20,13 +20,13 @@ class Sphere : protected Geometry {
 	unsigned int nIdx = 0;
 public:
 	Sphere(unsigned int _nStrips, unsigned int _nVtxPerRing);
-	int create() override;
+	bool create() override;
 	void draw() override;
 };
 
 class Plane : protected Geometry {
 	unsigned int nIdx = 0;
 public:
-	int create() override;
+	bool create() override;
 	void draw() override;
 };

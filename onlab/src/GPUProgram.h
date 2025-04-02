@@ -3,17 +3,18 @@
 #include "Shader.h"
 #include "Texture.h"
 #include <vector>
+#include <memory>
 
 class GPUProgram {
 	unsigned int progID;
-	std::vector<Shader*> shaders;
+	std::vector<std::unique_ptr<Shader>> shaders;
 	void getErrorInfo(unsigned int handle);
-	void checkLinking(unsigned int program);
+	bool checkLinking(unsigned int program);
 	int getLocation(const char* const name);
 public:
-	void addShader(Shader* shader);
+	void addShader(std::unique_ptr<Shader>& shader);
 
-	void create(const char* const fragOut);
+	bool create(const char* const fragOut);
 
 	void activate();
 

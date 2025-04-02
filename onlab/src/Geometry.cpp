@@ -5,11 +5,11 @@ Geometry::Geometry() {
 	buffers.reserve(4);
 }
 
-int Geometry::create() {
+bool Geometry::create() {
 	glGenVertexArrays(1, &VAO);
 	if (!VAO) {
 		fprintf(stderr, "VertexArrayObject creation failed!!!\n");
-		return NULL;
+		return false;
 	}
 	glBindVertexArray(VAO);
 	glGenBuffers(4, buffers.data());
@@ -20,9 +20,10 @@ int Geometry::create() {
 			glDeleteBuffers(4, buffers.data());
 			glBindVertexArray(NULL);
 			glDeleteVertexArrays(1, &VAO);
-			return NULL;
+			return false;
 		}
 	}
+	return true;
 }
 
 Geometry::~Geometry() {

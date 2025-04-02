@@ -14,9 +14,9 @@ Sphere::Sphere(unsigned int _nStrips, unsigned int _nVtxPerRing) {
     }
 }
 
-int Sphere::create() {
+bool Sphere::create() {
     if (!Geometry::create()) {
-        return NULL;
+        return false;
     }
 
     /*VERTICES*/
@@ -124,6 +124,7 @@ int Sphere::create() {
         0, NULL);
 
     glBindVertexArray(NULL);
+    return true;
 }
 
 void Sphere::draw() {

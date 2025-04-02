@@ -19,10 +19,11 @@ void GPUProgram::getErrorInfo(unsigned int program) {
 	}
 }
 
-void GPUProgram::checkLinking(unsigned int program) {
+bool GPUProgram::checkLinking(unsigned int program) {
 	int OK;
 	glGetProgramiv(program, GL_LINK_STATUS, &OK);
 	if (!OK) { printf("Failed to link shader program!\n"); getErrorInfo(program); getchar(); }
+	return OK;
 }
 
 int GPUProgram::getLocation(const char* const name) {
@@ -31,26 +32,27 @@ int GPUProgram::getLocation(const char* const name) {
 	return location;
 }
 
-void GPUProgram::addShader(Shader* shader) {
+void GPUProgram::addShader(std::unique_ptr<Shader>& shader) {
 	shaders.push_back(shader);
 }
 
-void GPUProgram::create(const char* const fragOut) {
+bool GPUProgram::create(const char* const fragOut) {
 	progID = glCreateProgram();
 	if (!progID) {
 		fprintf(stderr, "Error in shader program creation\n");
-		return;
+		return false;
 	}
 
-	for (Shader* s : shaders) {
+	for (const std::unique_ptr<Shader>& s : shaders) {
 		glAttachShader(progID, s->getID());
 	}
 
 	glBindFragDataLocation(progID, 0, fragOut);
 
 	glLinkProgram(progID);
-	checkLinking(progID);
+	if (!checkLinking(progID)) return false;
 	activate();
+	return true;
 }
 
 void GPUProgram::activate() {
