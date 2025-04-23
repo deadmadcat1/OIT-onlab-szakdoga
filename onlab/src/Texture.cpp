@@ -71,6 +71,7 @@ unsigned int Texture::create(
 	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, sourceFormat, sourceType, NULL);
 
 	glBindTexture(GL_TEXTURE_2D, 0);
+	return textureID;
 }
 
 Texture::~Texture() {

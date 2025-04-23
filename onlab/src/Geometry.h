@@ -14,7 +14,7 @@ public:
 	virtual ~Geometry();
 };
 
-class Sphere : protected Geometry {
+class Sphere : public Geometry {
 	unsigned int nStrips = 16; //2^n strips need 2^n-1 rings of vtx
 	unsigned int nVtxPerRing = 32;
 	unsigned int nIdx = 0;
@@ -24,7 +24,7 @@ public:
 	void draw() override;
 };
 
-class Plane : protected Geometry {
+class Plane : public Geometry {
 	unsigned int nIdx = 0;
 public:
 	bool create() override;

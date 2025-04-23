@@ -32,7 +32,7 @@ int GPUProgram::getLocation(const char* const name) {
 	return location;
 }
 
-void GPUProgram::addShader(std::unique_ptr<Shader>& shader) {
+void GPUProgram::addShader(std::shared_ptr<Shader> shader) {
 	shaders.push_back(shader);
 }
 
@@ -43,7 +43,7 @@ bool GPUProgram::create(const char* const fragOut) {
 		return false;
 	}
 
-	for (const std::unique_ptr<Shader>& s : shaders) {
+	for (std::shared_ptr<Shader> s: shaders) {
 		glAttachShader(progID, s->getID());
 	}
 

@@ -1,5 +1,6 @@
 #pragma once
 #include <glm/glm.hpp>
+#include "GPUProgram.h"
 
 class Camera {
 public:

@@ -1,5 +1,4 @@
 #include "Camera.h"
-#include "GPUProgram.h"
 #include <glm/ext.hpp>
 
 void Camera::update() {

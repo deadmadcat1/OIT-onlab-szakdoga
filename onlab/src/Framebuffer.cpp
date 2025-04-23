@@ -38,9 +38,9 @@ unsigned int Framebuffer::create(
 
 	for (size_t i = 0; i < targetCount; i++)
 	{
-		std::unique_ptr<Texture> target = std::make_unique<Texture>();
+		auto target = std::make_unique<Texture>();
 		target.get()->create(width, height, format, sourceFormat, sourceType, TextureParams(GL_LINEAR));
-		targets.push_back(target);
+		targets.push_back(std::move(target));
 	}
 
 	glBindFramebuffer(GL_FRAMEBUFFER, framebufferID);

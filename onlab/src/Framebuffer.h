@@ -8,7 +8,7 @@
 class Framebuffer{
 	unsigned int framebufferID = -1;
 	unsigned int depthbufferID = -1;
-	std::vector<std::unique_ptr<Texture>> targets;
+	std::vector<std::shared_ptr<Texture>> targets;
 	unsigned int _w = 512;
 	unsigned int _h = 512;
 	unsigned int _format = GL_RGBA;

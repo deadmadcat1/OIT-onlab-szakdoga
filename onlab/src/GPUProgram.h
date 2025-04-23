@@ -7,12 +7,12 @@
 
 class GPUProgram {
 	unsigned int progID;
-	std::vector<std::unique_ptr<Shader>> shaders;
+	std::vector<std::shared_ptr<Shader>> shaders;
 	void getErrorInfo(unsigned int handle);
 	bool checkLinking(unsigned int program);
 	int getLocation(const char* const name);
 public:
-	void addShader(std::unique_ptr<Shader>& shader);
+	void addShader(std::shared_ptr<Shader> shader);
 
 	bool create(const char* const fragOut);
 
