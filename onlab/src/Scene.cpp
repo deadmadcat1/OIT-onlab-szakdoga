@@ -1,40 +1,49 @@
+#include "Scene.h"
+#include "GPUProgram.h"
+#include "Geometry.h"
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #define	_USE_MATH_DEFINES
 #include <math.h>
-#include "Scene.h"
+#include <random>
 
-template <typename T> void appendVector(std::vector<T> target, std::vector<T> donor) {
+template <typename T> void appendVector(std::vector<T>& target, const std::vector<T>& donor) {
 	target.insert(target.end(), donor.begin(), donor.end());
 }
 
 bool Scene::set() {
-	struct boolToggle{
-		bool value;
-		boolToggle(bool init) : value(init) {}
+	struct successToggle{
+		bool value, changed;
+		successToggle(bool init) { value = init; changed = false; }
 		void operator=(bool right) {
-			value = (!value) ? right : value;
+			if (changed) return;
+			if (value != right) {
+				value = right;
+				changed = true;
+			}
 		}
-		bool operator!() {
-			return !value;
+		explicit operator bool() const{
+			return value;
 		}
 	};
 
-	boolToggle success = true;
+	std::random_device seed;
+	std::mt19937 gen(seed());
+
+	successToggle success = true;
 	auto vertexShader = std::make_shared<Shader>(GL_VERTEX_SHADER);
 	auto phongShader = std::make_shared<Shader>(GL_FRAGMENT_SHADER);
-	success = vertexShader.get()->create("/shaders/barebones_vs.glsl");
-	success = phongShader.get()->create("/shaders/phong_fs.glsl");
+	success = vertexShader.get()->create("./shaders/barebones_vs.glsl");
+	success = phongShader.get()->create("./shaders/phong_fs.glsl");
 
 	if (!success) return false;
 
 	auto simpleProgram = std::make_shared<GPUProgram>();
+	simpleProgram.get()->addShader(vertexShader);
+	simpleProgram.get()->addShader(phongShader);
 	success = simpleProgram.get()->create("fragColor");
 
 	if (!success) return false;
-
-	simpleProgram.get()->addShader(vertexShader);
-	simpleProgram.get()->addShader(phongShader);
 
 	auto simpleMaterial = std::make_shared<Material>(simpleProgram);
 	simpleMaterial.get()->ka = glm::vec3(0.1f, 0.1f, 0.1f);
@@ -43,31 +52,47 @@ bool Scene::set() {
 	simpleMaterial.get()->shine = 0.9f;
 
 	auto plane = std::make_shared<Plane>();
+	auto sphere = std::make_shared<Sphere>(32, 32);
 	success = plane.get()->create();
+	success = sphere.get()->create();
 
 	if (!success) return false;
 
-	std::vector<std::shared_ptr<Object>> sceneBox;
+	std::vector<std::shared_ptr<Object>> box;
 	for (int i = 0; i < 6; i++)
 	{
 		auto wall = std::make_unique<Object>(simpleMaterial, plane);
 		wall.get()->scale(glm::vec3(10, 10, 1));
-		sceneBox.push_back(std::move(wall));
+		box.push_back(std::move(wall));
 	}
-	sceneBox[0]->rotate(glm::vec3(M_PI_2, 0, 0));
-	sceneBox[1]->rotate(glm::vec3(-M_PI_2, 0, 0));
-	sceneBox[2]->rotate(glm::vec3(0, M_PI_2, 0));
-	sceneBox[3]->rotate(glm::vec3(0, -M_PI_2, 0));
-	sceneBox[5]->rotate(glm::vec3(0, M_PI, 0));
+	box[0]->rotate(glm::vec3(M_PI_2, 0, 0));
+	box[1]->rotate(glm::vec3(-M_PI_2, 0, 0));
+	box[2]->rotate(glm::vec3(0, M_PI_2, 0));
+	box[3]->rotate(glm::vec3(0, -M_PI_2, 0));
+	box[5]->rotate(glm::vec3(0, M_PI, 0));
 
-	sceneBox[0]->translate(glm::vec3(0, 10, 0));
-	sceneBox[1]->translate(glm::vec3(0, -10, 0));
-	sceneBox[2]->translate(glm::vec3(10, 0, 0));
-	sceneBox[3]->translate(glm::vec3(-10, 0, 0));
-	sceneBox[4]->translate(glm::vec3(0, 0, -10));
-	sceneBox[5]->translate(glm::vec3(0, 0, 10));
+	box[0]->translate(glm::vec3(0, 10, 0));
+	box[1]->translate(glm::vec3(0, -10, 0));
+	box[2]->translate(glm::vec3(10, 0, 0));
+	box[3]->translate(glm::vec3(-10, 0, 0));
+	box[4]->translate(glm::vec3(0, 0, -10));
+	box[5]->translate(glm::vec3(0, 0, 10));
 
-	appendVector(objects, sceneBox);
+	appendVector(opaqueObjects, box);
+
+	std::vector<std::shared_ptr<Object>> subject;
+
+	std::uniform_int_distribution<int> size_rand(1, 5);
+	std::uniform_real_distribution<float> pos_rand(-10.0f, 10.0f);
+	for (int i = 0; i < 20; i++)
+	{
+		auto ball = std::make_unique<Object>(simpleMaterial, sphere);
+		ball.get()->scale(glm::vec3(size_rand(gen), size_rand(gen), size_rand(gen)));
+		ball.get()->translate(glm::vec3(pos_rand(gen), pos_rand(gen), pos_rand(gen)));
+		subject.push_back(std::move(ball));
+	}
+
+	appendVector(transparentObjects, subject);
 
 	return true;
 }

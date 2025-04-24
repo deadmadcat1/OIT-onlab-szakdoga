@@ -1,11 +1,10 @@
 #pragma once
-#include <vector>
-#include <memory>
-#include "GPUProgram.h"
-#include "Geometry.h"
-#include "Material.h"
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
+#include <vector>
+#include <memory>
+#include "Geometry.h"
+#include "Material.h"
 
 class Object {
 	std::vector<std::shared_ptr<Material>> materials;

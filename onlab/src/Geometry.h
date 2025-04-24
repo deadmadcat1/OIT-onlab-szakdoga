@@ -1,13 +1,12 @@
 #pragma once
-#include <stdio.h>
-#include <vector>
+#include <array>
 #include <GL/glew.h>
 
 class Geometry {
 public:
 	Geometry();
-	std::vector<unsigned int> buffers;	//EBO, vtx, normal, uv
-	unsigned int VAO = -1;
+	std::array<unsigned int, 4> buffers;	//EBO, vtx, normal, uv
+	unsigned int VAO = 0;
 	
 	virtual void draw() = 0;
 	virtual bool create();
@@ -27,6 +26,7 @@ public:
 class Plane : public Geometry {
 	unsigned int nIdx = 0;
 public:
+	Plane();
 	bool create() override;
 	void draw() override;
 };

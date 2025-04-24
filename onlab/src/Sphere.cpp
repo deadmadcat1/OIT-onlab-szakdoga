@@ -5,7 +5,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-Sphere::Sphere(unsigned int _nStrips, unsigned int _nVtxPerRing) {
+Sphere::Sphere(unsigned int _nStrips = 16, unsigned int _nVtxPerRing = 16) : Geometry(){
     if (_nStrips > 0) {
         nStrips = _nStrips;
     }

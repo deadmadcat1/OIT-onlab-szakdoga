@@ -1,8 +1,8 @@
 #include "Framebuffer.h"
-#include <stdio.h>
+#include <iostream>
 
 unsigned int Framebuffer::getID() {
-	return (framebufferID> -1) ? framebufferID: NULL;
+	return framebufferID;
 }
 
 unsigned int Framebuffer::create(
@@ -15,21 +15,21 @@ unsigned int Framebuffer::create(
 {
 	
 	if (framebufferID > -1) {
-		fprintf(stderr, "Framebuffer %d already exists, make a new one!\n", framebufferID);
+		std::cerr << "Framebuffer " << framebufferID << " already exists, make a new one!" << std::endl;
 		return NULL;
 	}
 	glGenFramebuffers(1, &framebufferID);
 	if (!framebufferID) {
-		fprintf(stderr, "Framebuffer creation failed!\n");
+		std::cerr << "Framebuffer creation failed!" << std::endl;
 		glDeleteFramebuffers(1, &framebufferID);
-		return framebufferID;
+		return NULL;
 	}
 	glGenRenderbuffers(1, &depthbufferID);
 	if (!depthbufferID) {
-		fprintf(stderr, "Depth buffer creation failed!\n");
+		std::cerr << "Depth buffer creation failed!" << std::endl;
 		glDeleteRenderbuffers(1, &depthbufferID);
 		glDeleteFramebuffers(1, &framebufferID);
-		return framebufferID;
+		return NULL;
 	}
 	
 	_w = width;
@@ -64,6 +64,7 @@ unsigned int Framebuffer::create(
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+	return framebufferID;
 }
 
 void Framebuffer::bind() {

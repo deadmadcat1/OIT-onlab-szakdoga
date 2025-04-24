@@ -6,8 +6,8 @@
 #include "Texture.h"
 
 class Framebuffer{
-	unsigned int framebufferID = -1;
-	unsigned int depthbufferID = -1;
+	unsigned int framebufferID = 0;
+	unsigned int depthbufferID = 0;
 	std::vector<std::shared_ptr<Texture>> targets;
 	unsigned int _w = 512;
 	unsigned int _h = 512;

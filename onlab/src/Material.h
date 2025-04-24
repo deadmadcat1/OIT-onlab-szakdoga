@@ -5,10 +5,12 @@
 class Material {
 public:
 	std::shared_ptr<GPUProgram> gpuProgram;
-	glm::vec3 kd, ka, ks;
-	float shine;
+	glm::vec3 kd = glm::vec3(1);
+	glm::vec3 ka = glm::vec3(1);
+	glm::vec3 ks = glm::vec3(1);
+	float shine = 1.0f;
 
-	Material(std::shared_ptr<GPUProgram> _gpuprogram) : gpuProgram(_gpuprogram), kd(1, 1, 1), ks(1, 1, 1), ka(1, 1, 1), shine(1.0f) {}
+	explicit Material(std::shared_ptr<GPUProgram> _gpuprogram) : gpuProgram(_gpuprogram) {}
 
 	void bindUniforms() {
 		gpuProgram->activate();

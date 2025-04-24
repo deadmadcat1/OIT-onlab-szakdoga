@@ -1,5 +1,6 @@
 #pragma once
 #include <GL/glew.h>
+#include <string>
 
 using TextureParams = struct TextureParams{
 	GLenum min_filter;
@@ -20,11 +21,11 @@ using TextureParams = struct TextureParams{
 };
 
 class Texture {
-	unsigned int textureID = -1;
+	unsigned int textureID = 0;
 public:
 	unsigned int getID();
 	unsigned int getID() const;
-	unsigned int create(const char* const path, const TextureParams opt);
+	unsigned int create(const std::string& path, const TextureParams opt);
 	unsigned int create(
 		unsigned int width,
 		unsigned int height,

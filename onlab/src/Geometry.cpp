@@ -1,14 +1,15 @@
 #include "Geometry.h"
+#include <iostream>
 
 Geometry::Geometry() {
-	VAO = -1;
-	buffers.reserve(4);
+	VAO = 0;
+	buffers.fill(0);
 }
 
 bool Geometry::create() {
 	glGenVertexArrays(1, &VAO);
 	if (!VAO) {
-		fprintf(stderr, "VertexArrayObject creation failed!!!\n");
+		std::cerr << "VertexArrayObject creation failed!!!" << std::endl;
 		return false;
 	}
 	glBindVertexArray(VAO);
@@ -16,7 +17,7 @@ bool Geometry::create() {
 	for (int i = 0; i < 4; i++)
 	{
 		if (!buffers[i]) {
-			fprintf(stderr, "Buffer %d creation failed!!!\n", i);
+			std::cerr << "Buffer "<< i << " creation failed!!!" << std::endl;
 			glDeleteBuffers(4, buffers.data());
 			glBindVertexArray(NULL);
 			glDeleteVertexArrays(1, &VAO);

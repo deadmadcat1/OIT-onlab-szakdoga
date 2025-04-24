@@ -1,22 +1,23 @@
 #include "Texture.h"
 #include <stdio.h>
 #include <GL/glew.h>
+#include <iostream>
 #include "stb_image.h"
 
 unsigned int Texture::getID() {
-	return (textureID > -1) ? textureID : NULL;
+	return textureID;
 }
 unsigned int Texture::getID() const {
-	return (textureID > -1) ? textureID : NULL;
+	return textureID;
 }
-unsigned int Texture::create(const char* const path, const TextureParams opt) {
+unsigned int Texture::create(const std::string& path, const TextureParams opt) {
 	if (textureID > -1) {
-		fprintf(stderr, "Texture %d already exists, make a new one!\n", textureID);
+		std::cerr << "Texture " << textureID << " already exists, make a new one!" << std::endl;
 		return NULL;
 	}
 	glGenTextures(1, &textureID);
 	if (!textureID) {
-		fprintf(stderr, "Texture creation failed: %s\n", path);
+		std::cerr << "Texture creation failed: " << path << std::endl;
 		glDeleteTextures(1, &textureID);
 		return textureID;
 	}
@@ -27,14 +28,14 @@ unsigned int Texture::create(const char* const path, const TextureParams opt) {
 
 	int width, height, channels;
 	stbi_set_flip_vertically_on_load(true);
-	unsigned char* data = stbi_load(path, &width, &height, &channels, 0);
+	unsigned char* data = stbi_load(path.c_str(), &width, &height, &channels, 0);
 	if (data) {
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height,
 					 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else {
-		fprintf(stderr, "Unable to read image data: %s\n", path);
+		std::cerr << "Unable to read image data: " << path << std::endl;
 		glDeleteTextures(1, &textureID);
 	}
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -52,12 +53,12 @@ unsigned int Texture::create(
 	const TextureParams opt)
 {
 	if (textureID > -1) {
-		fprintf(stderr, "Texture %d already exists, make a new one!\n", textureID);
+		std::cerr << "Texture " << textureID << " already exists, make a new one!" << std::endl;
 		return NULL;
 	}
 	glGenTextures(1, &textureID);
 	if (!textureID) {
-		fprintf(stderr, "Render Target Texture creation failed!\n");
+		std::cerr << "Render Target Texture creation failed!" << std::endl;
 		glDeleteTextures(1, &textureID);
 		return textureID;
 	}

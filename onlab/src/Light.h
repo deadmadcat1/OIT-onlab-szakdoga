@@ -4,9 +4,9 @@
 
 class Light {
 public:
-	glm::vec4 position;
-	glm::vec3 ambientLuminosity;
-	glm::vec3 emissiveLuminosity;
+	glm::vec4 position = glm::vec4(0,0,0,1);
+	glm::vec3 ambientLuminosity = glm::vec3(0.5);
+	glm::vec3 emissiveLuminosity = glm::vec3(0);
 	int idx;
 
 	explicit Light(int lightIdx) : idx(lightIdx) {}
@@ -14,8 +14,8 @@ public:
 	void bindUniforms(GPUProgram* program) {
 		std::string baseHandle("lights[" + std::to_string(idx) + "]");
 		program->activate();
-		program->setUniform(&position, (baseHandle + ".pos").c_str());
-		program->setUniform(&ambientLuminosity, (baseHandle + ".L_a").c_str());
-		program->setUniform(&emissiveLuminosity, (baseHandle + ".L_e").c_str());
+		program->setUniform(&position, baseHandle + ".pos");
+		program->setUniform(&ambientLuminosity, baseHandle + ".L_a");
+		program->setUniform(&emissiveLuminosity, baseHandle + ".L_e");
 	}
 };

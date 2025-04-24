@@ -1,5 +1,8 @@
 #include "Geometry.h"
-#include "glm/glm.hpp"
+#include <glm/glm.hpp>
+#include <vector>
+
+Plane::Plane() : Geometry() {}
 
 bool Plane::create() {
 	if (!Geometry::create()) {

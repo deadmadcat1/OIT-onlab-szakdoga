@@ -23,10 +23,10 @@ int main(void)
 
     glfwMakeContextCurrent(window);
 
-    //glewExperimental = true;
     glewInit();
 
-    fprintf(stdout, "OpenGL version: %s\n", (const char*)glGetString(GL_VERSION));
+    std::cout << "OpenGL version: "<< (const char*)glGetString(GL_VERSION) << std::endl;
+    std::cout << "GLSL version: " << (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
 
     glfwSetKeyCallback(window, key_callback);
     glfwSetCursorPosCallback(window, mouseMove_callback);
