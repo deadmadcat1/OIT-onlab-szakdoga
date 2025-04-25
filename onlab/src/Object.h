@@ -28,5 +28,5 @@ public:
 
 	void scale(glm::vec3 amountPerAxis);
 
-	void draw() const;
+	void draw(std::shared_ptr<GPUProgram> program) const;
 };

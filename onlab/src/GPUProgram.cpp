@@ -35,7 +35,7 @@ bool GPUProgram::checkLinking() {
 
 int GPUProgram::getLocation(const std::string& name) {
 	int location = glGetUniformLocation(progID, name.c_str());
-	if (location < 0) std::cerr << "Uniform " << name << " cannot be set!" << std::endl;
+	if (location < 0) std::cerr << "Uniform " << name << " undeclared!" << std::endl;
 	return location;
 }
 

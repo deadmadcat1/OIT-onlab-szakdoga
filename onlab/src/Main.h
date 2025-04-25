@@ -27,15 +27,19 @@ static void key_callback(GLFWwindow* window, int key,
 			break;
 		case GLFW_KEY_1:
 			//TODO alphablend
+			std::cout << "Transparency mode: Alpha Blending" << std::endl;
 			break;
 		case GLFW_KEY_2:
 			//TODO depthpeel
+			std::cout << "Transparency mode: Dual Depth Peeling" << std::endl;
 			break;
 		case GLFW_KEY_3:
 			//TODO moment
+			std::cout << "Transparency mode: Moment-based" << std::endl;
 			break;
 		case GLFW_KEY_4:
 			//TODO wavelet
+			std::cout << "Transparency mode: Wavelet" << std::endl;
 			break;
 		default:
 			break;

@@ -38,9 +38,9 @@ void Object::scale(glm::vec3 amountPerAxis) {
 	scaling *= amountPerAxis;
 }
 
-void Object::draw() const {
+void Object::draw(std::shared_ptr<GPUProgram> program) const {
 	for (std::shared_ptr<Material> mat : materials) {
-		mat->bindUniforms();
+		mat->bindUniforms(program);
 	}
 	geometry->draw();
 }
