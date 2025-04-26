@@ -3,55 +3,59 @@
 #include "Geometry.h"
 #include <GL/glew.h>
 #include <glm/glm.hpp>
+#include <iostream>
 #define	_USE_MATH_DEFINES
 #include <math.h>
-#include <random>
 
 template <typename T> void appendVector(std::vector<T>& target, const std::vector<T>& donor) {
 	target.insert(target.end(), donor.begin(), donor.end());
 }
 
 bool Scene::set() {
-	struct successToggle{
-		bool value, changed;
-		successToggle(bool init) { value = init; changed = false; }
-		void operator=(bool right) {
-			if (changed) return;
-			if (value != right) {
-				value = right;
-				changed = true;
-			}
-		}
-		explicit operator bool() const{
-			return value;
-		}
-	};
+	seedRNG();
 
-	std::random_device seed;
-	std::mt19937 gen(seed());
-
-	successToggle success = true;
+	int numOfLights = 4;	//TODO: move to a settings class
 
 	camera = std::make_unique<Camera>();
+	camera->translate(glm::vec3(12.0f, 12.0f, 12.0f));
 
+	setMakeLights(numOfLights);
+
+	if (!setMakeShaderPrograms()) return false;
+
+	if (!setMakeOpaqueObjects()) return false;
+
+	if (!setMakeTransparentObjects()) return false;
+
+	return true;
+}
+
+void Scene::setMakeLights(int numOfLights) {
+	if (numOfLights > maxNumOfLights) {
+		numOfLights = maxNumOfLights;
+		std::cerr << "numOfLights exceeds maximum, count truncated to bounds!" << std::endl;
+	}
+	int lightsMade = 0;
 	auto l = std::make_shared<Light>(0);
 	l->changeAmbientColor(glm::vec3(0.7f, 0.5f, 0.3f));
 	l->changeEmissiveColor(glm::vec3(1));
-	lights.push_back(l);
+	lights[lightsMade] = l;
+	++lightsMade;
 
 	std::uniform_real_distribution<float> l_pos_rand(-15.0f, 15.0f);
 	std::uniform_real_distribution<float> l_L_rand(0.0f, 1.0f);
-	int numOfLights = 4; //TODO: somehow make consistent with how many lights a shader can handle;
-	for (int i = 1; i < numOfLights; i++) {
+
+	for (int i = lightsMade; i < numOfLights; i++){
 		l = std::make_shared<Light>(i);
 		l->setPointLight();
-		l->translate(glm::vec3(l_pos_rand(gen), l_pos_rand(gen), l_pos_rand(gen)));
-		l->changeEmissiveColor(glm::vec3(l_L_rand(gen), l_L_rand(gen), l_L_rand(gen)));
-		lights.push_back(l);
+		l->translate(glm::vec3(l_pos_rand(rng), l_pos_rand(rng), l_pos_rand(rng)));
+		l->changeEmissiveColor(glm::vec3(l_L_rand(rng), l_L_rand(rng), l_L_rand(rng)));
+		lights[i] = l;
 	}
+}
 
-	if (!success) return false;
-
+bool Scene::setMakeShaderPrograms() {
+	successToggle success(true);
 	auto vertexShader = std::make_shared<Shader>(GL_VERTEX_SHADER);
 	auto phongShader = std::make_shared<Shader>(GL_FRAGMENT_SHADER);
 	success = vertexShader->create("./shaders/barebones_vs.glsl");
@@ -66,12 +70,15 @@ bool Scene::set() {
 
 	if (!success) return false;
 
-	shaderPrograms.push_back(simpleProgram);
+	success = shaderPrograms.emplace("phongBlinn", simpleProgram).second;	//https://en.cppreference.com/w/cpp/container/unordered_map/emplace#Return_value
+	return success;
+}
+
+bool Scene::setMakeOpaqueObjects() {
+	successToggle success(true);
 
 	auto plane = std::make_shared<Plane>();
-	auto sphere = std::make_shared<Sphere>(32, 32);
 	success = plane->create();
-	success = sphere->create();
 
 	if (!success) return false;
 
@@ -101,10 +108,20 @@ bool Scene::set() {
 
 	appendVector(opaqueObjects, box);
 
+	return true;
+}
+
+bool Scene::setMakeTransparentObjects() {
+	successToggle success(true);
+
+	auto sphere = std::make_shared<Sphere>(32, 32);
+	success = sphere->create();
+
+	if (!success) return false;
+
 	auto ballMaterial = std::make_shared<Material>();
 	ballMaterial->kd = glm::vec3(0.2f, 0.2f, 0.2f);
 	ballMaterial->shine = 0.9f;
-
 
 	std::vector<std::shared_ptr<Object>> balls;
 
@@ -113,8 +130,8 @@ bool Scene::set() {
 	for (int i = 0; i < 20; i++)
 	{
 		auto ball = std::make_unique<Object>(ballMaterial, sphere);
-		ball->scale(glm::vec3(size_rand(gen), size_rand(gen), size_rand(gen)));
-		ball->translate(glm::vec3(pos_rand(gen), pos_rand(gen), pos_rand(gen)));
+		ball->scale(glm::vec3(size_rand(rng), size_rand(rng), size_rand(rng)));
+		ball->translate(glm::vec3(pos_rand(rng), pos_rand(rng), pos_rand(rng)));
 		balls.push_back(std::move(ball));
 	}
 
@@ -124,7 +141,58 @@ bool Scene::set() {
 }
 
 void Scene::render(TransparencyMode mode){
-	//TODO 3gre_105[43]
+	auto phongProgram = shaderPrograms["phongBlinn"];
+	phongProgram->activate();
+
+	camera->bindUniforms(phongProgram);
+	for (const auto& l : lights) {
+		l->bindUniforms(phongProgram);
+	}
+	for (const auto& o : opaqueObjects) {
+		o->bindUniforms(phongProgram);
+		o->draw();
+	}
+	switch (mode) {
+	default:
+	case TransparencyMode::alphaBlend:
+		renderAlphaBlend();
+		break;
+	case TransparencyMode::depthPeel:
+		renderDepthPeeling();
+		break;
+	case TransparencyMode::moment:
+		renderMBOIT();
+		break;
+	case TransparencyMode::wavelet:
+		renderWavelet();
+		break;
+	}
 }
 
-void Scene::animate(double dt) {}
+void Scene::renderAlphaBlend() {
+	auto phongProgram = shaderPrograms["phongBlinn"];
+	for (const auto& t : transparentObjects) {
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		t->bindUniforms(phongProgram);
+		t->draw();
+	}
+}
+void Scene::renderDepthPeeling() {
+	//TODO
+}
+void Scene::renderMBOIT() {
+	//TODO
+}
+void Scene::renderWavelet() {
+	//TODO
+}
+
+void Scene::animate(float dt) {
+	glm::vec3 xyzOmega(0.0f, 200.f, 0.0f);
+	camera->orbit(glm::vec3(0.0f), xyzOmega*dt);
+}
+
+void Scene::seedRNG() {
+	std::random_device seed;
+	rng = std::mt19937(seed());
+}

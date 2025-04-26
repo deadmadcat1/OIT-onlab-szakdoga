@@ -1,5 +1,6 @@
 #include "Geometry.h"
-#include <glm/glm.hpp>
+#include <glm/vec3.hpp>
+#include <glm/vec2.hpp>
 #include <vector>
 
 Plane::Plane() : Geometry() {}

@@ -1,21 +1,24 @@
 #pragma once
-#include <glm/mat4x4.hpp>
-#include <glm/vec4.hpp>
+#include <glm/vec3.hpp>
+#define GLM_ENABLE_EXPERIMENTAL	//only for glm::toMat4 to not throw compile error, it is just a wrapper for glm::mat4_cast(glm::quat)
+#include <glm/gtx/quaternion.hpp>
+#include <memory>
 #include "GPUProgram.h"
 
 class Camera {
-public:
-	glm::mat4 View;
-	glm::mat4 Proj;
-	glm::vec3 pos = glm::vec3(12.0f);
-	glm::vec3 lookAt = glm::vec3(0.0f);
+	glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
 	glm::vec3 viewUp = glm::vec3(0.0f, 1.0f, 0.0f);
-	float fov = 73.0f;
-	float asp = 4/3;
+	glm::quat orientation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
+	float vfov = 73.0f;
+	float aratio = 16.0f/9.0f;
 	float fp = 0.1f;
 	float bp = 100.0f;
-
-	void update();
-
-	void bindUniforms(GPUProgram* program);
+public:
+	void bindUniforms(std::shared_ptr<GPUProgram> program);
+	void setParams(float vfov, float aratio, float nearp, float farp);
+	void setViewUp(glm::vec3 direction);
+	void translate(glm::vec3 deltaPos);
+	void rotate(glm::vec3 amountPerAxis);
+	void lookAt(glm::vec3 point);
+	void orbit(glm::vec3 point, glm::vec3 amountPerAxis);
 };

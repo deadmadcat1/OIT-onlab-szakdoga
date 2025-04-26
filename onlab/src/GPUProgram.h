@@ -1,7 +1,10 @@
 #pragma once
 #include "Shader.h"
 #include "Texture.h"
-#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
+#include <glm/mat4x4.hpp>
 #include <vector>
 #include <memory>
 
@@ -20,21 +23,21 @@ public:
 
 	void activate();
 
-	void setUniform(int i, const std::string& name);
+	void setUniform(const std::string& name, int i);
 
-	void setUniform(float f, const std::string& name);
+	void setUniform(const std::string& name, float f);
 
-	void setUniform(const glm::vec2* const v, const std::string& name);
+	void setUniform(const std::string& name, const glm::vec2* const v);
 
-	void setUniform(const glm::vec3* const v, const std::string& name);
+	void setUniform(const std::string& name, const glm::vec3* const v);
 
-	void setUniform(const glm::vec4* const v, const std::string& name);
+	void setUniform(const std::string& name, const glm::vec4* const v);
 
-	void setUniform(const glm::mat4* const mat, const std::string& name);
+	void setUniform(const std::string& name, const glm::mat4* const mat);
 
-	void setUniform(const Texture* texture,
-					const std::string& samplerName,
-					unsigned int textureUnit = 0);
+	void setUniform(const std::string& samplerName,
+					const Texture* texture,
+					unsigned int textureUnit);
 
 	~GPUProgram();
 };

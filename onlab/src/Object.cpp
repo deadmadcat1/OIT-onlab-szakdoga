@@ -1,6 +1,4 @@
 #include "Object.h"
-#define GLM_ENABLE_EXPERIMENTAL	//only for glm::toMat4 to not throw compile error, it is just a wrapper for glm::mat4_cast(glm::quat)
-#include <glm/gtx/quaternion.hpp>
 
 Object::Object(std::shared_ptr<Material> _material, std::shared_ptr<Geometry> _geometry){
 	materials.push_back(_material);
@@ -9,6 +7,18 @@ Object::Object(std::shared_ptr<Material> _material, std::shared_ptr<Geometry> _g
 
 void Object::addMaterial(std::shared_ptr<Material> _material) {
 	materials.push_back(_material);
+}
+
+void Object::bindUniforms(std::shared_ptr<GPUProgram> program) {
+	glm::mat4 M = modelMatrix();
+	glm::mat4 Minv = modelMatrixInverse();
+	program->activate();
+	program->setUniform("M", &M);
+	program->setUniform("Minv", &Minv);
+
+	for (std::shared_ptr<Material> mat : materials) {
+		mat->bindUniforms(program);
+	}
 }
 
 glm::mat4 Object::modelMatrix() const {
@@ -38,9 +48,6 @@ void Object::scale(glm::vec3 amountPerAxis) {
 	scaling *= amountPerAxis;
 }
 
-void Object::draw(std::shared_ptr<GPUProgram> program) const {
-	for (std::shared_ptr<Material> mat : materials) {
-		mat->bindUniforms(program);
-	}
+void Object::draw() const{
 	geometry->draw();
 }

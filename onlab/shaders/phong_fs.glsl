@@ -1,22 +1,24 @@
 #version 460
 precision highp float;
 
-struct Light {
+uniform int	nLights;
+uniform struct {
 	vec4 pos;
 	vec3 L_a;
 	vec3 L_e;
-};
+} lights[8];
 
-struct Material {
+uniform struct {
 	vec3 kd, ks, ka;
 	float alpha, shine;
-};
+} material;
 
-uniform mat4		MVP, M, Minv;
-uniform vec3		wCamPos;
-uniform Light		lights[8];
-uniform int			nLights;
-uniform Material	material;
+uniform struct {
+	mat4 VP;
+	vec3 wPos;
+} camera;
+
+uniform mat4 M, Minv;
 
 in vec4 wLightDir[8];
 in vec3 wNormal;

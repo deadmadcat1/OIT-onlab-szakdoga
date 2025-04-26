@@ -66,39 +66,39 @@ void GPUProgram::activate() {
 	glUseProgram(progID);
 }
 
-void GPUProgram::setUniform(int i, const std::string& name) {
+void GPUProgram::setUniform(const std::string& name, int i) {
 	int location = getLocation(name);
 	if (location >= 0) glUniform1i(location, i);
 }
 
-void GPUProgram::setUniform(float f, const std::string& name) {
+void GPUProgram::setUniform(const std::string& name, float f) {
 	int location = getLocation(name);
 	if (location >= 0) glUniform1f(location, f);
 }
 
-void GPUProgram::setUniform(const vec2* const v, const std::string& name) {
+void GPUProgram::setUniform(const std::string& name, const glm::vec2* const v) {
 	int location = getLocation(name);
 	if (location >= 0) glUniform2fv(location, 1, &v->x);
 }
 
-void GPUProgram::setUniform(const vec3* const v, const std::string& name) {
+void GPUProgram::setUniform(const std::string& name, const glm::vec3* const v) {
 	int location = getLocation(name);
 	if (location >= 0) glUniform3fv(location, 1, &v->x);
 }
 
-void GPUProgram::setUniform(const vec4* const v, const std::string& name) {
+void GPUProgram::setUniform(const std::string& name, const glm::vec4* const v) {
 	int location = getLocation(name);
 	if (location >= 0) glUniform4fv(location, 1, &v->x);
 }
 
-void GPUProgram::setUniform(const mat4* const mat, const std::string& name) {
+void GPUProgram::setUniform(const std::string& name, const glm::mat4* const mat) {
 	int location = getLocation(name);
 	if (location >= 0) glUniformMatrix4fv(location, 1, GL_FALSE, &(*mat)[0][0]);
 }
 
-void GPUProgram::setUniform(const Texture* const texture,
-	const std::string& samplerName,
-	unsigned int textureUnit) {
+void GPUProgram::setUniform(const std::string& samplerName,
+							const Texture* texture,
+							unsigned int textureUnit = 0) {
 
 	int location = getLocation(samplerName);
 	if (location >= 0) {

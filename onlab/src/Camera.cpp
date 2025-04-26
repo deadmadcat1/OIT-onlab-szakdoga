@@ -1,23 +1,45 @@
 #include "Camera.h"
-#include <glm/ext.hpp>
+#include <glm/mat4x4.hpp>
+#include <glm/exponential.hpp>
+#include <glm/ext/matrix_transform.hpp>
+#include <iostream>
 
-void Camera::update() {
-	glm::vec3 w = glm::normalize(pos - lookAt);
-	glm::vec3 u = glm::normalize(glm::cross(viewUp, w));
-	glm::vec3 v = glm::cross(w, u);
+void Camera::bindUniforms(std::shared_ptr<GPUProgram> program) {
+	glm::mat4 View = glm::translate(glm::mat4(1.0f), -position) * glm::toMat4(orientation);
 
-	View = glm::translate(View, -pos) * glm::mat4(u.x, u.y, u.z, 0,
-		v.x, v.y, v.z, 0,
-		w.x, w.y, w.z, 0,
-		0, 0, 0, 1);
+	glm::mat4 Proj = glm::perspective(vfov, aratio, fp, bp);
 
-	Proj = glm::mat4(1 / (tan(fov * 0.5) * asp), 0, 0, 0,
-		0, 1 / tan(fov * 0.5), 0, 0,
-		0, 0, -(fp + bp) / (bp - fp), -2 * fp * bp / (bp - fp),
-		0, 0, -1, 0);
+	program->activate();
+	program->setUniform("camera.wPos", &position);
+	glm::mat4 VP = View * Proj;
+	program->setUniform("camera.VP", &VP);
 }
 
-void Camera::bindUniforms(GPUProgram* program) {
-	program->activate();
-	program->setUniform(&pos, "wCamPos");
+void Camera::setParams(float _vfov = 73.0f, float _aratio = (16.0f / 9.0f), float _fp = 0.1f, float _bp = 100.0f) {
+	vfov = _vfov;
+	aratio = _aratio;
+	fp = _fp;
+	bp = _bp;
+}
+
+void Camera::setViewUp(glm::vec3 direction) {
+	viewUp = direction;
+}
+
+void Camera::translate(glm::vec3 deltaPos) {
+	position += deltaPos;
+}
+
+void Camera::rotate(glm::vec3 amountPerAxis) {
+	glm::quat rotQuat(amountPerAxis);
+	orientation *= rotQuat;
+}
+
+void Camera::lookAt(glm::vec3 point) {
+	orientation = glm::quatLookAt(position-point, viewUp);
+}
+
+void Camera::orbit(glm::vec3 point, glm::vec3 amountPerAxis) {
+	glm::quat rotQuat(amountPerAxis);
+	position = point + (rotQuat * (position - point));
 }
