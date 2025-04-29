@@ -1,5 +1,5 @@
 #include "Window.h"
-#include <iostream>
+
 
 bool Window::create() {
 	glfwSetErrorCallback(error_callback);
@@ -11,26 +11,24 @@ bool Window::create() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	window = std::make_unique<GLFWwindow>(
-		glfwCreateWindow(windowWidth, windowHeight, "OIT Onlab", NULL, NULL)
-	);
+	window = glfwCreateWindow(windowWidth, windowHeight, "OIT Onlab", NULL, NULL);
 
 	if (!window)
 		return false;
 
-	glfwMakeContextCurrent(window.get());
-	glfwSetWindowUserPointer(window.get(), this);
+	glfwMakeContextCurrent(window);
+	glfwSetWindowUserPointer(window, this);
 
 	glewInit();
 
 	std::cout << "OpenGL version: " << (const char*)glGetString(GL_VERSION) << std::endl;
 	std::cout << "GLSL version: " << (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
 
-	glfwSetKeyCallback(window.get(), key_callback);
-	glfwSetCursorPosCallback(window.get(), mouseMove_callback);
-	glfwSetMouseButtonCallback(window.get(), mousePress_callback);
-	glfwSetFramebufferSizeCallback(window.get(), resize_callback);
-	//glfwSetScrollCallback(window.get(), mouseScroll_callback);
+	glfwSetKeyCallback(window, key_callback);
+	glfwSetCursorPosCallback(window, mouseMove_callback);
+	glfwSetMouseButtonCallback(window, mousePress_callback);
+	glfwSetFramebufferSizeCallback(window, resize_callback);
+	//glfwSetScrollCallback(window, mouseScroll_callback);
 
 	glfwSwapInterval(1);
 	scene = std::make_unique<Scene>();
@@ -38,8 +36,8 @@ bool Window::create() {
 	return (scene && scene->set());
 }
 
-bool Window::renderLoop() {
-	while (!glfwWindowShouldClose(window.get()))
+void Window::renderLoop() {
+	while (!glfwWindowShouldClose(window))
 	{
 		glClearColor(0.1f, 0.2f, 0.3f, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -54,8 +52,7 @@ bool Window::renderLoop() {
 		}
 
 		scene->render(renderingTransparencyMode);
-
-		glfwSwapBuffers(window.get());
+		glfwSwapBuffers(window);
 
 		glfwPollEvents();
 	}
@@ -63,7 +60,7 @@ bool Window::renderLoop() {
 
 Window::~Window()
 {
-	glfwDestroyWindow(window.get());
+	glfwDestroyWindow(window);
 }
 
 //callback implementations
@@ -76,7 +73,7 @@ void Window::key_callback(int key, int scancode, int action, int mods) {
 		switch (key) {
 		case GLFW_KEY_ESCAPE:
 			std::cout << "Exiting..." << std::endl;
-			glfwSetWindowShouldClose(window.get(), true);
+			glfwSetWindowShouldClose(window, true);
 			break;
 		case GLFW_KEY_1:
 			renderingTransparencyMode = TransparencyMode::alphaBlend;
@@ -132,30 +129,4 @@ void Window::mousePress_callback(int button, int action, int mods) {
 }
 void Window::mouseScroll_callback(double xoffset, double yoffset) {
 	return;
-}
-
-//static callback wrappers
-
-static void error_callback(int error, const char* desc) {
-	std::cerr << "GLFW error[" << error << "]: " << desc << std::endl;
-}
-static void resize_callback(GLFWwindow* window, int width, int height) {
-	Window* mainWindow = (Window*)glfwGetWindowUserPointer(window);
-	mainWindow->resize_callback(width, height);
-}
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-	Window* mainWindow = (Window*)glfwGetWindowUserPointer(window);
-	mainWindow->key_callback(key, scancode, action, mods);
-}
-static void mouseMove_callback(GLFWwindow* window, double xpos, double ypos) {
-	Window* mainWindow = (Window*)glfwGetWindowUserPointer(window);
-	mainWindow->mouseMove_callback(xpos, ypos);
-}
-static void mousePress_callback(GLFWwindow* window, int button, int action, int mods) {
-	Window* mainWindow = (Window*)glfwGetWindowUserPointer(window);
-	mainWindow->mousePress_callback(button, action, mods);
-}
-static void mouseScroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
-	Window* mainWindow = (Window*)glfwGetWindowUserPointer(window);
-	mainWindow->mouseScroll_callback(xoffset, yoffset);
 }

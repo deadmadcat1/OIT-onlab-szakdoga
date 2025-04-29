@@ -1,7 +1,8 @@
 #include "Geometry.h"
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
-#include <glm/ext/matrix_transform.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/quaternion.hpp>
 #include <vector>
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -22,27 +23,27 @@ bool Sphere::create() {
 
     /*VERTICES*/
     std::vector<glm::vec3> vertices;
-    glm::vec3 vtxProbe(0.0, 0.0, 1.0);
+    glm::vec3 vtxProbe(0.0f, 1.0f, 0.0f);
 
     vertices.push_back(vtxProbe);
 
-    float rotAngle = 2 * (float)M_PI / nVtxPerRing;
-    glm::mat4 rot(1.0);
+    float pitchAngle = ((float)M_PI / nStrips);
+    glm::quat pitchQuat(glm::vec3(pitchAngle, 0.0f, 0.0f));
+    glm::normalize(pitchQuat);
+    float yawAngle = 2 * (float)M_PI / nVtxPerRing;
+    glm::quat yawQuat(glm::vec3(0.0f, yawAngle, 0.0f));
+    glm::normalize(yawQuat);
 
     for (unsigned int i = 1; i < nStrips; i++)
     {
-        float pitchAngle = i * ((float)M_PI / nStrips);
-
-        rot = glm::rotate(rot, pitchAngle, glm::vec3(0.0, 0.0, 1.0));
-        vtxProbe = glm::vec3(glm::vec4(vtxProbe, 1) * rot);
+        vtxProbe = pitchQuat * vtxProbe;
         for (unsigned int j = 0; j < nVtxPerRing; j++) {
             vertices.push_back(vtxProbe);
-            rot = glm::rotate(rot, rotAngle, glm::vec3(0.0, 1.0, 0.0));
-            vtxProbe = glm::vec3(glm::vec4(vtxProbe, 1) * rot);
+            vtxProbe = yawQuat * vtxProbe;
         }
     }
 
-    vtxProbe = glm::vec3(0.0, 0.0, -1.0);
+    vtxProbe = glm::vec3(0.0, -1.0, 0.0);
     vertices.push_back(vtxProbe);
 
     glBindBuffer(GL_ARRAY_BUFFER, buffers[1]);

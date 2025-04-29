@@ -1,4 +1,6 @@
 #include "Object.h"
+#include <glm/ext/matrix_transform.hpp>
+#define TESTING
 
 Object::Object(std::shared_ptr<Material> _material, std::shared_ptr<Geometry> _geometry){
 	materials.push_back(_material);
@@ -13,8 +15,8 @@ void Object::bindUniforms(std::shared_ptr<GPUProgram> program) {
 	glm::mat4 M = modelMatrix();
 	glm::mat4 Minv = modelMatrixInverse();
 	program->activate();
-	program->setUniform("M", &M);
-	program->setUniform("Minv", &Minv);
+	program->setUniform("object.M", &M);
+	program->setUniform("object.Minv", &Minv);
 
 	for (std::shared_ptr<Material> mat : materials) {
 		mat->bindUniforms(program);
@@ -22,17 +24,19 @@ void Object::bindUniforms(std::shared_ptr<GPUProgram> program) {
 }
 
 glm::mat4 Object::modelMatrix() const {
-	glm::mat4 identity;
-	return glm::scale(identity, scaling)
-		* glm::toMat4(orientation)
-		* glm::translate(identity, position);
+	glm::mat4 identity(glm::mat4(1.0f));
+	glm::mat4 M = glm::translate(identity, position)
+				* glm::toMat4(glm::normalize(orientation))
+				* glm::scale(identity, scaling);
+	return M;
 }
 
 glm::mat4 Object::modelMatrixInverse() const {
-	glm::mat4 identity;
-	return glm::translate(identity, -position)
-		* glm::toMat4(-orientation)
-		* glm::scale(identity, glm::vec3(1,1,1) / scaling);
+	glm::mat4 identity(1.0f);
+	glm::mat4 Minv = glm::scale(identity, glm::vec3(1, 1, 1) / scaling)
+					* glm::toMat4(glm::conjugate(glm::normalize(orientation)))
+					* glm::translate(identity, -position);
+	return Minv;
 }
 
 void Object::translate(glm::vec3 amountPerAxis) {
@@ -41,7 +45,9 @@ void Object::translate(glm::vec3 amountPerAxis) {
 
 void Object::rotate(glm::vec3 amountPerAxis) {
 	glm::quat rotQuat(amountPerAxis);
+	rotQuat = glm::normalize(rotQuat);
 	orientation *= rotQuat;
+	orientation = glm::normalize(orientation);
 }
 
 void Object::scale(glm::vec3 amountPerAxis) {

@@ -5,17 +5,28 @@
 #include <iostream>
 
 void Camera::bindUniforms(std::shared_ptr<GPUProgram> program) {
-	glm::mat4 View = glm::translate(glm::mat4(1.0f), -position) * glm::toMat4(orientation);
+	glm::mat4 View = glm::translate(glm::identity<glm::mat4>(), -position) * glm::toMat4(glm::normalize(orientation))
+		;//TODO make View produce the same result as tempView!
+	glm::mat4 Proj = glm::perspective(glm::radians(vfov), aratio, fp, bp);
 
-	glm::mat4 Proj = glm::perspective(vfov, aratio, fp, bp);
+	glm::vec3 w = glm::normalize(position - lookAtP);
+	glm::vec3 u = glm::normalize(glm::cross(viewUp, w));
+	glm::vec3 v = glm::cross(w, u);
+	glm::mat4 tempView = 
+		glm::mat4(u.x, v.x, w.x, 0,
+				u.y, v.y, w.y, 0,
+				u.z, v.z, w.z, 0,
+				0, 0, 0, 1)
+		* glm::translate(glm::identity<glm::mat4>(), -position)
+		 ;
 
 	program->activate();
 	program->setUniform("camera.wPos", &position);
-	glm::mat4 VP = View * Proj;
+	glm::mat4 VP = Proj * View;
 	program->setUniform("camera.VP", &VP);
 }
 
-void Camera::setParams(float _vfov = 73.0f, float _aratio = (16.0f / 9.0f), float _fp = 0.1f, float _bp = 100.0f) {
+void Camera::setParams(float _vfov, float _aratio, float _fp, float _bp) {
 	vfov = _vfov;
 	aratio = _aratio;
 	fp = _fp;
@@ -30,16 +41,20 @@ void Camera::translate(glm::vec3 deltaPos) {
 	position += deltaPos;
 }
 
-void Camera::rotate(glm::vec3 amountPerAxis) {
-	glm::quat rotQuat(amountPerAxis);
+void Camera::rotate(glm::vec3 radiansPerAxis) {
+	glm::quat rotQuat(radiansPerAxis);
+	rotQuat = glm::normalize(rotQuat);
 	orientation *= rotQuat;
+	orientation = glm::normalize(orientation);
 }
 
 void Camera::lookAt(glm::vec3 point) {
-	orientation = glm::quatLookAt(position-point, viewUp);
+	lookAtP = point; return;//TODO make quat work
+	orientation = glm::normalize(glm::quatLookAt(position-point, viewUp));
 }
 
-void Camera::orbit(glm::vec3 point, glm::vec3 amountPerAxis) {
-	glm::quat rotQuat(amountPerAxis);
+void Camera::orbit(glm::vec3 point, glm::vec3 radiansPerAxis) {
+	glm::quat rotQuat(radiansPerAxis);
+	rotQuat = glm::normalize(rotQuat);
 	position = point + (rotQuat * (position - point));
 }

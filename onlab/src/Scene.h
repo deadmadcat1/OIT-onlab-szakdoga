@@ -1,6 +1,5 @@
 #pragma once
 #include <vector>
-#include <array>
 #include <unordered_map>
 #include <memory>
 #include <random>
@@ -30,7 +29,7 @@ class Scene {
 
 	static const size_t maxNumOfLights = 8;
 	std::unique_ptr<Camera> camera;
-	std::array<std::shared_ptr<Light>, maxNumOfLights> lights;
+	std::vector<std::shared_ptr<Light>> lights;
 	std::unordered_map<std::string, std::shared_ptr<GPUProgram>> shaderPrograms;
 	std::vector<std::shared_ptr<Object>> opaqueObjects;
 	std::vector<std::shared_ptr<Object>> transparentObjects;

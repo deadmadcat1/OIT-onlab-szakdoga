@@ -14,8 +14,8 @@ public:
 		std::string baseHandle("lights[" + std::to_string(idx) + "]");
 		program->activate();
 		program->setUniform(baseHandle + ".pos", &position);
-		program->setUniform(baseHandle + ".L_a", &ambientLuminosity);
-		program->setUniform(baseHandle + ".L_e", &emissiveLuminosity);
+		program->setUniform(baseHandle + ".La", &ambientLuminosity);
+		program->setUniform(baseHandle + ".Le", &emissiveLuminosity);
 	}
 	void translate(glm::vec3 deltaPos) {
 		position += glm::vec4(deltaPos, 0.0f);

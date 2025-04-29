@@ -4,8 +4,8 @@ precision highp float;
 uniform int	nLights;
 uniform struct {
 	vec4 pos;
-	vec3 L_a;
-	vec3 L_e;
+	vec3 La;
+	vec3 Le;
 } lights[8];
 
 uniform struct {
@@ -13,20 +13,13 @@ uniform struct {
 	float alpha, shine;
 } material;
 
-uniform struct {
-	mat4 VP;
-	vec3 wPos;
-} camera;
-
-uniform mat4 M, Minv;
-
-in vec4 wLightDir[8];
+in vec3 wLightDir[8];
+in vec4 wPos;
 in vec3 wNormal;
 in vec3 wView;
-in vec2 texcoord;
 
 out vec4 fragColor;
 
-void main(){
-	fragColor = vec4(material.kd, 1);
+void main(void){
+	fragColor = vec4(material.kd, material.alpha);
 }
