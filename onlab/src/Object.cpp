@@ -1,6 +1,5 @@
 #include "Object.h"
 #include <glm/ext/matrix_transform.hpp>
-#define TESTING
 
 Object::Object(std::shared_ptr<Material> _material, std::shared_ptr<Geometry> _geometry){
 	materials.push_back(_material);
@@ -33,7 +32,7 @@ glm::mat4 Object::modelMatrix() const {
 
 glm::mat4 Object::modelMatrixInverse() const {
 	glm::mat4 identity(1.0f);
-	glm::mat4 Minv = glm::scale(identity, glm::vec3(1, 1, 1) / scaling)
+	glm::mat4 Minv = glm::scale(identity, glm::vec3(1) / scaling)
 					* glm::toMat4(glm::conjugate(glm::normalize(orientation)))
 					* glm::translate(identity, -position);
 	return Minv;
@@ -43,8 +42,8 @@ void Object::translate(glm::vec3 amountPerAxis) {
 	position += amountPerAxis;
 }
 
-void Object::rotate(glm::vec3 amountPerAxis) {
-	glm::quat rotQuat(amountPerAxis);
+void Object::rotate(glm::vec3 degreesPerAxis) {
+	glm::quat rotQuat(glm::radians(degreesPerAxis));
 	rotQuat = glm::normalize(rotQuat);
 	orientation *= rotQuat;
 	orientation = glm::normalize(orientation);

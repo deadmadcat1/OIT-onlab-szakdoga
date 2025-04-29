@@ -51,7 +51,7 @@ class Scene {
 public:
 	bool set();
 
-	void render(TransparencyMode mode);
+	void render(TransparencyMethod mode);
 
 	void animate(float dt);
 };

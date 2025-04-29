@@ -76,19 +76,19 @@ void Window::key_callback(int key, int scancode, int action, int mods) {
 			glfwSetWindowShouldClose(window, true);
 			break;
 		case GLFW_KEY_1:
-			renderingTransparencyMode = TransparencyMode::alphaBlend;
+			renderingTransparencyMode = TransparencyMethod::alphaBlend;
 			std::cout << "Transparency mode: Alpha Blending" << std::endl;
 			break;
 		case GLFW_KEY_2:
-			renderingTransparencyMode = TransparencyMode::depthPeel;
+			renderingTransparencyMode = TransparencyMethod::depthPeel;
 			std::cout << "Transparency mode: Dual Depth Peeling" << std::endl;
 			break;
 		case GLFW_KEY_3:
-			renderingTransparencyMode = TransparencyMode::moment;
+			renderingTransparencyMode = TransparencyMethod::moment;
 			std::cout << "Transparency mode: Moment-based" << std::endl;
 			break;
 		case GLFW_KEY_4:
-			renderingTransparencyMode = TransparencyMode::wavelet;
+			renderingTransparencyMode = TransparencyMethod::wavelet;
 			std::cout << "Transparency mode: Wavelet" << std::endl;
 			break;
 		default:

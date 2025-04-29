@@ -26,6 +26,10 @@ void Shader::getErrorInfo() {
 	}
 }
 
+void Shader::addDefine(std::string directive) {
+	defines.push_back(directive);
+}
+
 bool Shader::create(std::string path) {
 	shaderID = glCreateShader(type);
 	if (!shaderID) {
@@ -42,8 +46,15 @@ bool Shader::create(std::string path) {
 
 	std::string content;
 	std::string line;
+	int lineNum = 0;
 	while (std::getline(sourcefile, line)) {
 		content += line +'\n';
+		if (3 == ++lineNum) {
+			for (std::string def : defines) {
+				content += def;// +'\n';
+			}
+			content += "\n";
+		}
 	}
 	content += '\0';
 

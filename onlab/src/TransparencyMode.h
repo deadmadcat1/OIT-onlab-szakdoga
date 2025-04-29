@@ -1,6 +1,6 @@
 #pragma once
 
-enum class TransparencyMode {
+enum class TransparencyMethod {
 	alphaBlend,
 	depthPeel,
 	moment,

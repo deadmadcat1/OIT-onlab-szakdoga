@@ -10,7 +10,7 @@
 class Window {
 	static const int windowWidth = 640;					// TODO: move to Settings or somesuch
 	static const int windowHeight = 480;				// -//-
-	TransparencyMode renderingTransparencyMode;	// -//-
+	TransparencyMethod renderingTransparencyMode;	// -//-
 
 	GLFWwindow* window;
 	std::unique_ptr<Scene> scene;

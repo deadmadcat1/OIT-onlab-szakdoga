@@ -11,9 +11,9 @@
 class Object {
 	std::vector<std::shared_ptr<Material>> materials;
 	std::shared_ptr<Geometry> geometry;
-	glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
+	glm::vec3 position = glm::vec3(0.0f);
 	glm::quat orientation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
-	glm::vec3 scaling = glm::vec3(1.0f, 1.0f, 1.0f);
+	glm::vec3 scaling = glm::vec3(1.0f);
 
 	glm::mat4 modelMatrix() const;
 	glm::mat4 modelMatrixInverse() const;
@@ -23,7 +23,7 @@ public:
 	void addMaterial(std::shared_ptr<Material> material);
 	void bindUniforms(std::shared_ptr<GPUProgram> program);
 	void translate(glm::vec3 amountPerAxis);
-	void rotate(glm::vec3 amountPerAxis);
+	void rotate(glm::vec3 degreesPerAxis);
 	void scale(glm::vec3 amountPerAxis);
 	void draw() const;
 };

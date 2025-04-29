@@ -30,8 +30,13 @@ vec3 shade(vec3 normal, vec3 lightDir, vec3 viewDir,
 }
 
 void main(void){
+#ifdef DEPTH_PEEL_ENABLED
+	float clipDepth = texelFetch(depthMask, ivec2(gl_FragCoord.xy), 0).r;
+	if (gl_FragCoord.z <= clipDepth) {
+		discard;
+	}
+#endif
 	fragColor = vec4(0,0,0,1);
-	vec3 x = wPos.xyz;
 	for (int i = 0; i < nLights; i++){
 		float oneoverfourpi = 1.0f / (4.0f * 3.1415926f);
 		vec3 powerDensity = lights[i].Le * ((lights[i].pos.w == 0.0f) ? 1.0f : oneoverfourpi);
@@ -42,5 +47,4 @@ void main(void){
 								Le, material.kd, material.ks, material.shine);
 		fragColor.a = material.alpha;
 	}
-	//fragColor = vec4(wNormal,1);
 }

@@ -28,11 +28,11 @@ out vec3 wView;
 
 void main(){
 	mat4 MVP = camera.VP * object.M;
-	wPos = vec4(vtxPos, 1) * object.M;
-	wNormal = (object.Minv * vec4(vtxNormal, 0)).xyz;
-	wView  = camera.wPos * wPos.w - wPos.xyz;
+	wPos = object.M * vec4(vtxPos, 1);
+	wNormal = (vec4(vtxNormal, 0) * object.Minv).xyz;
+	wView  = camera.wPos - wPos.xyz;
 	for(int i = 0; i < nLights; i++) {
-		wLightDir[i] = lights[i].pos.xyz * wPos.w - wPos.xyz * lights[i].pos.w;
+		wLightDir[i] = lights[i].pos.xyz - wPos.xyz * lights[i].pos.w;
 	}
-	gl_Position = vec4(vtxPos, 1) * MVP;
+	gl_Position = MVP * vec4(vtxPos, 1);
 }

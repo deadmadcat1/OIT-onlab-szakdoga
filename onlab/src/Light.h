@@ -4,9 +4,9 @@
 
 class Light {
 	int idx;
-	glm::vec4 position = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+	glm::vec4 position = glm::vec4(0.0f);
 	glm::vec3 ambientLuminosity = glm::vec3(0.0f);
-	glm::vec3 emissiveLuminosity = glm::vec3(0.5f);
+	glm::vec3 emissiveLuminosity = glm::vec3(0.0f);
 public:
 	explicit Light(int lightIdx) : idx(lightIdx) {}
 
@@ -20,11 +20,11 @@ public:
 	void translate(glm::vec3 deltaPos) {
 		position += glm::vec4(deltaPos, 0.0f);
 	}
-	void changeAmbientColor(glm::vec3 deltaLa) {
-		ambientLuminosity += deltaLa;
+	void setAmbientColor(glm::vec3 La) {
+		ambientLuminosity = La;
 	}
-	void changeEmissiveColor(glm::vec3 deltaLe) {
-		emissiveLuminosity += deltaLe;
+	void setEmissiveColor(glm::vec3 Le) {
+		emissiveLuminosity = Le;
 	}
 	void setPointLight() {
 		position.w = 1.0f;
