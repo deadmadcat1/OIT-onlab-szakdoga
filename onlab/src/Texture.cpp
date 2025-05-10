@@ -10,19 +10,20 @@ unsigned int Texture::getID() {
 unsigned int Texture::getID() const {
 	return textureID;
 }
-unsigned int Texture::create(const std::string& path, const TextureParams opt) {
-	if (textureID > -1) {
+bool Texture::create(const std::string& path, const TextureParams opt) {
+	if (textureID > 0) {
 		std::cerr << "Texture " << textureID << " already exists, make a new one!" << std::endl;
-		return NULL;
+		return false;
 	}
 	glGenTextures(1, &textureID);
 	if (!textureID) {
 		std::cerr << "Texture creation failed: " << path << std::endl;
-		glDeleteTextures(1, &textureID);
-		return textureID;
+		return false;
 	}
 	glBindTexture(GL_TEXTURE_2D, textureID);
 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, opt.wrap_s);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, opt.wrap_t);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, opt.min_filter);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, opt.mag_filter);
 
@@ -41,10 +42,10 @@ unsigned int Texture::create(const std::string& path, const TextureParams opt) {
 	glBindTexture(GL_TEXTURE_2D, 0);
 	stbi_image_free(data);
 	
-	return textureID;
+	return true;
 }
 
-unsigned int Texture::create(
+bool Texture::create(
 	unsigned int width,
 	unsigned int height,
 	unsigned int format,
@@ -52,15 +53,14 @@ unsigned int Texture::create(
 	unsigned int sourceType,
 	const TextureParams opt)
 {
-	if (textureID > -1) {
+	if (textureID > 0) {
 		std::cerr << "Texture " << textureID << " already exists, make a new one!" << std::endl;
-		return NULL;
+		return false;
 	}
 	glGenTextures(1, &textureID);
 	if (!textureID) {
 		std::cerr << "Render Target Texture creation failed!" << std::endl;
-		glDeleteTextures(1, &textureID);
-		return textureID;
+		return false;
 	}
 	glBindTexture(GL_TEXTURE_2D, textureID);
 	
@@ -72,7 +72,7 @@ unsigned int Texture::create(
 	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, sourceFormat, sourceType, NULL);
 
 	glBindTexture(GL_TEXTURE_2D, 0);
-	return textureID;
+	return true;
 }
 
 Texture::~Texture() {

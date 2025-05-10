@@ -18,6 +18,7 @@ class Object {
 	glm::mat4 modelMatrix() const;
 	glm::mat4 modelMatrixInverse() const;
 public:
+	Object(std::shared_ptr<Geometry> _geometry);
 	Object(std::shared_ptr<Material>_material,
 		   std::shared_ptr<Geometry> _geometry);
 	void addMaterial(std::shared_ptr<Material> material);

@@ -6,6 +6,7 @@
 #include "Camera.h"
 #include "Light.h"
 #include "Object.h"
+#include "Framebuffer.h"
 #include "GPUProgram.h"
 #include "TransparencyMode.h"
 
@@ -31,15 +32,19 @@ class Scene {
 	std::unique_ptr<Camera> camera;
 	std::vector<std::shared_ptr<Light>> lights;
 	std::unordered_map<std::string, std::shared_ptr<GPUProgram>> shaderPrograms;
+	std::unordered_map<std::string, std::shared_ptr<Framebuffer>> framebuffers;
 	std::vector<std::shared_ptr<Object>> opaqueObjects;
 	std::vector<std::shared_ptr<Object>> transparentObjects;
 
 	std::mt19937 rng;
 
+	std::unique_ptr<Object> fullscreenTexturedQuad;
+
 	void seedRNG();
 
 	void setMakeLights(int numOfLights);
 	bool setMakeShaderPrograms();
+	bool setMakeFramebuffers();
 	bool setMakeOpaqueObjects();
 	bool setMakeTransparentObjects();
 

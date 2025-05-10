@@ -1,8 +1,12 @@
 #include "Object.h"
 #include <glm/ext/matrix_transform.hpp>
 
+Object::Object(std::shared_ptr<Geometry> _geometry) {
+	geometry = _geometry;
+}
+
 Object::Object(std::shared_ptr<Material> _material, std::shared_ptr<Geometry> _geometry){
-	materials.push_back(_material);
+	addMaterial(_material);
 	geometry = _geometry;
 }
 

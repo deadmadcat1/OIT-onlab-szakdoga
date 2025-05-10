@@ -8,7 +8,7 @@
 #include <math.h>
 
 Sphere::Sphere(unsigned int _nStrips = 16, unsigned int _nVtxPerRing = 16) : Geometry(){
-    if (_nStrips > 0) {
+    if (_nStrips > 1) {
         nStrips = _nStrips;
     }
     if (_nVtxPerRing > 0) {
@@ -36,10 +36,11 @@ bool Sphere::create() {
 
     for (unsigned int i = 1; i < nStrips; i++)
     {
-        vtxProbe = pitchQuat * vtxProbe;
+        vtxProbe = glm::normalize(pitchQuat * vtxProbe);
         for (unsigned int j = 0; j < nVtxPerRing; j++) {
+            
             vertices.push_back(vtxProbe);
-            vtxProbe = yawQuat * vtxProbe;
+            vtxProbe = glm::normalize(yawQuat * vtxProbe);
         }
     }
 
@@ -61,38 +62,41 @@ bool Sphere::create() {
 
     /*INDICES*/
     std::vector<unsigned int> indices;
-
-    for (unsigned int i = 2; i < nVtxPerRing + 2; i++)
+        //cap
+    for (unsigned int i = 1; i < nVtxPerRing; i++)
     {
         indices.push_back(0);
-        indices.push_back(i - 1);
-        indices.push_back(i % nVtxPerRing);
+        indices.push_back(i);
+        indices.push_back(i + 1);
     }
-
-    for (unsigned int i = 0; i < nStrips - 1; i++)
+    indices.push_back(0);
+    indices.push_back(nVtxPerRing);
+    indices.push_back(1);
+        //body
+    for (unsigned int i = 0; i < nStrips - 2; i++)
     {
-        unsigned int oldRingOffset = i * nVtxPerRing;
+        unsigned int oldRingOffset = i * nVtxPerRing + 1;
         unsigned int newRingOffset = oldRingOffset + nVtxPerRing;
-        for (unsigned int j = 1; j < nVtxPerRing + 1; j++)
+        for (unsigned int j = 0; j < nVtxPerRing; j++)
         {
             indices.push_back(oldRingOffset + j);
             indices.push_back(newRingOffset + j);
-            indices.push_back(newRingOffset + ((j + 1) % nVtxPerRing));
-
-            indices.push_back(newRingOffset + ((j + 1) % nVtxPerRing));
-            indices.push_back(oldRingOffset + ((j + 1) % nVtxPerRing));
+            indices.push_back(newRingOffset + (j + 1) % nVtxPerRing);
+    
+            indices.push_back(newRingOffset + (j + 1) % nVtxPerRing);
+            indices.push_back(oldRingOffset + (j + 1) % nVtxPerRing);
             indices.push_back(oldRingOffset + j);
         }
     }
-
-    unsigned int lastRingOffset = (nStrips - 2) * nVtxPerRing;
-    unsigned int lastVtxIdx = lastRingOffset + nVtxPerRing + 1;
-
-    for (unsigned int i = 2; i < nVtxPerRing + 2; i++)
+        //endcap
+    unsigned int lastRingOffset = (nStrips - 2) * nVtxPerRing + 1;
+    unsigned int lastVtxIdx = lastRingOffset + nVtxPerRing;
+    
+    for (unsigned int i = 0; i < nVtxPerRing; i++)
     {
-        indices.push_back(lastRingOffset + (i % nVtxPerRing));
-        indices.push_back(lastRingOffset + i - 1);
+        indices.push_back(lastRingOffset + i);
         indices.push_back(lastVtxIdx);
+        indices.push_back(lastRingOffset + (i + 1) % nVtxPerRing);
     }
 
     nIdx = indices.size();

@@ -25,8 +25,8 @@ class Texture {
 public:
 	unsigned int getID();
 	unsigned int getID() const;
-	unsigned int create(const std::string& path, const TextureParams opt);
-	unsigned int create(
+	bool create(const std::string& path, const TextureParams opt);
+	bool create(
 		unsigned int width,
 		unsigned int height,
 		unsigned int format,

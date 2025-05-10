@@ -11,7 +11,16 @@ bool Window::create() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	window = glfwCreateWindow(windowWidth, windowHeight, "OIT Onlab", NULL, NULL);
+	auto monitor = glfwGetPrimaryMonitor();
+	auto mode = glfwGetVideoMode(monitor);
+	glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+	glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+	glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+	glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+
+	//window = glfwCreateWindow(mode->width, mode->height, "OIT Onlab", monitor, NULL);	//windowed fullscreen
+	//window = glfwCreateWindow(windowWidth, windowHeight, "OIT Onlab", monitor, NULL);	//fullscreen
+	window = glfwCreateWindow(windowWidth, windowHeight, "OIT Onlab", NULL, NULL);	//windowed mode
 
 	if (!window)
 		return false;
@@ -39,9 +48,6 @@ bool Window::create() {
 void Window::renderLoop() {
 	while (!glfwWindowShouldClose(window))
 	{
-		glClearColor(0.1f, 0.2f, 0.3f, 1.0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 		static float tend = 0.0f;
 		const float dt = 0.01f;
 		float tstart = tend;

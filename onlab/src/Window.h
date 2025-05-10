@@ -8,8 +8,8 @@
 #include <iostream>
 
 class Window {
-	static const int windowWidth = 640;					// TODO: move to Settings or somesuch
-	static const int windowHeight = 480;				// -//-
+	static const int windowWidth = 1920;					// TODO: move to Settings or somesuch
+	static const int windowHeight = 1080;				// -//-
 	TransparencyMethod renderingTransparencyMode;	// -//-
 
 	GLFWwindow* window;

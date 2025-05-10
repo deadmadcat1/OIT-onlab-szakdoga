@@ -23,7 +23,7 @@ out vec4 fragColor;
 vec3 shade(vec3 normal, vec3 lightDir, vec3 viewDir,
            vec3 Le, vec3 kd, vec3 ks, float shine){
 	float cosa = max(dot(normal, lightDir), 0.0f);
-	float cosb = clamp(dot(viewDir, normal), 0.0f, 1.0f);
+	float cosb = max(dot(normal, viewDir), 0.0f);
 	vec3 halfway = normalize(lightDir + viewDir);
 	float cosd = max(dot(normal, halfway), 0.0f);
 	return Le * (kd * cosa + ks * pow(cosd, shine) * (cosa/max(cosb, cosa)));

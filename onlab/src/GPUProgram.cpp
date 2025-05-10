@@ -98,7 +98,7 @@ void GPUProgram::setUniform(const std::string& name, const glm::mat4* const mat)
 
 void GPUProgram::setUniform(const std::string& samplerName,
 							const Texture* texture,
-							unsigned int textureUnit = 0) {
+							unsigned int textureUnit) {
 
 	int location = getLocation(samplerName);
 	if (location >= 0) {

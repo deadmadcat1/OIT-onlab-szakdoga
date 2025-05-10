@@ -15,13 +15,15 @@ bool Scene::set() {
 	int numOfLights = 4;	//TODO: move to a settings class
 
 	camera = std::make_unique<Camera>();
-	camera->translate(glm::vec3(0.0f, 3.0f, 3.0f));
+	camera->translate(glm::vec3(0.0f, 8.0f, 20.0f));
 
 	setMakeLights(numOfLights);
 
 	if (!setMakeShaderPrograms()) return false;
 
-	//if (!setMakeOpaqueObjects()) return false;
+	if (!setMakeFramebuffers()) return false;
+
+	if (!setMakeOpaqueObjects()) return false;
 
 	if (!setMakeTransparentObjects()) return false;
 
@@ -38,8 +40,8 @@ void Scene::setMakeLights(int numOfLights) {
 	l->setEmissiveColor(glm::vec3(1));
 	lights.push_back(l);
 
-	std::uniform_real_distribution<float> l_pos_rand(-15.0f, 15.0f);
-	std::uniform_real_distribution<float> l_L_rand(100.0f, 200.0f);
+	std::uniform_real_distribution<float> l_pos_rand(-12.0f, 12.0f);
+	std::uniform_real_distribution<float> l_L_rand(100.0f, 500.0f);
 
 	for (int i = lights.size(); i < numOfLights; i++){
 		l = std::make_shared<Light>(i);
@@ -52,8 +54,8 @@ void Scene::setMakeLights(int numOfLights) {
 
 bool Scene::setMakeShaderPrograms() {
 	successToggle success(true);
-	auto testVS = std::make_shared<Shader>(GL_VERTEX_SHADER);
-	auto testFS = std::make_shared<Shader>(GL_FRAGMENT_SHADER);
+	auto fullscreenQuadVS = std::make_shared<Shader>(GL_VERTEX_SHADER);
+	auto fullscreenQuadFS = std::make_shared<Shader>(GL_FRAGMENT_SHADER);
 	auto vertexShader = std::make_shared<Shader>(GL_VERTEX_SHADER);
 	auto phongShader = std::make_shared<Shader>(GL_FRAGMENT_SHADER);
 	auto depthPeelShader = std::make_shared<Shader>(GL_FRAGMENT_SHADER);
@@ -61,8 +63,8 @@ bool Scene::setMakeShaderPrograms() {
 
 	//depthPeelShader->addDefine("#define DEPTH_PEEL_ENABLED");
 
-	success = testVS->create("./shaders/vs_simple.glsl");
-	success = testFS->create("./shaders/fs_simple.glsl");
+	success = fullscreenQuadVS->create("./shaders/vs_FSTQ.glsl");
+	success = fullscreenQuadFS->create("./shaders/fs_FSTQ.glsl");
 	success = vertexShader->create("./shaders/vs_transform.glsl");
 	success = phongShader->create("./shaders/fs_maxblinn.glsl");
 	success = depthPeelShader->create("./shaders/fs_maxblinn.glsl");
@@ -80,10 +82,27 @@ bool Scene::setMakeShaderPrograms() {
 	depthPeelProgram->addShader(depthPeelShader);
 	//depthPeelProgram->addShader(depthPeelCompositor);
 	success = depthPeelProgram->create("fragColor");
+
+	auto FSTQProgram = std::make_shared<GPUProgram>();
+	FSTQProgram->addShader(fullscreenQuadVS);
+	FSTQProgram->addShader(fullscreenQuadFS);
+	success = FSTQProgram->create("fragColor");
 	if (!success) return false;
 
+	success = shaderPrograms.emplace("FSTQ", FSTQProgram).second;
 	success = shaderPrograms.emplace("phongBlinn", alphaBlendProgram).second;	//https://en.cppreference.com/w/cpp/container/unordered_map/emplace#Return_value
 	success = shaderPrograms.emplace("depthPeel", depthPeelProgram).second;
+	return success;
+}
+
+bool Scene::setMakeFramebuffers() {
+	successToggle success(true);
+
+	auto finalOutput = std::make_shared<Framebuffer>();
+	success = finalOutput->create(1, /*TODO: settings.renderResolution.w*/1920, /*TODO: settings.renderResolution.h*/1080);
+
+
+	success = framebuffers.emplace("finalOutput", finalOutput).second;
 	return success;
 }
 
@@ -94,6 +113,8 @@ bool Scene::setMakeOpaqueObjects() {
 	success = plane->create();
 
 	if (!success) return false;
+
+	fullscreenTexturedQuad = std::make_unique<Object>(plane);
 
 	auto boxMaterial = std::make_shared<Material>();
 	boxMaterial->kd = glm::vec3(0.2f, 0.2f, 0.2f);
@@ -129,35 +150,34 @@ bool Scene::setMakeOpaqueObjects() {
 bool Scene::setMakeTransparentObjects() {
 	successToggle success(true);
 
-	auto sphere = std::make_shared<Sphere>(32, 32);
+	auto sphere = std::make_shared<Sphere>(64, 32);
 	success = sphere->create();
 
 	if (!success) return false;
 
-	auto ballMaterial = std::make_shared<Material>();
-
 	std::vector<std::shared_ptr<Object>> balls;
-
-	float maxScale = 3;
+	
+	float maxScale = 2;
 	std::uniform_real_distribution<float> size_rand(1.0f, maxScale);
 	std::uniform_real_distribution<float> pos_rand(-10.0f, 10.0f);
 	std::uniform_real_distribution<float> _0_1_rand(0.0f, 1.0f);
 	for (int i = 0; i < 20; i++)
 	{
+		auto ballMaterial = std::make_shared<Material>();
+
 		ballMaterial->kd = glm::vec3(_0_1_rand(rng), _0_1_rand(rng), _0_1_rand(rng));
-		ballMaterial->alpha = _0_1_rand(rng);
+		ballMaterial->alpha = _0_1_rand(rng) + 0.1f / 2.0f;
 		ballMaterial->ks = glm::vec3(_0_1_rand(rng), _0_1_rand(rng), _0_1_rand(rng));
 		ballMaterial->shine = _0_1_rand(rng);
-
+	
 		auto ball = std::make_unique<Object>(ballMaterial, sphere);
 		float scaleFactor = size_rand(rng);
 		ball->scale(scaleFactor*glm::vec3(1.0f));
 		ball->translate(glm::vec3(pos_rand(rng), pos_rand(rng), pos_rand(rng)));
 		balls.push_back(std::move(ball));
 	}
-
+	
 	appendVector(transparentObjects, balls);
-
 	return true;
 }
 
@@ -177,9 +197,21 @@ void Scene::render(TransparencyMethod mode){
 		renderWavelet();
 		break;
 	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glDisable(GL_DEPTH_TEST);
+	auto FSTQprogram = shaderPrograms["FSTQ"];
+	FSTQprogram->activate();
+	framebuffers["finalOutput"]->bindUniforms(FSTQprogram);
+	fullscreenTexturedQuad->draw();
 }
 
 void Scene::renderAlphaBlend() {
+	glClearColor(0.1f, 0.2f, 0.3f, 1.0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	auto program = shaderPrograms["phongBlinn"];
 	program->activate();
 	
@@ -189,7 +221,8 @@ void Scene::renderAlphaBlend() {
 	for (const auto& l : lights) {
 		l->bindUniforms(program);
 	}
-
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	for (const auto& o : opaqueObjects) {
@@ -202,6 +235,8 @@ void Scene::renderAlphaBlend() {
 	}
 	glBlendFunc(GL_ONE, GL_ZERO);
 	glDisable(GL_BLEND);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
 }
 void Scene::renderDepthPeeling() {
 	auto program = shaderPrograms["depthPeel"];
