@@ -5,6 +5,8 @@
 #include <glm/glm.hpp>
 #include <iostream>
 
+//#define DRAW_WIREFRAME
+
 template <typename T> void appendVector(std::vector<T>& target, const std::vector<T>& donor) {
 	target.insert(target.end(), donor.begin(), donor.end());
 }
@@ -37,17 +39,18 @@ void Scene::setMakeLights(int numOfLights) {
 	}
 	auto l = std::make_shared<Light>(0);
 	l->translate(glm::vec3(1.0f, 2.0f, 3.0f));
-	l->setEmissiveColor(glm::vec3(1));
+	l->setEmissiveColor(glm::vec3(5));
 	lights.push_back(l);
 
 	std::uniform_real_distribution<float> l_pos_rand(-12.0f, 12.0f);
-	std::uniform_real_distribution<float> l_L_rand(100.0f, 500.0f);
+	std::uniform_real_distribution<float> l_L_rand(1.0f, 100.0f);
 
 	for (int i = lights.size(); i < numOfLights; i++){
 		l = std::make_shared<Light>(i);
 		l->setPointLight();
 		l->translate(glm::vec3(l_pos_rand(rng), l_pos_rand(rng), l_pos_rand(rng)));
-		l->setEmissiveColor(glm::vec3(l_L_rand(rng), l_L_rand(rng), l_L_rand(rng)));
+		auto color = glm::vec3(l_L_rand(rng), l_L_rand(rng), l_L_rand(rng));
+		l->setEmissiveColor(color);
 		lights.push_back(l);
 	}
 }
@@ -59,16 +62,16 @@ bool Scene::setMakeShaderPrograms() {
 	auto vertexShader = std::make_shared<Shader>(GL_VERTEX_SHADER);
 	auto phongShader = std::make_shared<Shader>(GL_FRAGMENT_SHADER);
 	auto depthPeelShader = std::make_shared<Shader>(GL_FRAGMENT_SHADER);
-	//auto depthPeelCompositor = std::make_shared<Shader>(GL_FRAGMENT_SHADER);
+	auto depthPeelCompositor = std::make_shared<Shader>(GL_FRAGMENT_SHADER);
 
-	//depthPeelShader->addDefine("#define DEPTH_PEEL_ENABLED");
+	depthPeelShader->addDefine("#define DEPTH_PEEL_ENABLED");
 
 	success = fullscreenQuadVS->create("./shaders/vs_FSTQ.glsl");
 	success = fullscreenQuadFS->create("./shaders/fs_FSTQ.glsl");
 	success = vertexShader->create("./shaders/vs_transform.glsl");
 	success = phongShader->create("./shaders/fs_maxblinn.glsl");
 	success = depthPeelShader->create("./shaders/fs_maxblinn.glsl");
-	//success = depthPeelCompositor->create("./shaders/fs_depthpeel_compositor.glsl");
+	success = depthPeelCompositor->create("./shaders/fs_depthpeel_compositor.glsl");
 
 	if (!success) return false;
 
@@ -80,8 +83,12 @@ bool Scene::setMakeShaderPrograms() {
 	auto depthPeelProgram = std::make_shared<GPUProgram>();
 	depthPeelProgram->addShader(vertexShader);
 	depthPeelProgram->addShader(depthPeelShader);
-	//depthPeelProgram->addShader(depthPeelCompositor);
 	success = depthPeelProgram->create("fragColor");
+
+	auto depthPeelCompositeProgram = std::make_shared<GPUProgram>();
+	depthPeelCompositeProgram->addShader(fullscreenQuadVS);
+	depthPeelCompositeProgram->addShader(depthPeelCompositor);
+	success = depthPeelCompositeProgram->create("fragColor");
 
 	auto FSTQProgram = std::make_shared<GPUProgram>();
 	FSTQProgram->addShader(fullscreenQuadVS);
@@ -92,17 +99,31 @@ bool Scene::setMakeShaderPrograms() {
 	success = shaderPrograms.emplace("FSTQ", FSTQProgram).second;
 	success = shaderPrograms.emplace("phongBlinn", alphaBlendProgram).second;	//https://en.cppreference.com/w/cpp/container/unordered_map/emplace#Return_value
 	success = shaderPrograms.emplace("depthPeel", depthPeelProgram).second;
+	success = shaderPrograms.emplace("depthPeelComposite", depthPeelCompositeProgram).second;
 	return success;
 }
 
 bool Scene::setMakeFramebuffers() {
 	successToggle success(true);
 
-	auto finalOutput = std::make_shared<Framebuffer>();
-	success = finalOutput->create(1, /*TODO: settings.renderResolution.w*/1920, /*TODO: settings.renderResolution.h*/1080);
+	auto output = std::make_shared<Framebuffer>();
+	success = output->create(1, /*TODO: settings.renderResolution.w*/1920, /*TODO: settings.renderResolution.h*/1080);
+	auto depthPeelPass1 = std::make_shared<Framebuffer>();
+	success = depthPeelPass1->create(1, /*TODO: settings.renderResolution.w*/1920, /*TODO: settings.renderResolution.h*/1080);
+	auto depthPeelPass2 = std::make_shared<Framebuffer>();
+	success = depthPeelPass2->create(1, /*TODO: settings.renderResolution.w*/1920, /*TODO: settings.renderResolution.h*/1080);
+	auto depthPeelPass3 = std::make_shared<Framebuffer>();
+	success = depthPeelPass3->create(1, /*TODO: settings.renderResolution.w*/1920, /*TODO: settings.renderResolution.h*/1080);
+	auto depthPeelPass4 = std::make_shared<Framebuffer>();
+	success = depthPeelPass4->create(1, /*TODO: settings.renderResolution.w*/1920, /*TODO: settings.renderResolution.h*/1080);
 
+	if (!success) return false;
 
-	success = framebuffers.emplace("finalOutput", finalOutput).second;
+	success = framebuffers.emplace("finalOutput", output).second;
+	success = framebuffers.emplace("depthPeelPass1", depthPeelPass1).second;
+	success = framebuffers.emplace("depthPeelPass2", depthPeelPass2).second;
+	success = framebuffers.emplace("depthPeelPass3", depthPeelPass3).second;
+	success = framebuffers.emplace("depthPeelPass4", depthPeelPass4).second;
 	return success;
 }
 
@@ -182,6 +203,9 @@ bool Scene::setMakeTransparentObjects() {
 }
 
 void Scene::render(TransparencyMethod mode){
+	auto FSTQprogram = shaderPrograms["FSTQ"];
+	auto compositeProgram = shaderPrograms["depthPeelComposite"];
+
 	switch (mode) {
 	default:
 	case TransparencyMethod::alphaBlend:
@@ -189,6 +213,17 @@ void Scene::render(TransparencyMethod mode){
 		break;
 	case TransparencyMethod::depthPeel:
 		renderDepthPeeling();
+		compositeProgram->activate();
+		for (int i = 0; i < 4/*settings.depthPeelCount*/; i++) {
+			auto layer = framebuffers["depthPeelPass" + std::to_string(i + 1)]->getColorTarget(0);
+			compositeProgram->setUniform("colorSampler" + std::to_string(i + 1), layer, i + 1);
+		}
+		
+		framebuffers["finalOutput"]->bind();
+		glClearColor(1.0f, 3.0f, 2.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glDisable(GL_DEPTH_TEST);
+		fullscreenTexturedQuad->draw();
 		break;
 	case TransparencyMethod::moment:
 		renderMBOIT();
@@ -198,17 +233,21 @@ void Scene::render(TransparencyMethod mode){
 		break;
 	}
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glDisable(GL_DEPTH_TEST);
-	auto FSTQprogram = shaderPrograms["FSTQ"];
 	FSTQprogram->activate();
 	framebuffers["finalOutput"]->bindUniforms(FSTQprogram);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glDisable(GL_DEPTH_TEST);
 	fullscreenTexturedQuad->draw();
 }
 
 void Scene::renderAlphaBlend() {
+#ifdef DRAW_WIREFRAME
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+#endif
+	framebuffers["finalOutput"]->bind();
+
 	glClearColor(0.1f, 0.2f, 0.3f, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -221,9 +260,9 @@ void Scene::renderAlphaBlend() {
 	for (const auto& l : lights) {
 		l->bindUniforms(program);
 	}
-	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
+	//glEnable(GL_CULL_FACE);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	for (const auto& o : opaqueObjects) {
 		o->bindUniforms(program);
@@ -234,12 +273,19 @@ void Scene::renderAlphaBlend() {
 		t->draw();
 	}
 	glBlendFunc(GL_ONE, GL_ZERO);
+	//glDisable(GL_CULL_FACE);
 	glDisable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_CULL_FACE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#ifdef DRAW_WIREFRAME
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+#endif
 }
 void Scene::renderDepthPeeling() {
-	auto program = shaderPrograms["depthPeel"];
+#ifdef DRAW_WIREFRAME
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+#endif
+	auto program = shaderPrograms["phongBlinn"];
 	program->activate();
 
 	camera->bindUniforms(program);
@@ -248,23 +294,65 @@ void Scene::renderDepthPeeling() {
 	for (const auto& l : lights) {
 		l->bindUniforms(program);
 	}
+	
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	auto framebuffer = framebuffers["depthPeelPass1"];
+	framebuffer->bind();
+
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	for (const auto& o : opaqueObjects) {
 		o->bindUniforms(program);
 		o->draw();
 	}
-	glDepthFunc(GL_ALWAYS);
 	for (const auto& t : transparentObjects) {
 		t->bindUniforms(program);
 		t->draw();
 	}
+	glDisable(GL_CULL_FACE);
+	program = shaderPrograms["depthPeel"];
+
+	camera->bindUniforms(program);
+
+	program->setUniform("nLights", (int)lights.size());
+	for (const auto& l : lights) {
+		l->bindUniforms(program);
+	}
+	glDepthFunc(GL_ALWAYS);
+	for (int i = 1; i < 4/*settings.depthPeelCount*/; i++) {
+		framebuffer->bindUniforms(program);
+	
+		framebuffer = framebuffers["depthPeelPass" + std::to_string(i + 1)];
+		framebuffer->bind();
+	
+		glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
+		for (const auto& o : opaqueObjects) {
+			o->bindUniforms(program);
+			o->draw();
+		}
+		for (const auto& t : transparentObjects) {
+			t->bindUniforms(program);
+			t->draw();
+		}
+	}
 	glDepthFunc(GL_LESS);
+	glDisable(GL_DEPTH_TEST);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+#ifdef DRAW_WIREFRAME
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+#endif
 }
 void Scene::renderMBOIT() {
 	//TODO
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 void Scene::renderWavelet() {
 	//TODO
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void Scene::animate(float dt) {
@@ -277,4 +365,11 @@ void Scene::animate(float dt) {
 void Scene::seedRNG() {
 	std::random_device seed;
 	rng = std::mt19937(seed());
+}
+
+void Scene::notifyResize(int w, int h) {
+	camera->setParams(73.0f, (float)w / (float)h);
+	for (auto& fb : framebuffers) {
+		fb.second->resize(w, h);
+	}
 }

@@ -29,33 +29,17 @@ bool Framebuffer::create(
 		glDeleteFramebuffers(1, &framebufferID);
 		return false;
 	}
-
-	_w = width;
-	_h = height;
+	
+	_targetCount = targetCount;
+	_width = width;
+	_height = height;
 	_format = format;
+	_sourceFormat = sourceFormat;
+	_sourceType = sourceType;
 
-	for (size_t i = 0; i < targetCount; i++)
-	{
-		auto colorTarget = std::make_unique<Texture>();
-		colorTarget->create(width, height, format, sourceFormat, sourceType, TextureParams(GL_LINEAR));
-		colorTargets.push_back(std::move(colorTarget));
-	}
-	depthTarget = std::make_unique<Texture>();
-	depthTarget->create(width, height, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, TextureParams(GL_LINEAR));
+	createTextures(targetCount, width, height, format, sourceFormat, sourceType);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, framebufferID);
-
-	std::vector<GLenum> attachments;
-	attachments.reserve(targetCount);
-	for (unsigned int i = 0; i < targetCount; i++)
-	{
-		unsigned int attach = GL_COLOR_ATTACHMENT0 + i;
-		attachments.push_back(attach);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, attach, GL_TEXTURE_2D, colorTargets[i]->getID(), 0);
-	}
-	glDrawBuffers(targetCount, attachments.data());
-
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTarget->getID(), 0);
+	attachTextures();
 
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if (status != GL_FRAMEBUFFER_COMPLETE) {
@@ -69,13 +53,41 @@ bool Framebuffer::create(
 	return true;
 }
 
-void Framebuffer::bind() {
-	glBindFramebuffer(GL_FRAMEBUFFER, framebufferID);
-	glViewport(0, 0, _w, _h);
+void Framebuffer::createTextures(unsigned int targetCount,
+	unsigned int width,
+	unsigned int height,
+	unsigned int format,
+	unsigned int sourceFormat,
+	unsigned int sourceType) {
+	for (size_t i = 0; i < targetCount; i++)
+	{
+		auto colorTarget = std::make_unique<Texture>();
+		colorTarget->create(width, height, format, sourceFormat, sourceType, TextureParams(GL_LINEAR));
+		colorTargets.push_back(std::move(colorTarget));
+	}
+	depthTarget = std::make_shared<Texture>();
+	depthTarget->create(width, height, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, TextureParams(GL_LINEAR));
+
 }
 
-void Framebuffer::activate(unsigned int target) {
-	glBindTexture(GL_TEXTURE_2D, colorTargets[target]->getID());
+void Framebuffer::attachTextures() {
+	glBindFramebuffer(GL_FRAMEBUFFER, framebufferID);
+
+	std::vector<GLenum> attachments;
+	for (size_t i = 0; i < _targetCount; i++)
+	{
+		GLenum attach = GL_COLOR_ATTACHMENT0 + i;
+		attachments.push_back(attach);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, attach, GL_TEXTURE_2D, colorTargets[i]->getID(), 0);
+	}
+	glDrawBuffers(attachments.size(), attachments.data());
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTarget->getID(), 0);
+}
+
+void Framebuffer::bind() {
+	glBindFramebuffer(GL_FRAMEBUFFER, framebufferID);
+	glViewport(0, 0, _width, _height);
 }
 
 void Framebuffer::bindUniforms(const std::shared_ptr<GPUProgram>& program) {
@@ -86,7 +98,32 @@ void Framebuffer::bindUniforms(const std::shared_ptr<GPUProgram>& program) {
 	}
 }
 
+Texture* Framebuffer::getColorTarget(int idx) {
+	return colorTargets[idx].get();
+}
+Texture* Framebuffer::getDepthTarget() {
+	return depthTarget.get();
+}
+
 Framebuffer::~Framebuffer(){
 	colorTargets.clear();
+	depthTarget.reset();
 	glDeleteFramebuffers(1, &framebufferID);
+}
+
+void Framebuffer::resize(int w, int h) {
+	colorTargets.clear();
+	depthTarget.reset();
+
+	_width = w;
+	_height = h;
+
+	createTextures(_targetCount, _width, _height, _format, _sourceFormat, _sourceType);
+
+	attachTextures();
+
+	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if (status != GL_FRAMEBUFFER_COMPLETE) {
+		std::cerr << "Framebuffer incomplete!" << std::endl;
+	}
 }

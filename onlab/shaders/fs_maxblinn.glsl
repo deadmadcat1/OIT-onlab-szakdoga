@@ -13,6 +13,8 @@ uniform struct {
 	float alpha, shine;
 } material;
 
+uniform sampler2D depthSampler;
+
 in vec3 wLightDir[8];
 in vec4 wPos;
 in vec3 wNormal;
@@ -31,7 +33,8 @@ vec3 shade(vec3 normal, vec3 lightDir, vec3 viewDir,
 
 void main(void){
 #ifdef DEPTH_PEEL_ENABLED
-	float clipDepth = texelFetch(depthMask, ivec2(gl_FragCoord.xy), 0).r;
+	float clipDepth = texelFetch(depthSampler, ivec2(gl_FragCoord.xy), 0).r;
+	clipDepth = (clipDepth * 0.5f) + 0.5f;
 	if (gl_FragCoord.z <= clipDepth) {
 		discard;
 	}

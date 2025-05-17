@@ -7,7 +7,7 @@
 void Camera::bindUniforms(std::shared_ptr<GPUProgram> program) {
 	glm::mat4 View = glm::lookAt(position, lookAtP, viewUp);
 	
-	glm::mat4 Proj = glm::perspective(glm::radians(vfov), aratio, fp, bp);
+	glm::mat4 Proj = glm::perspective(glm::radians(_vfov), _aratio, _fp, _bp);
 
 	program->activate();
 	program->setUniform("camera.wPos", &position);
@@ -15,11 +15,11 @@ void Camera::bindUniforms(std::shared_ptr<GPUProgram> program) {
 	program->setUniform("camera.VP", &VP);
 }
 
-void Camera::setParams(float _vfov, float _aratio, float _fp, float _bp) {
-	vfov = _vfov;
-	aratio = _aratio;
-	fp = _fp;
-	bp = _bp;
+void Camera::setParams(float vfov, float aratio, float fp, float bp) {
+	_vfov = vfov;
+	_aratio = aratio;
+	_fp = fp;
+	_bp = bp;
 }
 
 void Camera::setViewUp(glm::vec3 direction) {

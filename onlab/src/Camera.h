@@ -9,10 +9,10 @@ class Camera {
 	glm::vec3 position = glm::vec3(0.0f);
 	glm::vec3 viewUp = glm::vec3(0.0f, 1.0f, 0.0f);
 	glm::vec3 lookAtP = glm::vec3(0.0f);
-	float vfov = 73.0f;
-	float aratio = 16.0f/9.0f;
-	float fp = 0.1f;
-	float bp = 100.0f;
+	float _vfov = 73.0f;
+	float _aratio = 16.0f/9.0f;
+	float _fp = 0.1f;
+	float _bp = 100.0f;
 public:
 	void bindUniforms(std::shared_ptr<GPUProgram> program);
 	void setParams(float vfov = 73.0f, float aratio = (16.0f / 9.0f), float nearp = 0.1f, float farp = 100.0f);

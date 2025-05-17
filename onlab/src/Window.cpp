@@ -73,6 +73,7 @@ Window::~Window()
 
 void Window::resize_callback(int width, int height) {
 	glViewport(0, 0, width, height);
+	scene->notifyResize(width, height);
 }
 void Window::key_callback(int key, int scancode, int action, int mods) {
 	if (action == GLFW_PRESS) {
