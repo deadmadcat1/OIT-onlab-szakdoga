@@ -45,6 +45,7 @@ class Scene {
 	void setMakeLights(int numOfLights);
 	bool setMakeShaderPrograms();
 	bool setMakeFramebuffers();
+	bool setCreateFramebuffer(std::string name, int targetCount, int width, int height);
 	bool setMakeOpaqueObjects();
 	bool setMakeTransparentObjects();
 

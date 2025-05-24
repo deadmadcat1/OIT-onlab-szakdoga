@@ -103,27 +103,19 @@ bool Scene::setMakeShaderPrograms() {
 	return success;
 }
 
+bool Scene::setCreateFramebuffer(std::string n, int tc, int w, int h) {
+	auto fbuf = std::make_shared<Framebuffer>();
+	return (fbuf->create(tc, w, h) ? framebuffers.emplace(n, fbuf).second : false);
+}
+
 bool Scene::setMakeFramebuffers() {
 	successToggle success(true);
-
-	auto output = std::make_shared<Framebuffer>();
-	success = output->create(1, /*TODO: settings.renderResolution.w*/1920, /*TODO: settings.renderResolution.h*/1080);
-	auto depthPeelPass1 = std::make_shared<Framebuffer>();
-	success = depthPeelPass1->create(1, /*TODO: settings.renderResolution.w*/1920, /*TODO: settings.renderResolution.h*/1080);
-	auto depthPeelPass2 = std::make_shared<Framebuffer>();
-	success = depthPeelPass2->create(1, /*TODO: settings.renderResolution.w*/1920, /*TODO: settings.renderResolution.h*/1080);
-	auto depthPeelPass3 = std::make_shared<Framebuffer>();
-	success = depthPeelPass3->create(1, /*TODO: settings.renderResolution.w*/1920, /*TODO: settings.renderResolution.h*/1080);
-	auto depthPeelPass4 = std::make_shared<Framebuffer>();
-	success = depthPeelPass4->create(1, /*TODO: settings.renderResolution.w*/1920, /*TODO: settings.renderResolution.h*/1080);
-
-	if (!success) return false;
-
-	success = framebuffers.emplace("finalOutput", output).second;
-	success = framebuffers.emplace("depthPeelPass1", depthPeelPass1).second;
-	success = framebuffers.emplace("depthPeelPass2", depthPeelPass2).second;
-	success = framebuffers.emplace("depthPeelPass3", depthPeelPass3).second;
-	success = framebuffers.emplace("depthPeelPass4", depthPeelPass4).second;
+	/*TODO: settings.renderResolution.w & settings.renderResolution.h*/
+	success = setCreateFramebuffer("finalOutput", 1, 1920, 1080);
+	success = setCreateFramebuffer("depthPeelPass1", 1, 1920, 1080);
+	success = setCreateFramebuffer("depthPeelPass2", 1, 1920, 1080);
+	success = setCreateFramebuffer("depthPeelPass3", 1, 1920, 1080);
+	success = setCreateFramebuffer("depthPeelPass4", 1, 1920, 1080);
 	return success;
 }
 
@@ -327,7 +319,7 @@ void Scene::renderDepthPeeling() {
 		framebuffer = framebuffers["depthPeelPass" + std::to_string(i + 1)];
 		framebuffer->bind();
 	
-		glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
+		glClearColor(1.0f, 0.0f, 1.0f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 		for (const auto& o : opaqueObjects) {
@@ -356,7 +348,7 @@ void Scene::renderWavelet() {
 }
 
 void Scene::animate(float dt) {
-	glm::vec3 xyzOmega(0.0f, 360.0f, 0.0f);
+	glm::vec3 xyzOmega(0.0f, 210.0f, 0.0f);
 	glm::vec3 lookAtPoint(0.0f, 0.0f, 0.0f);
 	camera->lookAt(lookAtPoint);
 	camera->orbit(lookAtPoint, xyzOmega*100.0f*dt);

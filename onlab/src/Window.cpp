@@ -88,7 +88,7 @@ void Window::key_callback(int key, int scancode, int action, int mods) {
 			break;
 		case GLFW_KEY_2:
 			renderingTransparencyMode = TransparencyMethod::depthPeel;
-			std::cout << "Transparency mode: Dual Depth Peeling" << std::endl;
+			std::cout << "Transparency mode: Depth Peeling" << std::endl;
 			break;
 		case GLFW_KEY_3:
 			renderingTransparencyMode = TransparencyMethod::moment;
