@@ -20,6 +20,5 @@ void main(void){
 	vec4 layer2 = texture(colorSampler2, texCoord);
 	vec4 layer3 = texture(colorSampler3, texCoord);
 	vec4 layer4 = texture(colorSampler4, texCoord);
-	fragColor = layer4;
-	//fragColor = blend(layer1, blend(layer2, blend(layer3, layer4)));
+	fragColor = blend(layer1, blend(layer2, blend(layer3, layer4)));
 }

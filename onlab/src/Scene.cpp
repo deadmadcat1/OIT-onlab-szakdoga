@@ -39,7 +39,7 @@ void Scene::setMakeLights(int numOfLights) {
 	}
 	auto l = std::make_shared<Light>(0);
 	l->translate(glm::vec3(1.0f, 2.0f, 3.0f));
-	l->setEmissiveColor(glm::vec3(5));
+	l->setEmissiveColor(glm::vec3(10));
 	lights.push_back(l);
 
 	std::uniform_real_distribution<float> l_pos_rand(-12.0f, 12.0f);
@@ -171,7 +171,7 @@ bool Scene::setMakeOpaqueObjects() {
 bool Scene::setMakeTransparentObjects() {
 	successToggle success(true);
 
-	auto sphere = std::make_shared<Sphere>(64, 32);
+	auto sphere = std::make_shared<Sphere>(4, 4);
 	success = sphere->create();
 
 	if (!success) return false;
@@ -187,7 +187,7 @@ bool Scene::setMakeTransparentObjects() {
 		auto ballMaterial = std::make_shared<Material>();
 
 		ballMaterial->kd = glm::vec3(_0_1_rand(rng), _0_1_rand(rng), _0_1_rand(rng));
-		ballMaterial->alpha = _0_1_rand(rng) + 0.1f / 2.0f;
+		ballMaterial->alpha = _0_1_rand(rng) + 0.1f / 32.0f;
 		ballMaterial->ks = glm::vec3(_0_1_rand(rng), _0_1_rand(rng), _0_1_rand(rng));
 		ballMaterial->shine = _0_1_rand(rng);
 	
