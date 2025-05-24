@@ -1,0 +1,24 @@
+\subsection{Moment-Based OIT}
+\label{sec:MBOIT}
+\paragraph{}A \ac{MBOIT}~\cite{10.1145/3203206} egy relatíve új technika, amely a képtér pixelenkénti láthatósági függvényére\index{transmittance function, láthatósági függvény} ad megközelítést vagy hatványos, vagy akár trigonometrikus momentumok használatával.
+
+\paragraph{}A \ref{ch:1}. fejezetben bemutatott Depth Peeling-hez képest akár tízszer gyorsabb, és a trigonometrikus momentumok esetén alig megkülönböztethető képet készít.
+
+\paragraph{}A művelet két menetet követel meg, először a jelenet láthatósági függvényeinek meghatározásához, másodszor az átlátszó felületek összeállításához. Az átlátszatlan objektumok előre egy külön framebufferbe\index{framebuffer} lerajzolandók.
+
+\paragraph{}A számításokat gazdaságosabb az elnyelési függvényre~(\autoref{eq:logtransmit})\index{elnyelési függvény} alapozni a logaritmus miatt.
+
+\begin{gather}
+	\label{eq:pointtransmittance} T(z_f) := \prod_{\substack{l=0\\z_l<z_f}}^{n-1}(1-\alpha_l)\\
+	\label{eq:logtransmit}A(z_f) := -\ln\,T(z_f) = \sum_{\substack{l=0\\z_l<z_f}}^{n-1}-\ln(1-\alpha_l)
+\end{gather}
+
+\paragraph{}\Aref{eq:pointtransmittance}\,-\,es képlet a $z_f$ mélységbeli láthatósági függvénye a vizsgált pixelnek.
+\Aref{eq:logtransmit} -es képlet pedig ugyanezen láthatósági függvény logaritmizálva, az elnyelési függvény $z_f$ mélységben.
+
+Mivel $A(z_f)$ monoton a teljes mélységtartományon, képezhető belőle egy halmozott eloszlásfüggvény:
+$$Z := \sum_{l=0}^{n-1}-\ln(1-\alpha_l)\cdot\delta_{z_l}$$
+ahol $\delta_{z_l}$ egy Dirac-$\delta$ minden felület $z_l$ mélységében. A számított értékek tárolásához szükség van még egy momentum-generáló függvényre: $\boldsymbol{b} : [-1,1] \rightarrow \mathbb{R}^{m+1}$. Így a következő képlettel a vizsgált pixelbeli teljes láthatósági függvény hatékonyan eltárolható.
+
+
+$$b:=\mathcal{E}_Z(\boldsymbol{b}):=\sum_{l=0}^{n-1}-\ln(1-\alpha_l)\cdot\boldsymbol{b}(z_l)$$

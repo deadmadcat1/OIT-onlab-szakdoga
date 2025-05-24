@@ -11,7 +11,11 @@ in vec2 texCoord;
 out vec4 fragColor;
 
 vec4 blend(vec4 layerA, vec4 layerB){
-	return vec4(layerA.rgb + (1 - layerA.a) * layerB.rgb, layerA.a);
+	float alpha = layerA.a + layerB.a * (1 - layerA.a);
+	vec3 color = layerA.rgb * layerA.a  + layerB.a * layerB.rgb * (1 - layerA.a);
+	color = color / alpha;
+	
+	return vec4(color, alpha);
 }
 
 void main(void){

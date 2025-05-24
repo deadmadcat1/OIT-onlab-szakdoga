@@ -1,0 +1,28 @@
+\subsection{Wavelet OIT}
+\paragraph{}A \ac{WOIT}~\cite{aizenshtein2022wavelettransparency} a legújabban publikált technika a bemutatottak közül, amely épít többek között a \pageref{sec:MBOIT}. oldalon tárgyalt \ac{MBOIT}-ra is.
+
+\paragraph{}Az eredeti kiadás a következő táblázatban~\ref{tab:WOITcomp}összehasonlított más modern technikákat, köztük az MBOIT\index{MBOIT}-t is
+
+\paragraph{}Lényeges különbségek:
+\begin{itemize}
+	\item Ennek a technikának nem célja a valósághű pontosság javítása, ellenkezőleg éppen az emberi észlelés sajátosságaira hagyatkozik, hogy végül egy ``hihetőbb'' képet alkosson, az átlátszóság bármilyen alkalmazásában, legyen az köd vagy haj.
+	\item A láthatósági függvényt momentumok helyett wavelet\index{wavelet}-ekkel \cite{Mallat2008Wavelets} tárolja, amelyek magukban egyesítik a térbeli megoldások lokalitását és a frekvenciatartomány alapú megoldások tömöríthetőségét, így pontosabban megközelítve a valódi láthatósági függvényt, kisebb memóriaigénnyel.\label{list:liwavelet}
+\end{itemize}
+
+%\paragraph{}Ismét az elnyelési függvényt\index{elnyelési függvény} használjuk a számításokhoz.
+
+
+\paragraph{}Az eredmény végül egy fizikai hatásokra nem alapuló, de mégis lenyűgözően élethű átlátszóság és fénytörés hatás, mely többször mint sem felülmúlja az MBOIT által produkált eredményt (főleg az itt \ref{list:liwavelet} említettek miatt).
+
+\vfill
+\begin{figure}[bp]
+	\label{tab:WOITcomp}
+	\begin{tabular}{r|r|r|r|r|r}
+		MLAB4 & WBOIT & Moment6 & Moment8 & Wavelet3 & Wavelet4\\
+		\hline
+		1.8 & 0.46 & 2.04 & 2.1 & 1.8 & 2.05\\
+		
+	\end{tabular}
+	\caption{Láthatósági függvény meghatározása és árnyalás időigénye [ms]}
+\end{figure}
+

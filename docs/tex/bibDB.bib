@@ -1,0 +1,45 @@
+@article{10.1145/3203206,
+	author = {M\"{u}nstermann, Cedrick and Krumpen, Stefan and Klein, Reinhard and Peters, Christoph},
+	title = {Moment-Based Order-Independent Transparency},
+	year = {2018},
+	issue_date = {July 2018},
+	publisher = {Association for Computing Machinery},
+	address = {New York, NY, USA},
+	volume = {1},
+	number = {1},
+	url = {https://doi.org/10.1145/3203206},
+	doi = {10.1145/3203206},
+	abstract = {Compositing transparent surfaces rendered in an arbitrary order requires techniques for order-independent transparency. Each surface color needs to be multiplied by the appropriate transmittance to the eye to incorporate occlusion. Building upon moment shadow mapping, we present a moment-based method for compact storage and fast reconstruction of this depth-dependent function per pixel. We work with the logarithm of the transmittance such that the function may be accumulated additively rather than multiplicatively. Then an additive rendering pass for all transparent surfaces yields moments. Moment-based reconstruction algorithms provide approximations to the original function, which are used for compositing in a second additive pass. We utilize existing algorithms with four or six power moments and develop new algorithms using eight power moments or up to four trigonometric moments. The resulting techniques are completely order-independent, work well for participating media as well as transparent surfaces and come in many variants providing different tradeoffs. We also utilize the same approach for the closely related problem of computing shadows for transparent surfaces.},
+	journal = {Proc. ACM Comput. Graph. Interact. Tech.},
+	month = jul,
+	articleno = {7},
+	numpages = {20},
+	keywords = {trigonometric moments, transparent shadow casters, shadows, real-time rendering, power moments, partial coverage, order-independent transparency, moment-based, moment shadow mapping}
+}
+
+@misc{aizenshtein2022wavelettransparency,
+	title={Wavelet Transparency}, 
+	author={Maksim Aizenshtein and Niklas Smal and Morgan McGuire},
+	year={2022},
+	eprint={2201.00094},
+	archivePrefix={arXiv},
+	primaryClass={cs.GR},
+	url={https://arxiv.org/abs/2201.00094}, 
+}
+
+@techreport{Everitt01interactiveorder-independent,
+	author = {Cass Everitt},
+	title = {Interactive Order-Independent Transparency},
+	institution = {NVIDIA},
+	year = {2001}
+}
+
+@book{Mallat2008Wavelets,
+	author={Mallat, Stephane},
+	title = {A Wavelet Tour of Signal Processing, Third Edition: The Sparse Way},
+	year = {2008},
+	isbn = {0123743702, 9780123743701},
+	edition = {3rd},
+	publisher = {Academic Press, Inc.},
+	address = {Orlando, FL, USA},
+}

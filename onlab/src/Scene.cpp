@@ -179,7 +179,7 @@ bool Scene::setMakeTransparentObjects() {
 		auto ballMaterial = std::make_shared<Material>();
 
 		ballMaterial->kd = glm::vec3(_0_1_rand(rng), _0_1_rand(rng), _0_1_rand(rng));
-		ballMaterial->alpha = _0_1_rand(rng) + 0.1f / 32.0f;
+		ballMaterial->alpha = _0_1_rand(rng) + 0.1f / 2.0f;
 		ballMaterial->ks = glm::vec3(_0_1_rand(rng), _0_1_rand(rng), _0_1_rand(rng));
 		ballMaterial->shine = _0_1_rand(rng);
 	

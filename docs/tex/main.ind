@@ -1,0 +1,38 @@
+\begin{theindex}
+
+  \item depth buffer, \hyperpage{3}
+  \item depthpeeling, \hyperpage{4}
+
+  \indexspace
+
+  \item elnyelési függvény, \hyperpage{5}
+
+  \indexspace
+
+  \item fragment, fragmens, \hyperpage{4}
+  \item framebuffer, \hyperpage{4, 5}
+
+  \indexspace
+
+  \item MBOIT, \hyperpage{6}
+
+  \indexspace
+
+  \item prepass, előmenet, \hyperpage{4}
+  \item primitive, primitív, \hyperpage{3}
+
+  \indexspace
+
+  \item textúra, \hyperpage{4}
+  \item transmittance function, láthatósági függvény, 
+		\hyperpage{5}
+
+  \indexspace
+
+  \item wavelet, \hyperpage{6}
+
+  \indexspace
+
+  \item Z-buffer, \hyperpage{3}
+
+\end{theindex}

@@ -1,0 +1,23 @@
+\begin{thebibliography}{1}
+
+\bibitem{aizenshtein2022wavelettransparency}
+Maksim Aizenshtein, Niklas Smal, and Morgan McGuire.
+\newblock Wavelet transparency, 2022.
+
+\bibitem{Everitt01interactiveorder-independent}
+Cass Everitt.
+\newblock Interactive order-independent transparency.
+\newblock Technical report, NVIDIA, 2001.
+
+\bibitem{Mallat2008Wavelets}
+Stephane Mallat.
+\newblock {\em A Wavelet Tour of Signal Processing, Third Edition: The Sparse
+  Way}.
+\newblock Academic Press, Inc., Orlando, FL, USA, 3rd edition, 2008.
+
+\bibitem{10.1145/3203206}
+Cedrick M\"{u}nstermann, Stefan Krumpen, Reinhard Klein, and Christoph Peters.
+\newblock Moment-based order-independent transparency.
+\newblock {\em Proc. ACM Comput. Graph. Interact. Tech.}, 1(1), July 2018.
+
+\end{thebibliography}

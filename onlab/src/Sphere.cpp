@@ -62,7 +62,7 @@ bool Sphere::create() {
 
     /*INDICES*/
     std::vector<unsigned int> indices;
-        //cap
+        //top
     for (unsigned int i = 1; i < nVtxPerRing; i++)
     {
         indices.push_back(0);
@@ -88,7 +88,7 @@ bool Sphere::create() {
             indices.push_back(oldRingOffset + j);
         }
     }
-        //endcap
+        //bottom
     unsigned int lastRingOffset = (nStrips - 2) * nVtxPerRing + 1;
     unsigned int lastVtxIdx = lastRingOffset + nVtxPerRing;
     

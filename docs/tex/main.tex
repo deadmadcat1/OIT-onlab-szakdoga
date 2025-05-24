@@ -1,0 +1,47 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[magyar]{babel}
+\usepackage{t1enc}
+\usepackage[pass]{geometry}
+\usepackage[colorlinks, allcolors=blue]{hyperref}
+\usepackage{blindtext}
+\usepackage{makeidx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{tikz}
+\usetikzlibrary{shapes, calc, positioning}
+\usepackage[printonlyused, withpage]{acronym}
+\usepackage{graphicx}
+%\usepackage{float}
+\usepackage[bottom]{footmisc}
+\usepackage{subcaption}
+
+\makeatletter
+\DeclareRobustCommand{\rgbdddot}[1]{%
+	{\mathop{\kern\z@#1}\limits^{%
+			\vbox to-1.55\ex@{%
+				\kern-\tw@\ex@
+				\hbox{
+					\normalfont
+					\kern0.0em\textcolor{red}{.}
+					\kern-0.5em\textcolor{green}{.}
+					\kern-0.5em\textcolor{blue}{.}
+					}
+				\vss
+			}
+		}
+	}
+}
+\makeatother
+
+\makeindex
+\begin{document}
+	\input{cimlap.tex}
+	\tableofcontents
+	\include{bevezeto.tex}
+	\include{modern.tex}
+	\bibliography{bibDB}
+	\bibliographystyle{plain}
+	\input{roviditesek.tex}
+	\printindex
+\end{document}

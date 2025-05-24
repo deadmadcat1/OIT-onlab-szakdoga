@@ -1,0 +1,23 @@
+\section{Bevezető}
+\subsection{Motiváció}
+\paragraph{}A klasszikus Z-buffer\index{Z-buffer}\index{depth buffer} technika bár megfelelő eredményeket tud produkálni átlátszatlan felületek esetén, áttetsző felületek/közegek (megközelítőleg) pontos kirajolására alkalmatlan.
+\paragraph{}A probléma a következő:
+\begin{enumerate}
+	\item Az áttetsző felületek átfedéséből eredő látható szín függ a felületek mélységi sorrendjétől. Ez fontos szerepet játszik a térlátásban.
+	\item A mélység tesztelés időbeli sorrendje is meghatározó a helyes kitakarásban, ahogy az \aref{img:invisglass}. ábrán látható.
+	\item Túl költséges a képtér objektumait képkockánként mélység szerint sorba rendezni.
+	\item Alakzatok metszése esetén pixelenkénti sorrend meghatározása szükséges.
+\end{enumerate}
+
+\paragraph{}
+Ezeket hivatottak kiküszöbölni a tárgyalt eljárások.
+\vfill
+\begin{figure}[bp]
+	\centering
+	\includegraphics[scale=0.4]{invisglass.png}
+	\caption{Helytelen rajz sorrend eredménye. A zöld gömb helyesen mutatja a lila gömböt mögötte, de kitakarja a rózsaszín és barna gomböket.}
+	\label{img:invisglass}
+\end{figure}
+
+\newpage
+\input{depthpeeling.tex}
