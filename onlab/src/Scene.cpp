@@ -2,7 +2,6 @@
 #include "GPUProgram.h"
 #include "Geometry.h"
 #include <GL/glew.h>
-#include <glm/glm.hpp>
 #include <iostream>
 
 //#define DRAW_WIREFRAME
@@ -348,6 +347,10 @@ void Scene::renderWavelet() {
 }
 
 void Scene::animate(float dt) {
+	if (cameraOrbitLockoutTimer > 0) {
+		cameraOrbitLockoutTimer -= 500.0f * dt;
+		return;
+	}
 	glm::vec3 xyzOmega(0.0f, 210.0f, 0.0f);
 	glm::vec3 lookAtPoint(0.0f, 0.0f, 0.0f);
 	camera->lookAt(lookAtPoint);
@@ -364,4 +367,14 @@ void Scene::notifyResize(int w, int h) {
 	for (auto& fb : framebuffers) {
 		fb.second->resize(w, h);
 	}
+}
+
+void Scene::changeCameraAttitudeNDC(double dNDCy, double dNDCx) {
+	camera->rotateNDC(dNDCy, dNDCx);
+	cameraOrbitLockoutTimer = 1.0f;
+}
+
+void Scene::changeCameraPosition(glm::vec3 dpos) {
+	camera->translate(dpos);
+	cameraOrbitLockoutTimer = 1.0f;
 }

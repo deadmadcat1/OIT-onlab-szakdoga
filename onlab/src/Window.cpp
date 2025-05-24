@@ -73,6 +73,8 @@ Window::~Window()
 
 void Window::resize_callback(int width, int height) {
 	glViewport(0, 0, width, height);
+	windowWidth = width;
+	windowHeight = height;
 	scene->notifyResize(width, height);
 }
 void Window::key_callback(int key, int scancode, int action, int mods) {
@@ -104,36 +106,49 @@ void Window::key_callback(int key, int scancode, int action, int mods) {
 	}
 }
 void Window::mouseMove_callback(double xpos, double ypos) {
-	double Cx = 2.0f * xpos / windowWidth - 1;
-	double Cy = 1.0f - 2.0f * ypos / windowHeight;
-	std::cout << "Mouse moved to: (" << Cx << ", " << Cy << ")" << std::endl;
+	double Cx = screen2NDC(xpos, ypos).x;
+	double Cy = screen2NDC(xpos, ypos).y;
+	Cx -= mousePrevX;
+	Cy -= mousePrevY;
+	mousePrevX = Cx;
+	mousePrevY = Cy;
+	std::cout << Cx << ":" << Cy<< std::endl;//TODO: fix this crap
+	if (mouseDragState) {
+		scene->changeCameraAttitudeNDC(ypos, xpos);
+	}
 }
 void Window::mousePress_callback(int button, int action, int mods) {
 	if (action == GLFW_PRESS) {
 		switch (button) {
 		case GLFW_MOUSE_BUTTON_1:
-			std::cout << "LMB pressed." << std::endl;
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+			mouseDragState = true;
+			double oldX, oldY;
+			glfwGetCursorPos(window, &oldX, &oldY);
+			mousePrevX = screen2NDC(oldX, oldY).x;
+			mousePrevY = screen2NDC(oldX, oldY).y;
 			break;
 		case GLFW_MOUSE_BUTTON_2:
-			std::cout << "RMB pressed." << std::endl;
 			break;
-		default:
-			std::cout << "Other mouse button pressed." << std::endl;
 		}
 	}
 	else if (action == GLFW_RELEASE) {
 		switch (button) {
 		case GLFW_MOUSE_BUTTON_1:
-			std::cout << "LMB released." << std::endl;
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+			mouseDragState = false;
 			break;
 		case GLFW_MOUSE_BUTTON_2:
-			std::cout << "RMB released." << std::endl;
 			break;
-		default:
-			std::cout << "Other mouse button released." << std::endl;
 		}
 	}
 }
 void Window::mouseScroll_callback(double xoffset, double yoffset) {
 	return;
+}
+
+glm::vec2 Window::screen2NDC(double xpos, double ypos) {
+	double Cx = 2.0f * xpos / windowWidth - 1;
+	double Cy = 1.0f - 2.0f * ypos / windowHeight;
+	return glm::vec2(Cx, Cy);
 }

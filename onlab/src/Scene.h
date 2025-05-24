@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <memory>
 #include <random>
+#include <glm/vec3.hpp>
 #include "Camera.h"
 #include "Light.h"
 #include "Object.h"
@@ -30,6 +31,7 @@ class Scene {
 
 	static const size_t maxNumOfLights = 8;
 	std::unique_ptr<Camera> camera;
+	float cameraOrbitLockoutTimer = 0.0f;
 	std::vector<std::shared_ptr<Light>> lights;
 	std::unordered_map<std::string, std::shared_ptr<GPUProgram>> shaderPrograms;
 	std::unordered_map<std::string, std::shared_ptr<Framebuffer>> framebuffers;
@@ -62,4 +64,8 @@ public:
 	void render(TransparencyMethod mode);
 
 	void animate(float dt);
+
+	void changeCameraAttitudeNDC(double dNDCy, double dNDCx);
+
+	void changeCameraPosition(glm::vec3 dpos);
 };

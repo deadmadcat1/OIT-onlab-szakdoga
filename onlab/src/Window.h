@@ -8,9 +8,12 @@
 #include <iostream>
 
 class Window {
-	static const int windowWidth = 1920;					// TODO: move to Settings or somesuch
-	static const int windowHeight = 1080;				// -//-
+	int windowWidth = 1920;					// TODO: move to Settings or somesuch
+	int windowHeight = 1080;				// -//-
 	TransparencyMethod renderingTransparencyMode;	// -//-
+	bool mouseDragState;
+	double mousePrevX = 0.0;
+	double mousePrevY = 0.0;
 
 	GLFWwindow* window;
 	std::unique_ptr<Scene> scene;
@@ -25,6 +28,7 @@ public:
 	void mousePress_callback(int button, int action, int mods);
 	void mouseScroll_callback(double xoffset, double yoffset);
 private:
+	glm::vec2 screen2NDC(double xpos, double ypos);
 	//static callback wrappers
 
 	static void error_callback(int error, const char* desc) {
