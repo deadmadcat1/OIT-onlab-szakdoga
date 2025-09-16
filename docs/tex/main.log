@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.2.12)  24 MAY 2025 13:58
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.2.12)  25 MAY 2025 23:22
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -772,35 +772,6 @@ Package footmisc Info: Declaring symbol style lamport* on input line 747.
 Package footmisc Info: Declaring symbol style lamport*-robust on input line 768
 .
 )
-(c:/Eszkozok/TeXLive/texlive/2024/texmf-dist/tex/latex/caption/subcaption.sty
-Package: subcaption 2023/07/28 v1.6b Sub-captions (AR)
-
-(c:/Eszkozok/TeXLive/texlive/2024/texmf-dist/tex/latex/caption/caption.sty
-Package: caption 2023/08/05 v3.6o Customizing captions (AR)
-
-(c:/Eszkozok/TeXLive/texlive/2024/texmf-dist/tex/latex/caption/caption3.sty
-Package: caption3 2023/07/31 v2.4d caption3 kernel (AR)
-\caption@tempdima=\dimen274
-\captionmargin=\dimen275
-\caption@leftmargin=\dimen276
-\caption@rightmargin=\dimen277
-\caption@width=\dimen278
-\caption@indent=\dimen279
-\caption@parindent=\dimen280
-\caption@hangindent=\dimen281
-Package caption Info: Standard document class detected.
-Package caption Info: hungarian babel package is loaded.
-)
-\c@caption@flags=\count342
-\c@continuedfloat=\count343
-Package caption Info: hungarian babel package is loaded.
-Package caption Info: hyperref package is loaded.
-)
-Package caption Info: New subtype `subfigure' on input line 238.
-\c@subfigure=\count344
-Package caption Info: New subtype `subtable' on input line 238.
-\c@subtable=\count345
-)
 \@indexfile=\write4
 \openout4 = `main.idx'.
 
@@ -810,29 +781,29 @@ Writing index file main.idx
 (c:/Eszkozok/TeXLive/texlive/2024/texmf-dist/tex/latex/l3backend/l3backend-pdft
 ex.def
 File: l3backend-pdftex.def 2024-05-08 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count346
+\l__color_backend_stack_int=\count342
 \l__pdf_internal_box=\box85
-) (./main.aux (./bevezeto.aux) (./modern.aux))
+) (./main.aux (./bevezeto.aux) (./modern.aux) (./sajat.aux))
 \openout1 = `main.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 38.
-LaTeX Font Info:    ... okay on input line 38.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 38.
-LaTeX Font Info:    ... okay on input line 38.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 38.
-LaTeX Font Info:    ... okay on input line 38.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 38.
-LaTeX Font Info:    ... okay on input line 38.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 38.
-LaTeX Font Info:    ... okay on input line 38.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 38.
-LaTeX Font Info:    ... okay on input line 38.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 38.
-LaTeX Font Info:    ... okay on input line 38.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 38.
-LaTeX Font Info:    ... okay on input line 38.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 38.
-LaTeX Font Info:    ... okay on input line 38.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 36.
+LaTeX Font Info:    ... okay on input line 36.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 36.
+LaTeX Font Info:    ... okay on input line 36.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 36.
+LaTeX Font Info:    ... okay on input line 36.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 36.
+LaTeX Font Info:    ... okay on input line 36.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 36.
+LaTeX Font Info:    ... okay on input line 36.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 36.
+LaTeX Font Info:    ... okay on input line 36.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 36.
+LaTeX Font Info:    ... okay on input line 36.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 36.
+LaTeX Font Info:    ... okay on input line 36.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 36.
+LaTeX Font Info:    ... okay on input line 36.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -862,7 +833,7 @@ LaTeX Font Info:    ... okay on input line 38.
 * \@reversemarginfalse
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
-Package hyperref Info: Link coloring ON on input line 38.
+Package hyperref Info: Link coloring ON on input line 36.
 (./main.out) (./main.out)
 \@outlinefile=\write5
 \openout5 = `main.out'.
@@ -871,32 +842,36 @@ Package hyperref Info: Link coloring ON on input line 38.
 (c:/Eszkozok/TeXLive/texlive/2024/texmf-dist/tex/context/base/mkii/supp-pdf.mki
 i
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count347
-\scratchdimen=\dimen282
+\scratchcounter=\count343
+\scratchdimen=\dimen274
 \scratchbox=\box86
-\nofMPsegments=\count348
-\nofMParguments=\count349
+\nofMPsegments=\count344
+\nofMParguments=\count345
 \everyMPshowfont=\toks40
-\MPscratchCnt=\count350
-\MPscratchDim=\dimen283
-\MPnumerator=\count351
-\makeMPintoPDFobject=\count352
+\MPscratchCnt=\count346
+\MPscratchDim=\dimen275
+\MPnumerator=\count347
+\makeMPintoPDFobject=\count348
 \everyMPtoPDFconversion=\toks41
 )
 (c:/Eszkozok/TeXLive/texlive/2024/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-ba
 se.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
+ (c:/Eszkozok/TeXLive/texlive/2024/texmf-dist/tex/latex/grfext/grfext.sty
+Package: grfext 2019/12/03 v1.3 Manage graphics extensions (HO)
+)
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 85.
+Package grfext Info: Graphics extension search list:
+(grfext)             [.pdf,.png,.jpg,.mps,.jpeg,.jbig2,.jb2,.PDF,.PNG,.JPG,.JPE
+G,.JBIG2,.JB2,.eps]
+(grfext)             \AppendGraphicsExtensions on input line 504.
 
 (c:/Eszkozok/TeXLive/texlive/2024/texmf-dist/tex/latex/latexconfig/epstopdf-sys
 .cfg
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
-))
-Package caption Info: Begin \AtBeginDocument code.
-Package caption Info: End \AtBeginDocument code.
- (c:/Eszkozok/TeXLive/texlive/2024/texmf-dist/tex/latex/base/article.cls
+)) (c:/Eszkozok/TeXLive/texlive/2024/texmf-dist/tex/latex/base/article.cls
 LaTeX Info: Redefining \cal on input line 497.
 LaTeX Info: Redefining \mit on input line 498.
 ) (./cimlap.tex
@@ -927,12 +902,12 @@ pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has
 been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.41 	\include{bevezeto.tex}
+l.39 	\include{bevezeto.tex}
                              [1]
 \openout2 = `bevezeto.aux'.
 
  (./bevezeto.tex
-<invisglass.png, id=53, 328.22626pt x 306.14375pt>
+<invisglass.png, id=113, 328.22626pt x 306.14375pt>
 File: invisglass.png Graphic file (type png)
 <use invisglass.png>
 Package pdftex.def Info: invisglass.png  used on input line 17.
@@ -944,15 +919,6 @@ Package pdftex.def Info: invisglass.png  used on input line 17.
  <./invisglass.png (PNG copy)>] (./depthpeeling.tex
 Package acronym Info: Label `acro:OIT' newly defined as it shall be overridden
 although it is yet undefined on input line 2.
-
-
-Package caption Warning: \label without proper reference on input line 26.
-See the caption package documentation for explanation.
-
-
-LaTeX Warning: Reference `fig:depthpeeling' on page 3 undefined on input line 3
-.
-
 Package epstopdf Info: Source file: <camera-equipment-image-svgrepo-com.eps>
 (epstopdf)                    date: 2025-05-18 18:32:36
 (epstopdf)                    size: 6169 bytes
@@ -964,8 +930,8 @@ verted-to.pdf>
 repo-com-eps-converted-to.pdf camera-equipment-image-svgrepo-com.eps>
 (epstopdf)             \includegraphics on input line 18.
 Package epstopdf Info: Output file is already uptodate.
-<camera-equipment-image-svgrepo-com-eps-converted-to.pdf, id=71, 572.1375pt x 4
-39.6425pt>
+<camera-equipment-image-svgrepo-com-eps-converted-to.pdf, id=131, 572.1375pt x 
+439.6425pt>
 File: camera-equipment-image-svgrepo-com-eps-converted-to.pdf Graphic file (typ
 e pdf)
 <use camera-equipment-image-svgrepo-com-eps-converted-to.pdf>
@@ -973,44 +939,45 @@ Package pdftex.def Info: camera-equipment-image-svgrepo-com-eps-converted-to.pd
 f  used on input line 18.
 (pdftex.def)             Requested size: 28.60854pt x 21.9834pt.
 
-LaTeX Font Warning: Command \Large invalid in math mode on input line 34.
 
-LaTeX Font Info:    Calculating math sizes for size <> on input line 35.
+LaTeX Font Warning: Command \Large invalid in math mode on input line 32.
+
+LaTeX Font Info:    Calculating math sizes for size <> on input line 33.
 
 LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <> not available
-(Font)              size <5> substituted on input line 35.
+(Font)              size <5> substituted on input line 33.
 
 
 LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <0.7> not available
-(Font)              size <5> substituted on input line 35.
+(Font)              size <5> substituted on input line 33.
 
 
 LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <0.5> not available
-(Font)              size <5> substituted on input line 35.
+(Font)              size <5> substituted on input line 33.
 
 
 LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <> not available
-(Font)              size <5> substituted on input line 35.
+(Font)              size <5> substituted on input line 33.
 
 
 LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <0.7> not available
-(Font)              size <5> substituted on input line 35.
+(Font)              size <5> substituted on input line 33.
 
 
 LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <0.5> not available
-(Font)              size <5> substituted on input line 35.
+(Font)              size <5> substituted on input line 33.
 
 
 LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <> not available
-(Font)              size <5> substituted on input line 35.
+(Font)              size <5> substituted on input line 33.
 
 
 LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <0.7> not available
-(Font)              size <5> substituted on input line 35.
+(Font)              size <5> substituted on input line 33.
 
 
 LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <0.5> not available
-(Font)              size <5> substituted on input line 35.
+(Font)              size <5> substituted on input line 33.
 
 ))
 
@@ -1023,10 +990,6 @@ r-ts1.enc} <./camera-equipment-image-svgrepo-com-eps-converted-to.pdf>]
 Package acronym Info: Label `acro:MBOIT' newly defined as it shall be overridde
 n
 although it is yet undefined on input line 3.
-
-
-LaTeX Warning: Reference `ch:1' on page 4 undefined on input line 5.
-
 )
 
 [4
@@ -1037,34 +1000,41 @@ LaTeX Warning: Reference `ch:1' on page 4 undefined on input line 5.
 Package acronym Info: Label `acro:WOIT' newly defined as it shall be overridden
 
 although it is yet undefined on input line 2.
-
-
-Package caption Warning: \label without proper reference on input line 19.
-See the caption package documentation for explanation.
-
-
-LaTeX Warning: Reference `tab:WOITcomp' on page 5 undefined on input line 4.
-
 ))
 
-[5] (./main.bbl) (./roviditesek.tex) (./main.ind
+[5]
+\openout2 = `sajat.aux'.
+
+ (./sajat.tex
+Package acronym Info: Label `acro:GL' newly defined as it shall be overridden
+although it is yet undefined on input line 10.
+
 
 [6
 
 
+
 ]
-Overfull \hbox (8.37372pt too wide) in paragraph at lines 27--29
-[]\T1/cmr/m/n/10 transmittance func-ti-on, lát-ha-tó-sá-gi függ-
- []
+<tigerprint.png, id=215, 361.35pt x 212.795pt>
+File: tigerprint.png Graphic file (type png)
+<use tigerprint.png>
+Package pdftex.def Info: tigerprint.png  used on input line 31.
+(pdftex.def)             Requested size: 300.0pt x 176.66849pt.
+ (./jovo.tex))
+
+[7 <./tigerprint.png (PNG copy)>] (./main.bbl) (./roviditesek.tex) (./main.ind
+
+[8
+
+
+]
 
 
 
+[9
 
 
-[7
-
-
-]) (./main.aux (./bevezeto.aux) (./modern.aux))
+]) (./main.aux (./bevezeto.aux) (./modern.aux) (./sajat.aux))
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
@@ -1074,20 +1044,17 @@ L3 programming layer <2025-01-18>
 LaTeX Font Warning: Size substitutions with differences
 (Font)              up to 4.5pt have occurred.
 
-
-LaTeX Warning: There were undefined references.
-
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: D2D3A51191D9D5E905E0EA11A5CBBC0A;708.
+(rerunfilecheck)             Checksum: F2504448AB1327007C98A4630A069D73;2189.
  ) 
 Here is how much of TeX's memory you used:
- 27238 strings out of 473200
- 527013 string characters out of 5711421
- 948372 words of memory out of 5000000
- 49957 multiletter control sequences out of 15000+600000
- 575989 words of font info for 81 fonts, out of 8000000 for 9000
+ 25948 strings out of 473200
+ 501755 string characters out of 5711421
+ 925173 words of memory out of 5000000
+ 48633 multiletter control sequences out of 15000+600000
+ 576758 words of font info for 82 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 102i,13n,107p,497b,958s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 102i,13n,107p,497b,780s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <c:/Eszkozok/TeXLive/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/c
 mex10.pfb><c:/Eszkozok/TeXLive/texlive/2024/texmf-dist/fonts/type1/public/amsfo
 nts/cm/cmmi10.pfb><c:/Eszkozok/TeXLive/texlive/2024/texmf-dist/fonts/type1/publ
@@ -1097,26 +1064,26 @@ onts/type1/public/amsfonts/cm/cmmi7.pfb><c:/Eszkozok/TeXLive/texlive/2024/texmf
 -dist/fonts/type1/public/amsfonts/cm/cmmib10.pfb><c:/Eszkozok/TeXLive/texlive/2
 024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb><c:/Eszkozok/TeXLive/te
 xlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb><c:/Eszkozok/TeX
-Live/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb><c:/Eszkoz
-ok/TeXLive/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb><c
-:/Eszkozok/TeXLive/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7
-.pfb><c:/Eszkozok/TeXLive/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/s
-ymbols/msbm10.pfb><c:/Eszkozok/TeXLive/texlive/2024/texmf-dist/fonts/type1/publ
-ic/cm-super/sfbx1000.pfb><c:/Eszkozok/TeXLive/texlive/2024/texmf-dist/fonts/typ
-e1/public/cm-super/sfbx1200.pfb><c:/Eszkozok/TeXLive/texlive/2024/texmf-dist/fo
-nts/type1/public/cm-super/sfbx1440.pfb><c:/Eszkozok/TeXLive/texlive/2024/texmf-
-dist/fonts/type1/public/cm-super/sfcc1200.pfb><c:/Eszkozok/TeXLive/texlive/2024
-/texmf-dist/fonts/type1/public/cm-super/sfcc2074.pfb><c:/Eszkozok/TeXLive/texli
-ve/2024/texmf-dist/fonts/type1/public/cm-super/sfrm0900.pfb><c:/Eszkozok/TeXLiv
-e/texlive/2024/texmf-dist/fonts/type1/public/cm-super/sfrm1000.pfb><c:/Eszkozok
-/TeXLive/texlive/2024/texmf-dist/fonts/type1/public/cm-super/sfrm1440.pfb><c:/E
-szkozok/TeXLive/texlive/2024/texmf-dist/fonts/type1/public/cm-super/sfti1000.pf
-b><c:/Eszkozok/TeXLive/texlive/2024/texmf-dist/fonts/type1/public/cm-super/sfti
-1200.pfb>
-Output written on main.pdf (8 pages, 346726 bytes).
+Live/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb><c:/Eszkoz
+ok/TeXLive/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb><c:/
+Eszkozok/TeXLive/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.
+pfb><c:/Eszkozok/TeXLive/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm
+/cmsy7.pfb><c:/Eszkozok/TeXLive/texlive/2024/texmf-dist/fonts/type1/public/amsf
+onts/symbols/msbm10.pfb><c:/Eszkozok/TeXLive/texlive/2024/texmf-dist/fonts/type
+1/public/cm-super/sfbx1000.pfb><c:/Eszkozok/TeXLive/texlive/2024/texmf-dist/fon
+ts/type1/public/cm-super/sfbx1200.pfb><c:/Eszkozok/TeXLive/texlive/2024/texmf-d
+ist/fonts/type1/public/cm-super/sfbx1440.pfb><c:/Eszkozok/TeXLive/texlive/2024/
+texmf-dist/fonts/type1/public/cm-super/sfcc1200.pfb><c:/Eszkozok/TeXLive/texliv
+e/2024/texmf-dist/fonts/type1/public/cm-super/sfcc2074.pfb><c:/Eszkozok/TeXLive
+/texlive/2024/texmf-dist/fonts/type1/public/cm-super/sfrm1000.pfb><c:/Eszkozok/
+TeXLive/texlive/2024/texmf-dist/fonts/type1/public/cm-super/sfrm1440.pfb><c:/Es
+zkozok/TeXLive/texlive/2024/texmf-dist/fonts/type1/public/cm-super/sfti1000.pfb
+><c:/Eszkozok/TeXLive/texlive/2024/texmf-dist/fonts/type1/public/cm-super/sfti1
+200.pfb>
+Output written on main.pdf (10 pages, 375701 bytes).
 PDF statistics:
- 282 PDF objects out of 1000 (max. 8388607)
- 222 compressed objects within 3 object streams
- 53 named destinations out of 1000 (max. 500000)
- 71 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 381 PDF objects out of 1000 (max. 8388607)
+ 317 compressed objects within 4 object streams
+ 81 named destinations out of 1000 (max. 500000)
+ 172 words of extra memory for PDF output out of 10000 (max. 10000000)
 

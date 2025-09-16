@@ -1,38 +1,42 @@
 \begin{theindex}
 
-  \item depth buffer, \hyperpage{3}
-  \item depthpeeling, \hyperpage{4}
+  \item depth buffer, \hyperpage{2}, \hyperpage{6}
+  \item depth peeling, \hyperpage{3}
 
   \indexspace
 
-  \item elnyelési függvény, \hyperpage{5}
+  \item elnyelési függvény, \hyperpage{4, 5}
+  \item előmenet, \hyperpage{3}
 
   \indexspace
 
-  \item fragment, fragmens, \hyperpage{4}
-  \item framebuffer, \hyperpage{4, 5}
+  \item fragmens, \hyperpage{3}, \hyperpage{6}
+  \item fragment, \hyperpage{3}, \hyperpage{6}
+  \item framebuffer, \hyperpage{3, 4}
 
   \indexspace
 
-  \item MBOIT, \hyperpage{6}
+  \item láthatósági függvény, \hyperpage{4}
 
   \indexspace
 
-  \item prepass, előmenet, \hyperpage{4}
-  \item primitive, primitív, \hyperpage{3}
+  \item prepass, \hyperpage{3}
 
   \indexspace
 
-  \item textúra, \hyperpage{4}
-  \item transmittance function, láthatósági függvény, 
-		\hyperpage{5}
+  \item textúra, \hyperpage{3}
+  \item transmittance function, \hyperpage{4}
 
   \indexspace
 
-  \item wavelet, \hyperpage{6}
+  \item vertex shader, \hyperpage{6}
 
   \indexspace
 
-  \item Z-buffer, \hyperpage{3}
+  \item wavelet, \hyperpage{5}
+
+  \indexspace
+
+  \item Z-buffer, \hyperpage{2}, \hyperpage{6}
 
 \end{theindex}

@@ -1,38 +1,35 @@
-\subsection{Depth Peeling}\index{depthpeeling}
+\subsection{Depth Peeling}\index{depth peeling}
 \paragraph{}Ez az \ac{OIT} technika~\cite{Everitt01interactiveorder-independent} a képteret több ``rétegre'' osztja fel, majd ezeket a tárolt $\alpha$-érték szerint összekeveri a kimeneti kép elkészítéséhez.
-\paragraph{}Az első réteg eltárolja a nézőpontból látható $RGB\alpha$ értékeket, a második mindazt, amit az első kitakart, és így tovább~\autoref{fig:depthpeeling}. Ily módon ``implicit'' sorrendezéssel pontos eredményt állít elő $n$ rétegből~\ref{eq:simpleblend}. A többmenetes rajzolás költsége összetettebb jelenetek esetén eltörpül a sorbarendezés (idő-)költsége melett.
+\paragraph{}Az első réteg eltárolja a nézőpontból látható $RGB\alpha$ értékeket, a második mindazt, amit az első kitakart, és így tovább~[\ref{fig:depthpeeling}]. Ily módon ``implicit'' sorrendezéssel pontos eredményt állít elő $n$ rétegből~[\ref{eq:simpleblend}]. A többmenetes rajzolás költsége összetettebb jelenetek esetén eltörpül a sorbarendezés (idő-)költsége melett.
 \paragraph{}Az eljárás teljesítménye javítható különféle módokon, például:
 \begin{itemize}
 	\label{list:depthpeelvariants}
-	\item Az átlátszatlan objektumok mélységének egy külön előmenetbeli\index{prepass, előmenet} felrajzolása egy textúrába\index{textúra}, amelyet felhasználhatunk a képtér hátulról előre haladó hámozásakor, így nem kell az algoritmus futtatni olyan fragmenseken\index{fragment, fragmens} amelyek a nézőpont elől el vannak takarva.
+	\item Az átlátszatlan objektumok mélységének egy külön előmenetbeli\index{prepass}\index{előmenet} felrajzolása egy textúrába\index{textúra}, amelyet felhasználhatunk a képtér hátulról előre haladó hámozásakor, így nem kell az algoritmust futtatni olyan fragmenseken\index{fragment}\index{fragmens} amelyek a nézőpont elől el vannak takarva.
 	\item Az $n$ réteg külön-külön tárolása helyett létrehozunk egy gyüjtő- és egy pásztázó framebuffer-t\index{framebuffer}. A pásztázó buffer tartalma közvetlen a képrajzolás után belekeverhető a gyüjtőbe. Ez a megoldás jól kombinálható az előzővel, ugyanis ehhez is hátulról előre kell bejárni a képteret.
 \end{itemize}
 
+
 \vfill
-\begin{figure}[bp]
+\begin{figure}[!b]
 	\centering
-	\begin{subfigure}{\textwidth}
-		\centering
-		\begin{tikzpicture}[rectangle, minimum size = 20pt, node distance=2cm]
-			\node[] (0) {
-				\includegraphics[scale=0.05]{camera-equipment-image-svgrepo-com.eps}
-			};
-			\node[draw, right of = 0, label=below:1.réteg] (1) {$RGB\alpha$};
-			\draw[->] (0) to node[above] {} (1);
-			\node[right of = 1] (2) {\ldots};
-			\draw[->] (1) to node[above] {} (2);
-			\node[draw, right of = 2, label=below:$n$. réteg] (3) {$RGB\alpha$};
-			\draw[->] (2) to node[above] {} (3);
-			\label{fig:depthpeeling}
-		\end{tikzpicture}
-		\caption{A képteret rajzolással sorbarendezzük, sorbarendezéses rajzolás helyett.}
-	\end{subfigure}
-	\vfill%
-	\begin{subfigure}{\textwidth}
-		\begin{equation}
-			\label{eq:simpleblend}
-			\Large \rgbdddot{C_{AB}} = \rgbdddot{C_A} + (1 - \alpha_A) \cdot \rgbdddot{C_B}
-		\end{equation}
-		\vspace*{-1.5em}\caption{A keverés maga egyszerű.}
-	\end{subfigure}
+	\label{fig:depthpeeling}
+	\begin{tikzpicture}[rectangle, minimum size = 20pt, node distance=2cm]
+		\node[] (0) {
+			\includegraphics[scale=0.05]{camera-equipment-image-svgrepo-com.eps}
+		};
+		\node[draw, right of = 0, label=below:1.réteg] (1) {$RGB\alpha$};
+		\draw[->] (0) to node[above] {} (1);
+		\node[right of = 1] (2) {\ldots};
+		\draw[->] (1) to node[above] {} (2);
+		\node[draw, right of = 2, label=below:$n$. réteg] (3) {$RGB\alpha$};
+		\draw[->] (2) to node[above] {} (3);
+	\end{tikzpicture}
+	\caption{A képteret rajzolással sorbarendezzük, sorbarendezéses rajzolás helyett.}
+\end{figure}
+\begin{figure}[!b]
+	\begin{equation}
+		\label{eq:simpleblend}
+		\Large \rgbdddot{C_{AB}} = \rgbdddot{C_A} + (1 - \alpha_A) \cdot \rgbdddot{C_B}
+	\end{equation}
+	\vspace*{-1.5em}\caption{A keverés maga egyszerű.}
 \end{figure}

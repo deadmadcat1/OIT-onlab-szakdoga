@@ -1,0 +1,55 @@
+\select@language {magyar} \headcommand {\slideentry {0}{0}{1}{1/1}{}{0}}
+\select@language {magyar} \headcommand {\beamer@framepages {1}{1}}
+\select@language {magyar} \headcommand {\beamer@sectionpages {1}{1}}
+\select@language {magyar} \headcommand {\beamer@subsectionpages {1}{1}}
+\select@language {magyar} \headcommand {\sectionentry {1}{Bevezető}{2}{Bevezető}{0}}
+\select@language {magyar} \headcommand {\beamer@subsectionpages {2}{1}}
+\select@language {magyar} \headcommand {\beamer@subsectionentry {0}{1}{1}{2}{Bevezető}}
+\select@language {magyar} \headcommand {\slideentry {1}{1}{1}{2/2}{Bevezető}{0}}
+\select@language {magyar} \headcommand {\beamer@framepages {2}{2}}
+\select@language {magyar} \headcommand {\slideentry {1}{1}{2}{3/3}{Bevezető}{0}}
+\select@language {magyar} \headcommand {\beamer@framepages {3}{3}}
+\select@language {magyar} \headcommand {\beamer@sectionpages {2}{3}}
+\select@language {magyar} \headcommand {\beamer@subsectionpages {2}{3}}
+\select@language {magyar} \headcommand {\sectionentry {2}{Régi technikák}{4}{Régi technikák}{0}}
+\select@language {magyar} \headcommand {\beamer@subsectionpages {4}{3}}
+\select@language {magyar} \headcommand {\beamer@subsectionentry {0}{2}{1}{4}{Depth Peeling}}
+\select@language {magyar} \headcommand {\slideentry {2}{1}{1}{4/4}{Depth Peeling}{0}}
+\select@language {magyar} \headcommand {\beamer@framepages {4}{4}}
+\select@language {magyar} \headcommand {\slideentry {2}{1}{2}{5/5}{Depth Peeling}{0}}
+\select@language {magyar} \headcommand {\beamer@framepages {5}{5}}
+\select@language {magyar} \headcommand {\slideentry {2}{1}{3}{6/6}{Depth Peeling}{0}}
+\select@language {magyar} \headcommand {\beamer@framepages {6}{6}}
+\select@language {magyar} \headcommand {\beamer@sectionpages {4}{6}}
+\select@language {magyar} \headcommand {\beamer@subsectionpages {4}{6}}
+\select@language {magyar} \headcommand {\sectionentry {3}{Modern technikák}{7}{Modern technikák}{0}}
+\select@language {magyar} \headcommand {\beamer@subsectionpages {7}{6}}
+\select@language {magyar} \headcommand {\beamer@subsectionentry {0}{3}{1}{7}{Approximációs technikák}}
+\select@language {magyar} \headcommand {\slideentry {3}{1}{1}{7/7}{Approximációs technikák}{0}}
+\select@language {magyar} \headcommand {\beamer@framepages {7}{7}}
+\select@language {magyar} \headcommand {\slideentry {3}{1}{2}{8/8}{Approximációs technikák}{0}}
+\select@language {magyar} \headcommand {\beamer@framepages {8}{8}}
+\select@language {magyar} \headcommand {\beamer@sectionpages {7}{8}}
+\select@language {magyar} \headcommand {\beamer@subsectionpages {7}{8}}
+\select@language {magyar} \headcommand {\sectionentry {4}{Saját munka}{9}{Saját munka}{0}}
+\select@language {magyar} \headcommand {\beamer@subsectionpages {9}{8}}
+\select@language {magyar} \headcommand {\beamer@subsectionentry {0}{4}{1}{9}{keret}}
+\select@language {magyar} \headcommand {\slideentry {4}{1}{1}{9/9}{keret}{0}}
+\select@language {magyar} \headcommand {\beamer@framepages {9}{9}}
+\select@language {magyar} \headcommand {\beamer@subsectionpages {9}{9}}
+\select@language {magyar} \headcommand {\beamer@subsectionentry {0}{4}{2}{10}{nehézségek}}
+\select@language {magyar} \headcommand {\slideentry {4}{2}{1}{10/10}{nehézségek}{0}}
+\select@language {magyar} \headcommand {\beamer@framepages {10}{10}}
+\select@language {magyar} \headcommand {\slideentry {4}{2}{2}{11/11}{nehézségek}{0}}
+\select@language {magyar} \headcommand {\beamer@framepages {11}{11}}
+\select@language {magyar} \headcommand {\beamer@subsectionpages {10}{11}}
+\select@language {magyar} \headcommand {\beamer@subsectionentry {0}{4}{3}{12}{kitekintés}}
+\select@language {magyar} \headcommand {\slideentry {4}{3}{1}{12/12}{kitekintés}{0}}
+\select@language {magyar} \headcommand {\beamer@framepages {12}{12}}
+\select@language {magyar} \headcommand {\slideentry {4}{3}{2}{13/13}{kitekintés}{0}}
+\select@language {magyar} \headcommand {\beamer@framepages {13}{13}}
+\headcommand {\beamer@partpages {1}{13}}
+\headcommand {\beamer@subsectionpages {12}{13}}
+\headcommand {\beamer@sectionpages {9}{13}}
+\headcommand {\beamer@documentpages {13}}
+\headcommand {\gdef \inserttotalframenumber {13}}

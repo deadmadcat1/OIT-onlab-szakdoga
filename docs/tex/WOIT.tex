@@ -1,28 +1,22 @@
 \subsection{Wavelet OIT}
 \paragraph{}A \ac{WOIT}~\cite{aizenshtein2022wavelettransparency} a legújabban publikált technika a bemutatottak közül, amely épít többek között a \pageref{sec:MBOIT}. oldalon tárgyalt \ac{MBOIT}-ra is.
-
-\paragraph{}Az eredeti kiadás a következő táblázatban~\ref{tab:WOITcomp}összehasonlított más modern technikákat, köztük az MBOIT\index{MBOIT}-t is
-
 \paragraph{}Lényeges különbségek:
 \begin{itemize}
-	\item Ennek a technikának nem célja a valósághű pontosság javítása, ellenkezőleg éppen az emberi észlelés sajátosságaira hagyatkozik, hogy végül egy ``hihetőbb'' képet alkosson, az átlátszóság bármilyen alkalmazásában, legyen az köd vagy haj.
-	\item A láthatósági függvényt momentumok helyett wavelet\index{wavelet}-ekkel \cite{Mallat2008Wavelets} tárolja, amelyek magukban egyesítik a térbeli megoldások lokalitását és a frekvenciatartomány alapú megoldások tömöríthetőségét, így pontosabban megközelítve a valódi láthatósági függvényt, kisebb memóriaigénnyel.\label{list:liwavelet}
+	\item Ennek a technikának nem célja a fizikai szimulációt megközelítő pontosság, ellenkezőleg éppen az emberi észlelés sajátosságaira hagyatkozik, hogy végül egy ``hihetőbb'' képet alkosson hatékonyan, az átlátszóság bármilyen alkalmazásában, legyen az köd vagy haj.
+	\item A láthatósági függvényt momentumok helyett wavelet\index{wavelet}-ekkel \cite{Mallat2008Wavelets} tárolja, amelyek magukban egyesítik a térbeli megoldások lokalitását és a frekvenciatartomány alapú megoldások tömöríthetőségét, így pontosabban megközelítve a valódi láthatósági függvényt, kisebb memóriaigénnyel.
 \end{itemize}
 
-%\paragraph{}Ismét az elnyelési függvényt\index{elnyelési függvény} használjuk a számításokhoz.
+\paragraph{}Ismét az elnyelési függvényt\index{elnyelési függvény} használjuk a számításokhoz.
+\begin{gather*}
+	A \approx \chi_{0,0}\phi_{0,0}\left(z\right)+\sum_{n,k}X_{n,k}\Psi_{n,k}\left(z\right)\\
+	\chi_{0,0} = \sum\alpha_i\left(1-x_i\right)\\
+	X_{n,k} = - \sum\alpha_i\Psi_{n,k}(x_i)
+\end{gather*}
 
-
-\paragraph{}Az eredmény végül egy fizikai hatásokra nem alapuló, de mégis lenyűgözően élethű átlátszóság és fénytörés hatás, mely többször mint sem felülmúlja az MBOIT által produkált eredményt (főleg az itt \ref{list:liwavelet} említettek miatt).
-
-\vfill
-\begin{figure}[bp]
-	\label{tab:WOITcomp}
-	\begin{tabular}{r|r|r|r|r|r}
-		MLAB4 & WBOIT & Moment6 & Moment8 & Wavelet3 & Wavelet4\\
-		\hline
-		1.8 & 0.46 & 2.04 & 2.1 & 1.8 & 2.05\\
-		
-	\end{tabular}
-	\caption{Láthatósági függvény meghatározása és árnyalás időigénye [ms]}
-\end{figure}
+\paragraph{}Ahol $\Psi_{n,k}$ a wavelet maga.
+$$\Psi_{n,k}\left(x\right) = 2^{-\frac{n}{2}}\cdot\left\lbrace\begin{matrix}
+	2^nx-k	& 0\leq2^nx-k<0.5\\
+	1+k-2^nx	& 0.5\leq2^x-k\leq1\\
+	0			& \textrm{Máshol}
+\end{matrix}\right\rbrace$$
 

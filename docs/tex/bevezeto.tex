@@ -1,12 +1,12 @@
 \section{Bevezető}
 \subsection{Motiváció}
-\paragraph{}A klasszikus Z-buffer\index{Z-buffer}\index{depth buffer} technika bár megfelelő eredményeket tud produkálni átlátszatlan felületek esetén, áttetsző felületek/közegek (megközelítőleg) pontos kirajolására alkalmatlan.
+\paragraph{}A klasszikus Z-buffer\index{Z-buffer}\index{depth buffer} technika bár megfelelő eredményeket tud produkálni átlátszatlan felületek esetén, áttetsző felületek/közegek pontos kirajolására alkalmatlan.
 \paragraph{}A probléma a következő:
 \begin{enumerate}
 	\item Az áttetsző felületek átfedéséből eredő látható szín függ a felületek mélységi sorrendjétől. Ez fontos szerepet játszik a térlátásban.
-	\item A mélység tesztelés időbeli sorrendje is meghatározó a helyes kitakarásban, ahogy az \aref{img:invisglass}. ábrán látható.
 	\item Túl költséges a képtér objektumait képkockánként mélység szerint sorba rendezni.
 	\item Alakzatok metszése esetén pixelenkénti sorrend meghatározása szükséges.
+	\item A mélység tesztelés időbeli sorrendje is meghatározó a helyes kitakarásban, ahogy az \aref{img:invisglass}. ábrán látható.
 \end{enumerate}
 
 \paragraph{}

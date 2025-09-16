@@ -98,7 +98,7 @@ bool Sphere::create() {
         indices.push_back(lastVtxIdx);
         indices.push_back(lastRingOffset + (i + 1) % nVtxPerRing);
     }
-
+    
     nIdx = indices.size();
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[0]);

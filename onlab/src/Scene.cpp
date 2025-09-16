@@ -162,7 +162,7 @@ bool Scene::setMakeOpaqueObjects() {
 bool Scene::setMakeTransparentObjects() {
 	successToggle success(true);
 
-	auto sphere = std::make_shared<Sphere>(4, 4);
+	auto sphere = std::make_shared<Sphere>(64, 32);
 	success = sphere->create();
 
 	if (!success) return false;
@@ -211,7 +211,7 @@ void Scene::render(TransparencyMethod mode){
 		}
 		
 		framebuffers["finalOutput"]->bind();
-		glClearColor(1.0f, 3.0f, 2.0f, 1.0f);
+		glClearColor(1.0f, 3.0f, 2.0f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glDisable(GL_DEPTH_TEST);
 		fullscreenTexturedQuad->draw();
@@ -227,7 +227,7 @@ void Scene::render(TransparencyMethod mode){
 	FSTQprogram->activate();
 	framebuffers["finalOutput"]->bindUniforms(FSTQprogram);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDisable(GL_DEPTH_TEST);
 	fullscreenTexturedQuad->draw();
@@ -239,7 +239,7 @@ void Scene::renderAlphaBlend() {
 #endif
 	framebuffers["finalOutput"]->bind();
 
-	glClearColor(0.1f, 0.2f, 0.3f, 1.0);
+	glClearColor(0.1f, 0.2f, 0.3f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	auto program = shaderPrograms["phongBlinn"];
@@ -253,7 +253,6 @@ void Scene::renderAlphaBlend() {
 	}
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
-	//glEnable(GL_CULL_FACE);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	for (const auto& o : opaqueObjects) {
 		o->bindUniforms(program);
@@ -264,7 +263,6 @@ void Scene::renderAlphaBlend() {
 		t->draw();
 	}
 	glBlendFunc(GL_ONE, GL_ZERO);
-	//glDisable(GL_CULL_FACE);
 	glDisable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -287,11 +285,10 @@ void Scene::renderDepthPeeling() {
 	}
 	
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
 	auto framebuffer = framebuffers["depthPeelPass1"];
 	framebuffer->bind();
 
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClearColor(1.0f, 0.0f, 1.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	for (const auto& o : opaqueObjects) {
@@ -302,7 +299,6 @@ void Scene::renderDepthPeeling() {
 		t->bindUniforms(program);
 		t->draw();
 	}
-	glDisable(GL_CULL_FACE);
 	program = shaderPrograms["depthPeel"];
 
 	camera->bindUniforms(program);
