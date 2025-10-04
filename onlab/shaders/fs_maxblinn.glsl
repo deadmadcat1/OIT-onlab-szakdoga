@@ -24,17 +24,11 @@ out vec4 fragColor;
 
 vec3 shade(vec3 normal, vec3 lightDir, vec3 viewDir,
            vec3 Le, vec3 kd, vec3 ks, float shine){
-#ifdef DEPTH_PEEL_ENABLED
 	float cosa = abs(dot(normal, lightDir));
 	float cosb = dot(normal, viewDir);
 	vec3 halfway = normalize(lightDir + viewDir);
 	float cosd = abs(dot(normal, halfway));
-#else
-	float cosa = max(dot(normal, lightDir), 0.0f);
-	float cosb = max(dot(normal, viewDir), 0.0f);
-	vec3 halfway = normalize(lightDir + viewDir);
-	float cosd = max(dot(normal, halfway), 0.0f);
-#endif
+
 	return Le * (kd * cosa + ks * pow(cosd, shine) * (cosa/max(cosb, cosa)));
 }
 
@@ -47,13 +41,15 @@ void main(void){
 #endif
 	fragColor = vec4(0,0,0,1);
 	for (int i = 0; i < nLights; i++){
-		float oneoverfourpi = 1.0f / (4.0f * 3.1415926f);
-		vec3 powerDensity = lights[i].Le * ((lights[i].pos.w == 0.0f) ? 1.0f : oneoverfourpi);
+		vec3 powerDensity = lights[i].Le * ((lights[i].pos.w == 0.0f) ? 1.0f : 1.0f / (4.0f * 3.1415926f));
 		vec3 Le = powerDensity/dot(abs(wLightDir[i]), abs(wLightDir[i]));
 	
 		fragColor.rgb += material.ka * lights[i].La
 						+ shade(normalize(wNormal), normalize(wLightDir[i]), normalize(wView),
 								Le, material.kd, material.ks, material.shine);
-		fragColor.a = material.alpha;
 	}
+	fragColor.a = material.alpha;
+#ifdef DEPTH_PEEL_ENABLED
+	fragColor.rgb *= fragColor.a;
+#endif
 }

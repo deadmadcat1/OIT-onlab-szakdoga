@@ -13,7 +13,7 @@ template <typename T> void appendVector(std::vector<T>& target, const std::vecto
 bool Scene::set() {
 	seedRNG();
 
-	int numOfLights = 4;	//TODO: move to a settings class
+	int numOfLights = 8;	//TODO: move to a settings class
 
 	camera = std::make_unique<Camera>();
 	camera->translate(glm::vec3(0.0f, 8.0f, 20.0f));
@@ -36,20 +36,16 @@ void Scene::setMakeLights(int numOfLights) {
 		numOfLights = maxNumOfLights;
 		std::cerr << "numOfLights exceeds maximum, count truncated to bounds!" << std::endl;
 	}
-	auto l = std::make_shared<Light>(0);
-	l->translate(glm::vec3(1.0f, 2.0f, 3.0f));
-	l->setEmissiveColor(glm::vec3(10));
-	lights.push_back(l);
+	std::shared_ptr<Light> l;
 
-	std::uniform_real_distribution<float> l_pos_rand(-12.0f, 12.0f);
-	std::uniform_real_distribution<float> l_L_rand(1.0f, 100.0f);
+	std::uniform_real_distribution<float> l_pos_rand(-15.0f, 15.0f);
+	std::uniform_real_distribution<float> l_L_rand(40.0f, 50.0f);
 
 	for (int i = lights.size(); i < numOfLights; i++){
 		l = std::make_shared<Light>(i);
 		l->setPointLight();
 		l->translate(glm::vec3(l_pos_rand(rng), l_pos_rand(rng), l_pos_rand(rng)));
-		auto color = glm::vec3(l_L_rand(rng), l_L_rand(rng), l_L_rand(rng));
-		l->setEmissiveColor(color);
+		l->setEmissiveColor(glm::vec3(l_L_rand(rng), l_L_rand(rng), l_L_rand(rng)));
 		lights.push_back(l);
 	}
 }
@@ -177,8 +173,10 @@ bool Scene::setMakeTransparentObjects() {
 	{
 		auto ballMaterial = std::make_shared<Material>();
 
-		ballMaterial->kd = glm::vec3(_0_1_rand(rng), _0_1_rand(rng), _0_1_rand(rng));
-		ballMaterial->alpha = _0_1_rand(rng) + 0.1f / 2.0f;
+		auto color = glm::vec3(_0_1_rand(rng), _0_1_rand(rng), _0_1_rand(rng));
+		ballMaterial->kd = color;
+		ballMaterial->ka = color;
+		ballMaterial->alpha = _0_1_rand(rng) + 0.3f / 2.0f;
 		ballMaterial->ks = glm::vec3(_0_1_rand(rng), _0_1_rand(rng), _0_1_rand(rng));
 		ballMaterial->shine = _0_1_rand(rng);
 	
@@ -227,7 +225,7 @@ void Scene::render(TransparencyMethod mode){
 	FSTQprogram->activate();
 	framebuffers["finalOutput"]->bindUniforms(FSTQprogram);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+	glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDisable(GL_DEPTH_TEST);
 	fullscreenTexturedQuad->draw();
@@ -251,20 +249,21 @@ void Scene::renderAlphaBlend() {
 	for (const auto& l : lights) {
 		l->bindUniforms(program);
 	}
+	
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDisable(GL_BLEND);
 	for (const auto& o : opaqueObjects) {
 		o->bindUniforms(program);
 		o->draw();
 	}
+	glDisable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	for (const auto& t : transparentObjects) {
 		t->bindUniforms(program);
 		t->draw();
 	}
-	glBlendFunc(GL_ONE, GL_ZERO);
 	glDisable(GL_BLEND);
-	glDisable(GL_DEPTH_TEST);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 #ifdef DRAW_WIREFRAME
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -285,6 +284,7 @@ void Scene::renderDepthPeeling() {
 	}
 	
 	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_BLEND);
 	auto framebuffer = framebuffers["depthPeelPass1"];
 	framebuffer->bind();
 
@@ -300,6 +300,7 @@ void Scene::renderDepthPeeling() {
 		t->draw();
 	}
 	program = shaderPrograms["depthPeel"];
+	program->activate();
 
 	camera->bindUniforms(program);
 
@@ -307,7 +308,6 @@ void Scene::renderDepthPeeling() {
 	for (const auto& l : lights) {
 		l->bindUniforms(program);
 	}
-	glDepthFunc(GL_ALWAYS);
 	for (int i = 1; i < 4/*settings.depthPeelCount*/; i++) {
 		framebuffer->bindUniforms(program);
 	
@@ -326,8 +326,8 @@ void Scene::renderDepthPeeling() {
 			t->draw();
 		}
 	}
-	glDepthFunc(GL_LESS);
 	glDisable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 #ifdef DRAW_WIREFRAME
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
