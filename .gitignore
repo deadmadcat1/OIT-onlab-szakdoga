@@ -1,4 +1,3 @@
-
 # Prerequisites
 *.d
 
@@ -39,6 +38,6 @@
 /onlab/.vs
 /onlab/onlab/*
 /onlab/x64/*
-/onlab/Dependencies/glm/manual.pdf
+/onlab/build/*
 *.pdf
 *.docx
