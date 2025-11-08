@@ -39,7 +39,7 @@
 /onlab/onlab/*
 /onlab/x64/*
 /onlab/build/*
-Makefile
 *.pdf
 *.docx
 *.nix
+.cache
