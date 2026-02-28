@@ -56,7 +56,7 @@ target_link_libraries(GLM
 add_executable(Exec)
 set_target_properties(Exec PROPERTIES OUTPUT_NAME "demo.elf")
 file(GLOB SOURCE_FILES
-	"src/*.cpp"
+	"./src/*.cpp"
 )
 target_sources(Exec
 	PRIVATE
@@ -73,4 +73,42 @@ target_compile_options(Exec
 	PUBLIC
 		-Wall
 		-Wextra
+)
+
+set_target_properties(Exec
+	PROPERTIES
+	ARCHIVE_OUTPUT_DIRECTORY "./release/lib"
+	LIBRARY_OUTPUT_DIRECTORY "./release/lib"
+	RUNTIME_OUTPUT_DIRECTORY "./release/bin"
+)
+
+add_executable(Debug)
+set_target_properties(Debug PROPERTIES OUTPUT_NAME "demo.elf")
+file(GLOB SOURCE_FILES
+	"./src/*.cpp"
+)
+target_sources(Debug
+	PRIVATE
+		${SOURCE_FILES}
+)
+target_link_libraries(Debug
+	PRIVATE
+		GLM
+		GLEW_FRAMEWORK
+		GLFW
+		OpenGL
+)
+target_compile_options(Debug
+	PUBLIC
+		-Wall
+		-Wextra
+		-g
+		-O0
+)
+
+set_target_properties(Debug
+	PROPERTIES
+	ARCHIVE_OUTPUT_DIRECTORY "./debug/lib"
+	LIBRARY_OUTPUT_DIRECTORY "./debug/lib"
+	RUNTIME_OUTPUT_DIRECTORY "./debug/bin"
 )

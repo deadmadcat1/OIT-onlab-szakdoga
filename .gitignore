@@ -41,5 +41,4 @@
 /onlab/build/*
 *.pdf
 *.docx
-*.nix
 .cache
