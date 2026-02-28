@@ -39,6 +39,8 @@
 /onlab/onlab/*
 /onlab/x64/*
 /onlab/build/*
+/onlab/CMakeCache.txt
+/onlab/CMakeFiles/*
 *.pdf
 *.docx
 .cache
