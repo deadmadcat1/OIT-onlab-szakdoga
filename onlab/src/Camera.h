@@ -19,7 +19,7 @@ public:
 	void setViewUp(glm::vec3 direction);
 	void translate(glm::vec3 amountPerAxis);
 	void rotate(glm::vec3 degreesPerAxis);
-	void rotateNDC(float pitch, float yaw);
+	void pan(glm::vec2 amount);
 	void lookAt(glm::vec3 point);
 	void orbit(glm::vec3 point, glm::vec3 degreesPerAxis);
 };

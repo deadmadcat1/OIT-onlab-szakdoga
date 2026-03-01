@@ -64,8 +64,7 @@ void Window::renderLoop() {
 	}
 }
 
-Window::~Window()
-{
+Window::~Window() {
 	glfwDestroyWindow(window);
 }
 
@@ -80,6 +79,7 @@ void Window::resize_callback(int width, int height) {
 void Window::key_callback(int key, int scancode, int action, int mods) {
 	if (action == GLFW_PRESS) {
 		switch (key) {
+		case GLFW_KEY_Q:
 		case GLFW_KEY_ESCAPE:
 			std::cout << "Exiting..." << std::endl;
 			glfwSetWindowShouldClose(window, true);
@@ -106,15 +106,10 @@ void Window::key_callback(int key, int scancode, int action, int mods) {
 	}
 }
 void Window::mouseMove_callback(double xpos, double ypos) {
-	double Cx = screen2NDC(xpos, ypos).x;
-	double Cy = screen2NDC(xpos, ypos).y;
-	Cx -= mousePrevX;
-	Cy -= mousePrevY;
-	mousePrevX = Cx;
-	mousePrevY = Cy;
-	std::cout << Cx << ":" << Cy<< std::endl;//TODO: fix this crap
 	if (mouseDragState) {
-		scene->changeCameraAttitudeNDC(ypos, xpos);
+		glm::vec2 normCoord = screen2NDC(xpos, ypos);
+		scene->panCameraNDC(normCoord - mousePrev);
+		mousePrev = normCoord;
 	}
 }
 void Window::mousePress_callback(int button, int action, int mods) {
@@ -125,8 +120,7 @@ void Window::mousePress_callback(int button, int action, int mods) {
 			mouseDragState = true;
 			double oldX, oldY;
 			glfwGetCursorPos(window, &oldX, &oldY);
-			mousePrevX = screen2NDC(oldX, oldY).x;
-			mousePrevY = screen2NDC(oldX, oldY).y;
+			mousePrev = screen2NDC(oldX, oldY);
 			break;
 		case GLFW_MOUSE_BUTTON_2:
 			break;
@@ -137,6 +131,7 @@ void Window::mousePress_callback(int button, int action, int mods) {
 		case GLFW_MOUSE_BUTTON_1:
 			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 			mouseDragState = false;
+			mousePrev = glm::vec2(0,0);
 			break;
 		case GLFW_MOUSE_BUTTON_2:
 			break;

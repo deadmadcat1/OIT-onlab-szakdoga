@@ -78,7 +78,7 @@ bool Plane::create() {
 		GL_FALSE,
 		0, NULL);
 
-	glBindVertexArray(NULL);
+	glBindVertexArray(0);
 	return true;
 }
 

@@ -12,8 +12,7 @@ class Window {
 	int windowHeight = 1080;				// -//-
 	TransparencyMethod renderingTransparencyMode;	// -//-
 	bool mouseDragState;
-	double mousePrevX = 0.0;
-	double mousePrevY = 0.0;
+	glm::vec2 mousePrev;
 
 	GLFWwindow* window;
 	std::unique_ptr<Scene> scene;
@@ -29,7 +28,6 @@ public:
 	void mouseScroll_callback(double xoffset, double yoffset);
 private:
 	glm::vec2 screen2NDC(double xpos, double ypos);
-	//static callback wrappers
 
 	static void error_callback(int error, const char* desc) {
 		std::cerr << "GLFW error[" << error << "]: " << desc << std::endl;

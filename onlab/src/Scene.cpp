@@ -16,7 +16,7 @@ bool Scene::set() {
 	int numOfLights = 8;	//TODO: move to a settings class
 
 	camera = std::make_unique<Camera>();
-	camera->translate(glm::vec3(0.0f, 8.0f, 20.0f));
+	camera->translate(glm::vec3(0.0f, 8.0f, 16.0f));
 
 	setMakeLights(numOfLights);
 
@@ -209,7 +209,7 @@ void Scene::render(TransparencyMethod mode){
 		}
 		
 		framebuffers["finalOutput"]->bind();
-		glClearColor(1.0f, 3.0f, 2.0f, 0.0f);
+		glClearColor(0.0f, 1.0f, 0.0f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glDisable(GL_DEPTH_TEST);
 		fullscreenTexturedQuad->draw();
@@ -225,7 +225,7 @@ void Scene::render(TransparencyMethod mode){
 	FSTQprogram->activate();
 	framebuffers["finalOutput"]->bindUniforms(FSTQprogram);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
+	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDisable(GL_DEPTH_TEST);
 	fullscreenTexturedQuad->draw();
@@ -237,7 +237,7 @@ void Scene::renderAlphaBlend() {
 #endif
 	framebuffers["finalOutput"]->bind();
 
-	glClearColor(0.1f, 0.2f, 0.3f, 0.0f);
+	glClearColor(0.0f, 0.0f, 1.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	auto program = shaderPrograms["phongBlinn"];
@@ -269,6 +269,7 @@ void Scene::renderAlphaBlend() {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 #endif
 }
+
 void Scene::renderDepthPeeling() {
 #ifdef DRAW_WIREFRAME
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -288,7 +289,7 @@ void Scene::renderDepthPeeling() {
 	auto framebuffer = framebuffers["depthPeelPass1"];
 	framebuffer->bind();
 
-	glClearColor(1.0f, 0.0f, 1.0f, 0.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	for (const auto& o : opaqueObjects) {
@@ -314,7 +315,6 @@ void Scene::renderDepthPeeling() {
 		framebuffer = framebuffers["depthPeelPass" + std::to_string(i + 1)];
 		framebuffer->bind();
 	
-		glClearColor(1.0f, 0.0f, 1.0f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 		for (const auto& o : opaqueObjects) {
@@ -333,10 +333,12 @@ void Scene::renderDepthPeeling() {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 #endif
 }
+
 void Scene::renderMBOIT() {
 	//TODO
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
+
 void Scene::renderWavelet() {
 	//TODO
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -348,9 +350,9 @@ void Scene::animate(float dt) {
 		return;
 	}
 	glm::vec3 xyzOmega(0.0f, 210.0f, 0.0f);
-	glm::vec3 lookAtPoint(0.0f, 0.0f, 0.0f);
-	camera->lookAt(lookAtPoint);
-	camera->orbit(lookAtPoint, xyzOmega*100.0f*dt);
+	glm::vec3 orbitRootPoint(0.0f, 0.0f, 0.0f);
+	camera->orbit(orbitRootPoint, xyzOmega*100.0f*dt);
+	camera->lookAt(orbitRootPoint);
 }
 
 void Scene::seedRNG() {
@@ -365,8 +367,8 @@ void Scene::notifyResize(int w, int h) {
 	}
 }
 
-void Scene::changeCameraAttitudeNDC(double dNDCy, double dNDCx) {
-	camera->rotateNDC(dNDCy, dNDCx);
+void Scene::panCameraNDC(glm::vec2 dNDC) {
+	camera->pan(dNDC);
 	cameraOrbitLockoutTimer = 1.0f;
 }
 

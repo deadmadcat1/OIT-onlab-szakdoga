@@ -7,7 +7,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-Sphere::Sphere(unsigned int _nStrips = 16, unsigned int _nVtxPerRing = 16) : Geometry(){
+Sphere::Sphere(unsigned int _nStrips, unsigned int _nVtxPerRing) : Geometry(){
     if (_nStrips > 1) {
         nStrips = _nStrips;
     }
@@ -29,10 +29,10 @@ bool Sphere::create() {
 
     float pitchAngle = ((float)M_PI / nStrips);
     glm::quat pitchQuat(glm::vec3(pitchAngle, 0.0f, 0.0f));
-    glm::normalize(pitchQuat);
+    pitchQuat = glm::normalize(pitchQuat);
     float yawAngle = 2 * (float)M_PI / nVtxPerRing;
     glm::quat yawQuat(glm::vec3(0.0f, yawAngle, 0.0f));
-    glm::normalize(yawQuat);
+    yawQuat = glm::normalize(yawQuat);
 
     for (unsigned int i = 1; i < nStrips; i++)
     {
@@ -129,7 +129,7 @@ bool Sphere::create() {
         GL_FALSE,
         0, NULL);
 
-    glBindVertexArray(NULL);
+    glBindVertexArray(0);
     return true;
 }
 

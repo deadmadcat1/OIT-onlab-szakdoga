@@ -47,10 +47,8 @@ void Object::translate(glm::vec3 amountPerAxis) {
 }
 
 void Object::rotate(glm::vec3 degreesPerAxis) {
-	glm::quat rotQuat(glm::radians(degreesPerAxis));
-	rotQuat = glm::normalize(rotQuat);
-	orientation *= rotQuat;
-	orientation = glm::normalize(orientation);
+	glm::quat rotQuat = glm::normalize(glm::quat(glm::radians(degreesPerAxis)));
+	orientation = glm::normalize(rotQuat * orientation);// * glm::conjugate(rotQuat));
 }
 
 void Object::scale(glm::vec3 amountPerAxis) {

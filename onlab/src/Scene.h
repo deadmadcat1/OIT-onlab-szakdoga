@@ -65,7 +65,7 @@ public:
 
 	void animate(float dt);
 
-	void changeCameraAttitudeNDC(double dNDCy, double dNDCx);
+	void panCameraNDC(glm::vec2 dNDC);
 
 	void changeCameraPosition(glm::vec3 dpos);
 };
