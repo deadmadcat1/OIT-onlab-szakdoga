@@ -36,7 +36,7 @@ bool Window::create() {
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetCursorPosCallback(window, mouseMove_callback);
 	glfwSetMouseButtonCallback(window, mousePress_callback);
-	glfwSetFramebufferSizeCallback(window, resize_callback);
+	//glfwSetFramebufferSizeCallback(window, resize_callback);
 	//glfwSetScrollCallback(window, mouseScroll_callback);
 
 	glfwSwapInterval(1);
@@ -74,7 +74,7 @@ void Window::resize_callback(int width, int height) {
 	glViewport(0, 0, width, height);
 	windowWidth = width;
 	windowHeight = height;
-	scene->notifyResize(width, height);
+	//scene->notifyResize(width, height);
 }
 void Window::key_callback(int key, int scancode, int action, int mods) {
 	if (action == GLFW_PRESS) {

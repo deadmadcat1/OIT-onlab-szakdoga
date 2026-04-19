@@ -4,8 +4,10 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 #include <vector>
+#ifndef _USE_MATH_DEFINES
 #define _USE_MATH_DEFINES
 #include <math.h>
+#endif
 
 Sphere::Sphere(unsigned int _nStrips, unsigned int _nVtxPerRing) : Geometry(){
     if (_nStrips > 1) {
@@ -57,8 +59,10 @@ bool Sphere::create() {
 
     /*UVs*/
     //unused
+    //TODO: if only to stop access violations when trying to read sphere uv
+    std::vector<glm::vec2> uvs;
     glBindBuffer(GL_ARRAY_BUFFER, buffers[3]);
-    glBufferData(GL_ARRAY_BUFFER, 0, NULL, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(glm::vec2), uvs.data(), GL_STATIC_DRAW);
 
     /*INDICES*/
     std::vector<unsigned int> indices;

@@ -6,21 +6,19 @@ unsigned int Framebuffer::getID() {
 }
 
 bool Framebuffer::create(
-	unsigned int targetCount,
-	unsigned int width,
-	unsigned int height,
-	unsigned int format,
-	unsigned int sourceFormat,
-	unsigned int sourceType)
+	const std::unordered_map<std::string, colorTargetParameters>& targetParams,
+	unsigned int depthbuffer_width,
+	unsigned int depthbuffer_height)
 {
+	if (framebufferID > 0) {
+		std::cerr << "Framebuffer " << framebufferID << " already exists, make a new one!" << std::endl;
+		return false;
+	}
+	size_t targetCount = targetParams.size();
 	int maxColorAttachments = 0;	//would be better to create a factory that manages this, but idc
 	glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &maxColorAttachments);
 	if (targetCount > maxColorAttachments - 1) {
 		std::cerr << "Framebuffer " << framebufferID << " cannot store " << targetCount << " color attachments, only "<< maxColorAttachments<< "!" << std::endl;
-		targetCount = maxColorAttachments;
-	}
-	if (framebufferID > 0) {
-		std::cerr << "Framebuffer " << framebufferID << " already exists, make a new one!" << std::endl;
 		return false;
 	}
 	glGenFramebuffers(1, &framebufferID);
@@ -29,16 +27,13 @@ bool Framebuffer::create(
 		glDeleteFramebuffers(1, &framebufferID);
 		return false;
 	}
+	depth_width = depthbuffer_width;
+	depth_height = depthbuffer_height;
+	//colorTargetParams = targetParams;
 	
-	_targetCount = targetCount;
-	_width = width;
-	_height = height;
-	_format = format;
-	_sourceFormat = sourceFormat;
-	_sourceType = sourceType;
-
-	createTextures(targetCount, width, height, format, sourceFormat, sourceType);
-
+	//createColorTargets(colorTargetParams);
+	createColorTargets(targetParams);
+	createDepthTargets(depth_width, depth_height);
 	attachTextures();
 
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -53,77 +48,85 @@ bool Framebuffer::create(
 	return true;
 }
 
-void Framebuffer::createTextures(unsigned int targetCount,
-	unsigned int width,
-	unsigned int height,
-	unsigned int format,
-	unsigned int sourceFormat,
-	unsigned int sourceType) {
-	for (size_t i = 0; i < targetCount; i++)
-	{
+void Framebuffer::createColorTargets(const std::unordered_map<std::string, colorTargetParameters>& targetParams) {
+	for (const auto& t : targetParams) {
 		auto colorTarget = std::make_unique<Texture>();
-		colorTarget->create(width, height, format, sourceFormat, sourceType, TextureParams(GL_LINEAR));
-		colorTargets.push_back(std::move(colorTarget));
+		colorTarget->create(t.second.width, t.second.height, t.second.internalFormat, t.second.format, t.second.type, t.second.data, TextureParams(GL_LINEAR));
+		colorTargets.emplace(t.first, std::move(colorTarget));
 	}
-	depthTarget = std::make_shared<Texture>();
-	depthTarget->create(width, height, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, TextureParams(GL_LINEAR));
+}
 
+void Framebuffer::createDepthTargets(unsigned int width, unsigned int height) {
+	depthTarget = std::make_shared<Texture>();
+	depthTarget->create(width, height, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, nullptr, TextureParams(GL_LINEAR));
 }
 
 void Framebuffer::attachTextures() {
 	glBindFramebuffer(GL_FRAMEBUFFER, framebufferID);
 
 	std::vector<GLenum> attachments;
-	for (size_t i = 0; i < _targetCount; i++)
-	{
-		GLenum attach = GL_COLOR_ATTACHMENT0 + i;
+	int i = 0;
+	for (const auto& ct : colorTargets) {
+		GLenum attach = GL_COLOR_ATTACHMENT0 + (unsigned int)i;
 		attachments.push_back(attach);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, attach, GL_TEXTURE_2D, colorTargets[i]->getID(), 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, attach, GL_TEXTURE_2D, ct.second->getID(), 0);
+		i++;
 	}
-	glDrawBuffers(attachments.size(), attachments.data());
+	glDrawBuffers((unsigned int)attachments.size(), attachments.data());
 
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTarget->getID(), 0);
 }
 
 void Framebuffer::bind() {
 	glBindFramebuffer(GL_FRAMEBUFFER, framebufferID);
-	glViewport(0, 0, _width, _height);
 }
 
 void Framebuffer::bindUniforms(const std::shared_ptr<GPUProgram>& program) {
 	program->activate();
 	program->setUniform("depthSampler", depthTarget.get(), 0);
-	for (int i = 0; i < colorTargets.size(); i++) {
-		program->setUniform("colorSampler" + std::to_string(i+1), colorTargets[i].get(), i+1);
+	int i = 0;
+	for (const auto& n : program->color_sampler_names) {
+		if (colorTargets.find(n) != colorTargets.end()) {
+			program->setUniform(n, colorTargets[n].get(), (unsigned int)i);
+		}
+		//else {
+		//	std::cout << "Framebuffer " << framebufferID << " does not produce " << n << "!" << std::endl;
+		//}
+		i++;
 	}
+	//for (size_t i = 0; i < colorTargets.size(); i++) {
+	//	program->setUniform(program->color_sampler_names[i], colorTargets[i].get(), (unsigned int)i);
+	//}
 }
 
-Texture* Framebuffer::getColorTarget(int idx) {
-	return colorTargets[idx].get();
+Texture* Framebuffer::getColorTarget(std::string name) {
+	return colorTargets[name].get();
 }
 Texture* Framebuffer::getDepthTarget() {
 	return depthTarget.get();
 }
 
-Framebuffer::~Framebuffer(){
+Framebuffer::~Framebuffer() {
 	colorTargets.clear();
 	depthTarget.reset();
 	glDeleteFramebuffers(1, &framebufferID);
 }
 
-void Framebuffer::resize(int w, int h) {
-	colorTargets.clear();
-	depthTarget.reset();
-
-	_width = w;
-	_height = h;
-
-	createTextures(_targetCount, _width, _height, _format, _sourceFormat, _sourceType);
-
-	attachTextures();
-
-	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	if (status != GL_FRAMEBUFFER_COMPLETE) {
-		std::cerr << "Framebuffer incomplete!" << std::endl;
-	}
-}
+//void Framebuffer::resize(unsigned int w, unsigned int h) {
+//	colorTargets.clear();
+//	depthTarget.reset();
+//
+//	depth_width = w;
+//	depth_height = h;
+//	colorTargetParams[0].width = w;
+//	colorTargetParams[0].height = h;
+//	createColorTargets(colorTargetParams);
+//	createDepthTargets(depth_width, depth_height);
+//
+//	attachTextures();
+//
+//	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+//	if (status != GL_FRAMEBUFFER_COMPLETE) {
+//		std::cerr << "Framebuffer incomplete!" << std::endl;
+//	}
+//} 

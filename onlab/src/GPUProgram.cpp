@@ -43,7 +43,8 @@ void GPUProgram::addShader(std::shared_ptr<Shader> shader) {
 	shaders.push_back(shader);
 }
 
-bool GPUProgram::create(const std::string& fragOut) {
+bool GPUProgram::create(const std::vector<std::string>& colorSamplers) {
+//bool GPUProgram::create() {
 	progID = glCreateProgram();
 	if (!progID) {
 		std::cerr << "Error in shader program creation" << std::endl;
@@ -54,7 +55,10 @@ bool GPUProgram::create(const std::string& fragOut) {
 		glAttachShader(progID, s->getID());
 	}
 
-	glBindFragDataLocation(progID, 0, fragOut.c_str());
+	_color_sampler_names = colorSamplers;
+	//for (std::string on: outputs) {
+	//	glBindFragDataLocation(progID, 0, on.c_str());
+	//}
 
 	glLinkProgram(progID);
 	if (!checkLinking()) return false;

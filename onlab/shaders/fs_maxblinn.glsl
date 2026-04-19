@@ -20,7 +20,7 @@ in vec4 wPos;
 in vec3 wNormal;
 in vec3 wView;
 
-out vec4 fragColor;
+layout(location = 0) out vec4 fragColor;
 
 vec3 shade(vec3 normal, vec3 lightDir, vec3 viewDir,
            vec3 Le, vec3 kd, vec3 ks, float shine){

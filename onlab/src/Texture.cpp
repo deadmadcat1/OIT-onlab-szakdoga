@@ -31,8 +31,24 @@ bool Texture::create(const std::string& path, const TextureParams opt) {
 	stbi_set_flip_vertically_on_load(true);
 	unsigned char* data = stbi_load(path.c_str(), &width, &height, &channels, 0);
 	if (data) {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height,
-					 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		GLint gl_channels;
+		switch (channels) {
+		case 1:
+			gl_channels = GL_RED;
+			break;
+		case 2:
+			gl_channels = GL_RG;
+			break;
+		case 3:
+			gl_channels = GL_RGB;
+			break;
+		case 4:
+		default:
+			gl_channels = GL_RGBA;
+			break;
+		}
+		glTexImage2D(GL_TEXTURE_2D, 0, gl_channels, width, height,
+					 0, gl_channels, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else {
@@ -48,9 +64,10 @@ bool Texture::create(const std::string& path, const TextureParams opt) {
 bool Texture::create(
 	unsigned int width,
 	unsigned int height,
+	unsigned int internalFormat,
 	unsigned int format,
-	unsigned int sourceFormat,
-	unsigned int sourceType,
+	unsigned int type,
+	const void * data,
 	const TextureParams opt)
 {
 	if (textureID > 0) {
@@ -69,7 +86,7 @@ bool Texture::create(
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, opt.min_filter);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, opt.mag_filter);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, sourceFormat, sourceType, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, data);
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 	return true;

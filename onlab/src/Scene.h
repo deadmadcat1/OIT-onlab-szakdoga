@@ -47,7 +47,7 @@ class Scene {
 	void setMakeLights(int numOfLights);
 	bool setMakeShaderPrograms();
 	bool setMakeFramebuffers();
-	bool setCreateFramebuffer(std::string name, int targetCount, int width, int height);
+	bool setCreateFramebuffer(const std::string& name, const std::unordered_map<std::string, colorTargetParameters>& colorTargetParams, unsigned int depth_width, unsigned int depth_height);
 	bool setMakeOpaqueObjects();
 	bool setMakeTransparentObjects();
 
@@ -59,7 +59,7 @@ class Scene {
 public:
 	bool set();
 
-	void notifyResize(int width, int height);
+	//void notifyResize(int width, int height);
 
 	void render(TransparencyMethod mode);
 

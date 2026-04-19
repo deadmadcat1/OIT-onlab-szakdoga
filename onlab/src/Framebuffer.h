@@ -1,43 +1,53 @@
 #pragma once
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <vector>
+#include <unordered_map>
 #include <memory>
 #include <string>
 #include "Texture.h"
 #include "GPUProgram.h"
 
+struct colorTargetParameters {
+	unsigned int width;
+	unsigned int height;
+	unsigned int internalFormat;
+	unsigned int format;
+	unsigned int type;
+	const void * data;
+	colorTargetParameters(
+		unsigned int width,
+		unsigned int height,
+		unsigned int internalFormat,
+		unsigned int format,
+		unsigned int type,
+		const void* data)
+		:width(width), height(height),
+		internalFormat(internalFormat),
+		format(format),
+		type(type), data(data) {}
+};
+
 class Framebuffer{
 	unsigned int framebufferID;
-	std::vector<std::shared_ptr<Texture>> colorTargets;
-	std::vector<std::string> samplerNames;
+	std::unordered_map<std::string, std::shared_ptr<Texture>> colorTargets;
+	//std::vector<colorTargetParameters> colorTargetParams;
 	std::shared_ptr<Texture> depthTarget;
-	unsigned int _targetCount;
-	unsigned int _width;
-	unsigned int _height;
-	unsigned int _format;
-	unsigned int _sourceFormat;
-	unsigned int _sourceType;
+	unsigned int depth_width;
+	unsigned int depth_height;
+
+	void createColorTargets(const std::unordered_map<std::string, colorTargetParameters>& targetParams);
+	void createDepthTargets(unsigned int width, unsigned int height);
+	void attachTextures();
 public:
 	unsigned int getID();
 	bool create(
-		unsigned int targetCount = 1,
-		unsigned int width = 512,
-		unsigned int height = 512,
-		unsigned int format = GL_RGBA,
-		unsigned int sourceFormat = GL_RGBA,
-		unsigned int sourceType = GL_UNSIGNED_BYTE);
+		const std::unordered_map<std::string, colorTargetParameters>& targetParams,
+		unsigned int depthbuffer_width,
+		unsigned int depthbuffer_height);
 	void bind();
-	Texture* getColorTarget(int idx);
+	Texture* getColorTarget(std::string name);
 	Texture* getDepthTarget();
-	void resize(int width, int height);
+	//void resize(unsigned int w, unsigned int h);
 	void bindUniforms(const std::shared_ptr<GPUProgram>& program);
-	void createTextures(unsigned int targetCount,
-		unsigned int width,
-		unsigned int height,
-		unsigned int format,
-		unsigned int sourceFormat,
-		unsigned int sourceType);
-	void attachTextures();
 	~Framebuffer();
 };

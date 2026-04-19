@@ -29,9 +29,10 @@ public:
 	bool create(
 		unsigned int width,
 		unsigned int height,
+		unsigned int internalFormat,
 		unsigned int format,
-		unsigned int sourceFormat,
-		unsigned int sourceType,
-		const TextureParams opt);
+		unsigned int type = GL_UNSIGNED_BYTE,
+		const void * data = nullptr,
+		const TextureParams opt = {});
 	~Texture();
 };
