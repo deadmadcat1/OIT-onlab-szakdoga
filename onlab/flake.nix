@@ -22,6 +22,7 @@
 				clang-tools
 				lldb
 				glsl_analyzer
+				renderdoc
 			];
 			env = {
 				GLFW_LIB = "${pkgs.glfw}";
