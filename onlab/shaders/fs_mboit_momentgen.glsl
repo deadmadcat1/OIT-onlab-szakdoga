@@ -10,11 +10,6 @@ uniform float wrapping_zone_param;
 
 uniform sampler2D depthSampler;
 
-in vec3 wLightDir[8];
-in vec4 wPos;
-in vec3 wNormal;
-in vec3 wView;
-
 layout(location = 0) out vec3 moment012;
 layout(location = 1) out vec4 moment3456;
 
@@ -28,18 +23,17 @@ vec2 depthToFourierBasisFunc(float depth){
 }
 
 void main(void) {
-  //float clipDepth = texelFetch(depthSampler, ivec2(gl_FragCoord.xy), 0).r;
-  //float fragDepth = gl_FragCoord.z;
-  //if (fragDepth < clipDepth) {
-  //  discard;
-  //}
+  float clipDepth = texelFetch(depthSampler, ivec2(gl_FragCoord.xy), 0).r;
+  float fragDepth = gl_FragCoord.z;
+  if (fragDepth >= clipDepth) {
+    discard;
+  }
 
-  //float absorbance = -log(1.0f - material.alpha);
-  moment012 = vec3(1.0f, 1.0f, 1.0f);
-  moment3456 = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+  float absorbance = -log(1.0f - material.alpha);
 
-  //vec2 circle_point = depthToFourierBasisFunc(fragDepth);
-  //vec2 circle_point_pow2 = c_mul(circle_point, circle_point);
-  //moment012 = vec3(1.0f, circle_point) * absorbance;
-  //moment3456 = vec4(circle_point_pow2, c_mul(circle_point, circle_point_pow2)) * absorbance;
+  vec2 circle_point = depthToFourierBasisFunc(fragDepth);
+  vec2 circle_point_pow2 = c_mul(circle_point, circle_point);
+
+  moment012 = vec3(1.0f, circle_point) * absorbance;
+  moment3456 = vec4(circle_point_pow2, c_mul(circle_point, circle_point_pow2)) * absorbance;
 }

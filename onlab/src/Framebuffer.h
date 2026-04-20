@@ -30,13 +30,13 @@ struct colorTargetParameters {
 class Framebuffer{
 	unsigned int framebufferID;
 	std::unordered_map<std::string, std::shared_ptr<Texture>> colorTargets;
-	//std::vector<colorTargetParameters> colorTargetParams;
+	std::unordered_map<std::string, colorTargetParameters> colorTargetParams;
 	std::shared_ptr<Texture> depthTarget;
 	unsigned int depth_width;
 	unsigned int depth_height;
 
-	void createColorTargets(const std::unordered_map<std::string, colorTargetParameters>& targetParams);
-	void createDepthTargets(unsigned int width, unsigned int height);
+	void createColorTargets();
+	void createDepthTarget();
 	void attachTextures();
 public:
 	unsigned int getID();
@@ -47,7 +47,7 @@ public:
 	void bind();
 	Texture* getColorTarget(std::string name);
 	Texture* getDepthTarget();
-	//void resize(unsigned int w, unsigned int h);
+	void resize(unsigned int w, unsigned int h);
 	void bindUniforms(const std::shared_ptr<GPUProgram>& program);
 	~Framebuffer();
 };

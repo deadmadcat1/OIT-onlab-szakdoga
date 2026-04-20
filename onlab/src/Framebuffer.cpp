@@ -17,7 +17,7 @@ bool Framebuffer::create(
 	size_t targetCount = targetParams.size();
 	int maxColorAttachments = 0;	//would be better to create a factory that manages this, but idc
 	glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &maxColorAttachments);
-	if (targetCount > maxColorAttachments - 1) {
+	if (targetCount > (unsigned int)maxColorAttachments - 1) {
 		std::cerr << "Framebuffer " << framebufferID << " cannot store " << targetCount << " color attachments, only "<< maxColorAttachments<< "!" << std::endl;
 		return false;
 	}
@@ -29,11 +29,10 @@ bool Framebuffer::create(
 	}
 	depth_width = depthbuffer_width;
 	depth_height = depthbuffer_height;
-	//colorTargetParams = targetParams;
+	colorTargetParams = targetParams;
 	
-	//createColorTargets(colorTargetParams);
-	createColorTargets(targetParams);
-	createDepthTargets(depth_width, depth_height);
+	createColorTargets();
+	createDepthTarget();
 	attachTextures();
 
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -48,17 +47,17 @@ bool Framebuffer::create(
 	return true;
 }
 
-void Framebuffer::createColorTargets(const std::unordered_map<std::string, colorTargetParameters>& targetParams) {
-	for (const auto& t : targetParams) {
+void Framebuffer::createColorTargets() {
+	for (const auto& t : colorTargetParams) {
 		auto colorTarget = std::make_unique<Texture>();
 		colorTarget->create(t.second.width, t.second.height, t.second.internalFormat, t.second.format, t.second.type, t.second.data, TextureParams(GL_LINEAR));
 		colorTargets.emplace(t.first, std::move(colorTarget));
 	}
 }
 
-void Framebuffer::createDepthTargets(unsigned int width, unsigned int height) {
+void Framebuffer::createDepthTarget() {
 	depthTarget = std::make_shared<Texture>();
-	depthTarget->create(width, height, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, nullptr, TextureParams(GL_LINEAR));
+	depthTarget->create(depth_width, depth_height, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, nullptr, TextureParams(GL_LINEAR));
 }
 
 void Framebuffer::attachTextures() {
@@ -94,9 +93,6 @@ void Framebuffer::bindUniforms(const std::shared_ptr<GPUProgram>& program) {
 		//}
 		i++;
 	}
-	//for (size_t i = 0; i < colorTargets.size(); i++) {
-	//	program->setUniform(program->color_sampler_names[i], colorTargets[i].get(), (unsigned int)i);
-	//}
 }
 
 Texture* Framebuffer::getColorTarget(std::string name) {
@@ -112,21 +108,23 @@ Framebuffer::~Framebuffer() {
 	glDeleteFramebuffers(1, &framebufferID);
 }
 
-//void Framebuffer::resize(unsigned int w, unsigned int h) {
-//	colorTargets.clear();
-//	depthTarget.reset();
-//
-//	depth_width = w;
-//	depth_height = h;
-//	colorTargetParams[0].width = w;
-//	colorTargetParams[0].height = h;
-//	createColorTargets(colorTargetParams);
-//	createDepthTargets(depth_width, depth_height);
-//
-//	attachTextures();
-//
-//	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-//	if (status != GL_FRAMEBUFFER_COMPLETE) {
-//		std::cerr << "Framebuffer incomplete!" << std::endl;
-//	}
-//} 
+void Framebuffer::resize(unsigned int w, unsigned int h) {
+	colorTargets.clear();
+	depthTarget.reset();
+
+	depth_width = w;
+	depth_height = h;
+	for (auto& ctp : colorTargetParams) {
+		ctp.second.width = w;
+		ctp.second.height = h;
+	}
+	createColorTargets();
+	createDepthTarget();
+
+	attachTextures();
+
+	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if (status != GL_FRAMEBUFFER_COMPLETE) {
+		std::cerr << "Framebuffer incomplete!" << std::endl;
+	}
+} 

@@ -74,9 +74,9 @@ void Window::resize_callback(int width, int height) {
 	glViewport(0, 0, width, height);
 	windowWidth = width;
 	windowHeight = height;
-	//scene->notifyResize(width, height);
+	scene->notifyResize(width, height);
 }
-void Window::key_callback(int key, int scancode, int action, int mods) {
+void Window::key_callback(int key, int scancode __attribute__((unused)), int action, int mods __attribute__((unused)) ) {
 	if (action == GLFW_PRESS) {
 		switch (key) {
 		case GLFW_KEY_Q:
@@ -112,7 +112,7 @@ void Window::mouseMove_callback(double xpos, double ypos) {
 		mousePrev = normCoord;
 	}
 }
-void Window::mousePress_callback(int button, int action, int mods) {
+void Window::mousePress_callback(int button, int action, int mods __attribute__((unused))) {
 	if (action == GLFW_PRESS) {
 		switch (button) {
 		case GLFW_MOUSE_BUTTON_1:
@@ -138,9 +138,9 @@ void Window::mousePress_callback(int button, int action, int mods) {
 		}
 	}
 }
-void Window::mouseScroll_callback(double xoffset, double yoffset) {
-	return;
-}
+//void Window::mouseScroll_callback(double xoffset, double yoffset) {
+//	return;
+//}
 
 glm::vec2 Window::screen2NDC(double xpos, double ypos) {
 	double Cx = 2.0f * xpos / windowWidth - 1;

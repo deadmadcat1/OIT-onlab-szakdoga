@@ -40,7 +40,7 @@ bool Scene::set() {
   return true;
 }
 
-void Scene::setMakeLights(int numOfLights) {
+void Scene::setMakeLights(unsigned int numOfLights) {
   if (numOfLights > maxNumOfLights) {
     numOfLights = maxNumOfLights;
     std::cerr << "numOfLights exceeds maximum, count truncated to bounds!"
@@ -431,6 +431,8 @@ void Scene::renderMBOIT() {
   program = shaderPrograms["MBOITMomentGen"];
   program->activate();
 
+  camera->bindUniforms(program);
+
   program->setUniform("wrapping_zone_param", wrapping_zone_param);
 
   framebuffer->bindUniforms(program);
@@ -448,8 +450,8 @@ void Scene::renderMBOIT() {
     t->draw();
   }
   // Produce image from moments
-  glBlendFunci(0, GL_ONE, GL_ONE);
-  glBlendFunci(1, GL_ONE, GL_ZERO);
+  //glBlendFunci(0, GL_ONE, GL_ONE);
+  //glBlendFunci(1, GL_ONE, GL_ZERO);
   std::cout << "Beginning MBOIT Transparent pass" << std::endl;
   program = shaderPrograms["MBOITTransparentPass"];
   program->activate();
@@ -463,6 +465,8 @@ void Scene::renderMBOIT() {
   program->setUniform("wrapping_zone_param", wrapping_zone_param);
 
   framebuffer->bindUniforms(program);
+	framebuffers["MBOITOpaque"]->bindUniforms(program);
+	//TODO: only enable zbuffer on FBO's that need to draw to it, bindings are getting confused.
   framebuffer = framebuffers["MBOITTransparent"];
   framebuffer->bind();
 
@@ -516,12 +520,12 @@ void Scene::seedRNG() {
   rng = std::mt19937(seed());
 }
 
-//void Scene::notifyResize(int w, int h) {
-//  camera->setParams(73.0f, (float)w / (float)h);
-//  for (auto &fb : framebuffers) {
-//    fb.second->resize(w, h);
-//  }
-//}
+void Scene::notifyResize(int w, int h) {
+  camera->setParams(73.0f, (float)w / (float)h);
+  for (auto &fb : framebuffers) {
+    fb.second->resize(w, h);
+  }
+}
 
 void Scene::panCameraNDC(glm::vec2 dNDC) {
   camera->pan(dNDC);

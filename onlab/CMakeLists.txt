@@ -102,6 +102,7 @@ target_compile_options(Debug
 	PUBLIC
 		-Wall
 		-Wextra
+		-Wno-cpp
 		-g
 		-O0
 )

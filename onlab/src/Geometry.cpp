@@ -19,7 +19,7 @@ bool Geometry::create() {
 		if (!buffers[i]) {
 			std::cerr << "Buffer "<< i << " creation failed!!!" << std::endl;
 			glDeleteBuffers(4, buffers.data());
-			glBindVertexArray(NULL);
+			glBindVertexArray(0);
 			glDeleteVertexArrays(1, &VAO);
 			return false;
 		}
@@ -29,6 +29,6 @@ bool Geometry::create() {
 
 Geometry::~Geometry() {
 	glDeleteBuffers(4, buffers.data());
-	glBindVertexArray(NULL);
+	glBindVertexArray(0);
 	glDeleteVertexArrays(1, &VAO);
 }

@@ -273,19 +273,19 @@ void main(void){
 	ivec2 texCoord = ivec2(gl_FragCoord.xy);
 	float fragDepth = gl_FragCoord.z;
 	float clipDepth = texelFetch(depthSampler, texCoord, 0).r;
-	if (fragDepth < clipDepth) {
+	if (fragDepth >= clipDepth) {
 		discard;
 	}
 
 	vec3 b_012 = texelFetch(moment012, texCoord, 0).rgb;
-	//if (b_012.x == 0.0f) {
-	//	discard;
-	//}
+	if (b_012.x == 0.0f) {
+		discard;
+	}
 
-	//vec4 b_3456 = texture(moment3456, ndcCoord);
-	//b_012.yz /= b_012.x;
-	//b_3456 /= b_012.x;
-	//float T_z_f = computeTransmittance(b_012, b_3456, fragDepth, 0.0000008f, 0.25f);
+	vec4 b_3456 = texelFetch(moment3456, texCoord, 0);
+	b_012.yz /= b_012.x;
+	b_3456 /= b_012.x;
+	float T_z_f = computeTransmittance(b_012, b_3456, fragDepth, 0.0000008f, 0.25f);
 
 	transparentTarget = vec4(0.0f, 0.0f, 0.0f, 0.0f);
 	for (int i = 0; i < nLights; i++){
@@ -297,10 +297,7 @@ void main(void){
 								Le, material.kd, material.ks, material.shine);
 	}
 
-	//transparentTarget.a = material.alpha * T_z_f;
-	transparentTarget.a = material.alpha;
-	//transparentTarget.rgb *= transparentTarget.a;
+	transparentTarget.a = material.alpha * T_z_f;
+	transparentTarget.rgb *= transparentTarget.a;
 	totalTransmittance = exp(-b_012.x);
-	//transparentTarget.x = b_012.x;
-	//transparentTarget.a = T_z_f;
 } 

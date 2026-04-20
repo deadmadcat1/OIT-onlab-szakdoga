@@ -29,7 +29,7 @@ class Scene {
 		}
 	};
 
-	static const size_t maxNumOfLights = 8;
+	static const unsigned int maxNumOfLights = 8;
 	std::unique_ptr<Camera> camera;
 	float cameraOrbitLockoutTimer = 0.0f;
 	std::vector<std::shared_ptr<Light>> lights;
@@ -44,7 +44,7 @@ class Scene {
 
 	void seedRNG();
 
-	void setMakeLights(int numOfLights);
+	void setMakeLights(unsigned int numOfLights);
 	bool setMakeShaderPrograms();
 	bool setMakeFramebuffers();
 	bool setCreateFramebuffer(const std::string& name, const std::unordered_map<std::string, colorTargetParameters>& colorTargetParams, unsigned int depth_width, unsigned int depth_height);
@@ -59,7 +59,7 @@ class Scene {
 public:
 	bool set();
 
-	//void notifyResize(int width, int height);
+	void notifyResize(int width, int height);
 
 	void render(TransparencyMethod mode);
 
