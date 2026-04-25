@@ -44,3 +44,4 @@
 *.pdf
 *.docx
 .cache
+/renderdoc/*

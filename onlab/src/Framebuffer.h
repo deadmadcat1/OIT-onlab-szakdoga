@@ -7,14 +7,14 @@
 #include "Texture.h"
 #include "GPUProgram.h"
 
-struct colorTargetParameters {
+struct TargetParams {
 	unsigned int width;
 	unsigned int height;
 	unsigned int internalFormat;
 	unsigned int format;
 	unsigned int type;
 	const void * data;
-	colorTargetParameters(
+	TargetParams(
 		unsigned int width,
 		unsigned int height,
 		unsigned int internalFormat,
@@ -25,29 +25,22 @@ struct colorTargetParameters {
 		internalFormat(internalFormat),
 		format(format),
 		type(type), data(data) {}
+	TargetParams() {}
 };
 
 class Framebuffer{
 	unsigned int framebufferID;
-	std::unordered_map<std::string, std::shared_ptr<Texture>> colorTargets;
-	std::unordered_map<std::string, colorTargetParameters> colorTargetParams;
-	std::shared_ptr<Texture> depthTarget;
-	unsigned int depth_width;
-	unsigned int depth_height;
+	std::unordered_map<std::string, std::shared_ptr<Texture>> _targets;
+	std::unordered_map<std::string, TargetParams> _targetParams;
 
-	void createColorTargets();
-	void createDepthTarget();
+	void createTargets();
 	void attachTextures();
 public:
 	unsigned int getID();
-	bool create(
-		const std::unordered_map<std::string, colorTargetParameters>& targetParams,
-		unsigned int depthbuffer_width,
-		unsigned int depthbuffer_height);
+	bool create(const std::unordered_map<std::string, TargetParams>& colorTargetParams);
 	void bind();
-	Texture* getColorTarget(std::string name);
-	Texture* getDepthTarget();
-	void resize(unsigned int w, unsigned int h);
+	Texture* getTarget(std::string name);
+	void resize(glm::uvec2 newsize);
 	void bindUniforms(const std::shared_ptr<GPUProgram>& program);
 	~Framebuffer();
 };

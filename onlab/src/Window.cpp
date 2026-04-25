@@ -18,9 +18,9 @@ bool Window::create() {
 	glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
 	glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
 
-	//window = glfwCreateWindow(mode->width, mode->height, "OIT Onlab", monitor, NULL);	//windowed fullscreen
-	//window = glfwCreateWindow(windowWidth, windowHeight, "OIT Onlab", monitor, NULL);	//fullscreen
-	window = glfwCreateWindow(windowWidth, windowHeight, "OIT Onlab", NULL, NULL);	//windowed mode
+	window = glfwCreateWindow(mode->width, mode->height, "OIT Onlab", monitor, NULL);	//windowed fullscreen
+	//window = glfwCreateWindow(settings.viewportSize.x, settings.viewportSize.y, "OIT Onlab", monitor, NULL);	//fullscreen
+	//window = glfwCreateWindow(settings.viewportSize.x, settings.viewportSize.y, "OIT Onlab", NULL, NULL);	//windowed mode
 
 	if (!window)
 		return false;
@@ -40,7 +40,7 @@ bool Window::create() {
 	//glfwSetScrollCallback(window, mouseScroll_callback);
 
 	glfwSwapInterval(1);
-	scene = std::make_unique<Scene>();
+	scene = std::make_unique<Scene>(settings);
 
 	return (scene && scene->set());
 }
@@ -71,10 +71,8 @@ Window::~Window() {
 //callback implementations
 
 void Window::resize_callback(int width, int height) {
-	glViewport(0, 0, width, height);
-	windowWidth = width;
-	windowHeight = height;
-	scene->notifyResize(width, height);
+	_settings.viewportSize = glm::uvec2(width, height);
+	scene->notifyResize(settings.viewportSize);
 }
 void Window::key_callback(int key, int scancode __attribute__((unused)), int action, int mods __attribute__((unused)) ) {
 	if (action == GLFW_PRESS) {
@@ -112,6 +110,7 @@ void Window::mouseMove_callback(double xpos, double ypos) {
 		mousePrev = normCoord;
 	}
 }
+
 void Window::mousePress_callback(int button, int action, int mods __attribute__((unused))) {
 	if (action == GLFW_PRESS) {
 		switch (button) {
@@ -143,7 +142,7 @@ void Window::mousePress_callback(int button, int action, int mods __attribute__(
 //}
 
 glm::vec2 Window::screen2NDC(double xpos, double ypos) {
-	double Cx = 2.0f * xpos / windowWidth - 1;
-	double Cy = 1.0f - 2.0f * ypos / windowHeight;
+	double Cx = 2.0f * xpos / settings.viewportSize.x - 1;
+	double Cy = 1.0f - 2.0f * ypos / settings.viewportSize.y;
 	return glm::vec2(Cx, Cy);
 }

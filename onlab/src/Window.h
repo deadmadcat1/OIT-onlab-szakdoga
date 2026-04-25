@@ -1,6 +1,7 @@
 #pragma once
 #include "Scene.h"
 #include "TransparencyMode.h"
+#include "Settings.h"
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include <GL/glew.h>
@@ -8,15 +9,15 @@
 #include <iostream>
 
 class Window {
-	int windowWidth = 1920;					// TODO: move to Settings or somesuch
-	int windowHeight = 1080;				// -//-
 	TransparencyMethod renderingTransparencyMode;	// -//-
 	bool mouseDragState;
 	glm::vec2 mousePrev;
+	Settings _settings;
 
 	GLFWwindow* window;
 	std::unique_ptr<Scene> scene;
 public:
+	const Settings& settings = _settings;
 	Window() = default;
 	~Window();
 	bool create();

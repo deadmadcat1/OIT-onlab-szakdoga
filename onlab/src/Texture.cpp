@@ -1,5 +1,4 @@
 #include "Texture.h"
-#include <stdio.h>
 #include <GL/glew.h>
 #include <iostream>
 #include "stb_image.h"
@@ -22,10 +21,10 @@ bool Texture::create(const std::string& path, const TextureParams opt) {
 	}
 	glBindTexture(GL_TEXTURE_2D, textureID);
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, opt.wrap_s);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, opt.wrap_t);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, opt.min_filter);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, opt.mag_filter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, opt._wrap_s);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, opt._wrap_t);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, opt._min_filter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, opt._mag_filter);
 
 	int width, height, channels;
 	stbi_set_flip_vertically_on_load(true);
@@ -81,10 +80,10 @@ bool Texture::create(
 	}
 	glBindTexture(GL_TEXTURE_2D, textureID);
 	
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, opt.wrap_s);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, opt.wrap_t);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, opt.min_filter);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, opt.mag_filter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, opt._wrap_s);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, opt._wrap_t);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, opt._min_filter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, opt._mag_filter);
 
 	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, data);
 

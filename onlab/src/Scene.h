@@ -10,6 +10,7 @@
 #include "Framebuffer.h"
 #include "GPUProgram.h"
 #include "TransparencyMode.h"
+#include "Settings.h"
 
 class Scene {
 	class successToggle {
@@ -29,7 +30,7 @@ class Scene {
 		}
 	};
 
-	static const unsigned int maxNumOfLights = 8;
+	Settings _settings;
 	std::unique_ptr<Camera> camera;
 	float cameraOrbitLockoutTimer = 0.0f;
 	std::vector<std::shared_ptr<Light>> lights;
@@ -47,7 +48,7 @@ class Scene {
 	void setMakeLights(unsigned int numOfLights);
 	bool setMakeShaderPrograms();
 	bool setMakeFramebuffers();
-	bool setCreateFramebuffer(const std::string& name, const std::unordered_map<std::string, colorTargetParameters>& colorTargetParams, unsigned int depth_width, unsigned int depth_height);
+	bool setCreateFramebuffer(const std::string& name, const std::unordered_map<std::string, TargetParams>& targetParams);
 	bool setMakeOpaqueObjects();
 	bool setMakeTransparentObjects();
 
@@ -59,7 +60,7 @@ class Scene {
 public:
 	bool set();
 
-	void notifyResize(int width, int height);
+	void notifyResize(glm::uvec2 newsize);
 
 	void render(TransparencyMethod mode);
 
@@ -68,4 +69,6 @@ public:
 	void panCameraNDC(glm::vec2 dNDC);
 
 	void changeCameraPosition(glm::vec3 dpos);
+	
+	Scene(Settings settings) : _settings(settings) {}
 };

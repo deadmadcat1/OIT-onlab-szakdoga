@@ -11,19 +11,17 @@
 class GPUProgram {
 	unsigned int progID = 0;
 	std::vector<std::shared_ptr<Shader>> shaders;
-	std::vector<std::string> _color_sampler_names;
+	std::vector<std::string> _sampler_names;
 	void getErrorInfo();
 	bool checkLinking();
 	int getLocation(const std::string& name);
 public:
-	const std::vector<std::string>& color_sampler_names = _color_sampler_names;
+	const std::vector<std::string>& sampler_names = _sampler_names;
 	unsigned int getID();
 
 	void addShader(std::shared_ptr<Shader> shader);
 
-	//bool create(const std::string& fragOut);
-	bool create(const std::vector<std::string>& colorSamplers);
-	//bool create();
+	bool create(const std::vector<std::string>& samplers);
 
 	void activate();
 

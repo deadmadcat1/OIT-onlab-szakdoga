@@ -24,6 +24,9 @@
 				glsl_analyzer
 				renderdoc
 			];
+			shellHook = ''
+				alias renderdoc='WAYLAND_DISPLAY= XDG_SESSION_TYPE=x11 qrenderdoc'
+			'';
 			env = {
 				GLFW_LIB = "${pkgs.glfw}";
 				GLEW_LIB = "${pkgs.glew.dev}";
