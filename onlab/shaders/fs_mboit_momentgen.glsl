@@ -10,8 +10,9 @@ uniform float wrapping_zone_param;
 
 uniform sampler2D depthSampler;
 
-layout(location = 0) out vec3 moment012;
-layout(location = 1) out vec4 moment3456;
+layout(location = 0) out float totalAbsorbance;
+layout(location = 1) out vec2 moment1;
+layout(location = 2) out vec4 moment23;
 
 vec2 c_mul(vec2 lhs, vec2 rhs){
   return vec2(lhs.x * rhs.x - lhs.y * rhs.y, lhs.x * rhs.y + lhs.y * rhs.x);
@@ -34,6 +35,7 @@ void main(void) {
   vec2 circle_point = depthToFourierBasisFunc(fragDepth);
   vec2 circle_point_pow2 = c_mul(circle_point, circle_point);
 
-  moment012 = vec3(1.0f, circle_point) * absorbance;
-  moment3456 = vec4(circle_point_pow2, c_mul(circle_point, circle_point_pow2)) * absorbance;
+	totalAbsorbance = absorbance; //additively blended
+  moment1 = circle_point * absorbance;
+  moment23 = vec4(circle_point_pow2, c_mul(circle_point, circle_point_pow2)) * absorbance;
 }

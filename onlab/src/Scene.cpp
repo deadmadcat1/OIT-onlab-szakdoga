@@ -96,7 +96,7 @@ bool Scene::setMakeShaderPrograms() {
   auto depthPeelProgram = std::make_shared<GPUProgram>();
   depthPeelProgram->addShader(vertexShader);
   depthPeelProgram->addShader(depthPeel);
-  success = depthPeelProgram->create({});
+  success = depthPeelProgram->create({"depthSampler"});
 
   auto depthPeelCompositorProgram = std::make_shared<GPUProgram>();
   depthPeelCompositorProgram->addShader(fullscreenQuadVS);
@@ -108,18 +108,18 @@ bool Scene::setMakeShaderPrograms() {
   auto MBOITMomentGenProgram = std::make_shared<GPUProgram>();
   MBOITMomentGenProgram->addShader(vertexShader);
   MBOITMomentGenProgram->addShader(MBOITMomentGen);
-  success = MBOITMomentGenProgram->create({});
+  success = MBOITMomentGenProgram->create({"depthSampler"});
 
   auto MBOITTransparentPassProgram = std::make_shared<GPUProgram>();
   MBOITTransparentPassProgram->addShader(vertexShader);
   MBOITTransparentPassProgram->addShader(MBOITTransparentPass);
-  success = MBOITTransparentPassProgram->create({"moment012", "moment3456"});
+  success = MBOITTransparentPassProgram->create({"totalAbsorbance", "moment1", "moment23", "depthSampler"});
 
   auto MBOITCompositorProgram = std::make_shared<GPUProgram>();
   MBOITCompositorProgram->addShader(fullscreenQuadVS);
   MBOITCompositorProgram->addShader(MBOITCompositor);
   success = MBOITCompositorProgram->create(
-      {"opaqueTarget", "transparentTarget", "totalTransmittance"});
+      {"opaqueTarget", "transparentTarget", "totalAbsorbance"});
 
   auto FSTQProgram = std::make_shared<GPUProgram>();
   FSTQProgram->addShader(fullscreenQuadVS);
@@ -154,15 +154,19 @@ bool Scene::setCreateFramebuffer(
 }
 
 bool Scene::setMakeFramebuffers() {
-  auto rgba =
+	//TODO: figure out better formats to store textures in
+  auto rgba_u =
       TargetParams(_settings.renderResolution.x, _settings.renderResolution.y,
-                   GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-  auto rgb =
+                   GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+  auto rgba_s =
       TargetParams(_settings.renderResolution.x, _settings.renderResolution.y,
-                   GL_RGB, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-  auto r =
+                   GL_RGBA8_SNORM, GL_RGBA, GL_BYTE, nullptr);
+  auto rg_s =
       TargetParams(_settings.renderResolution.x, _settings.renderResolution.y,
-                   GL_RED, GL_RED, GL_UNSIGNED_BYTE, nullptr);
+                   GL_RG8_SNORM, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+  auto r_u =
+      TargetParams(_settings.renderResolution.x, _settings.renderResolution.y,
+                   GL_R8, GL_RED, GL_UNSIGNED_BYTE, nullptr);
   auto d = TargetParams(_settings.renderResolution.x,
                         _settings.renderResolution.y, GL_DEPTH_COMPONENT,
                         GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, nullptr);
@@ -172,15 +176,15 @@ bool Scene::setMakeFramebuffers() {
   };
 	//TODO: ->settings
   auto fbufs = std::vector<FramebufferParameters>(
-      {{"finalOutput", {{"mainPassColor", rgba}}},
-       {"depthPeelPass1", {{"peel1", rgba}, {"depthBuffer", d}}},
-       {"depthPeelPass2", {{"peel2", rgba}, {"depthBuffer", d}}},
-       {"depthPeelPass3", {{"peel3", rgba}, {"depthBuffer", d}}},
-       {"depthPeelPass4", {{"peel4", rgba}, {"depthBuffer", d}}},
-       {"MBOITOpaque", {{"opaqueTarget", rgba}, {"depthBuffer", d}}},
-       {"MBOITMoments", {{"moment012", rgb}, {"moment3456", rgba}}},
-       {"MBOITTransparent",
-        {{"transparentTarget", rgba}, {"totalTransmittance", r}}}});
+      {{"finalOutput", {{"mainPassColor", rgba_u}}},
+       {"depthPeelPass1", {{"peel1", rgba_u}, {"depthSampler", d}}},
+       {"depthPeelPass2", {{"peel2", rgba_u}, {"depthSampler", d}}},
+       {"depthPeelPass3", {{"peel3", rgba_u}, {"depthSampler", d}}},
+       {"depthPeelPass4", {{"peel4", rgba_u}, {"depthSampler", d}}},
+       {"MBOITOpaque", {{"opaqueTarget", rgba_u}, {"depthSampler", d}}},
+       {"MBOITMoments", {{"totalAbsorbance", r_u}, {"moment1", rg_s}, {"moment23", rgba_s}}},
+       {"MBOITTransparent",{{"transparentTarget", rgba_u}}}
+			 });
   for (const FramebufferParameters &fbuf : fbufs) {
     if (!setCreateFramebuffer(fbuf.name, fbuf.params))
       return false;
@@ -254,7 +258,7 @@ bool Scene::setMakeTransparentObjects() {
     auto color = glm::vec3(_0_1_rand(rng), _0_1_rand(rng), _0_1_rand(rng));
     ballMaterial->kd = color;
     ballMaterial->ka = color;
-    ballMaterial->alpha = _0_1_rand(rng) + 0.3f / 2.0f;
+    ballMaterial->alpha = _0_1_rand(rng) * 0.95f;
     ballMaterial->ks =
         glm::vec3(_0_1_rand(rng), _0_1_rand(rng), _0_1_rand(rng));
     ballMaterial->shine = _0_1_rand(rng);
@@ -470,8 +474,6 @@ void Scene::renderMBOIT() {
     t->draw();
   }
   // Produce image from moments
-  // glBlendFunci(0, GL_ONE, GL_ONE);
-  // glBlendFunci(1, GL_ONE, GL_ZERO);
   std::cout << "Beginning MBOIT Transparent pass" << std::endl;
   program = shaderPrograms["MBOITTransparentPass"];
   program->activate();
@@ -486,8 +488,6 @@ void Scene::renderMBOIT() {
 
   framebuffer->bindUniforms(program);
   framebuffers["MBOITOpaque"]->bindUniforms(program);
-  // TODO: only enable zbuffer on FBO's that need to draw to it, bindings are
-  // getting confused.
   framebuffer = framebuffers["MBOITTransparent"];
   framebuffer->bind();
 
@@ -509,6 +509,7 @@ void Scene::renderMBOIT() {
   program = shaderPrograms["MBOITCompositor"];
   program->activate();
   framebuffers["MBOITOpaque"]->bindUniforms(program);
+  framebuffers["MBOITMoments"]->bindUniforms(program);
   framebuffers["MBOITTransparent"]->bindUniforms(program);
   framebuffers["finalOutput"]->bind();
 

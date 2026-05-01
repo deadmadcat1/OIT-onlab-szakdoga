@@ -18,9 +18,9 @@ bool Window::create() {
 	glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
 	glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
 
-	window = glfwCreateWindow(mode->width, mode->height, "OIT Onlab", monitor, NULL);	//windowed fullscreen
+	//window = glfwCreateWindow(mode->width, mode->height, "OIT Onlab", monitor, NULL);	//windowed fullscreen
 	//window = glfwCreateWindow(settings.viewportSize.x, settings.viewportSize.y, "OIT Onlab", monitor, NULL);	//fullscreen
-	//window = glfwCreateWindow(settings.viewportSize.x, settings.viewportSize.y, "OIT Onlab", NULL, NULL);	//windowed mode
+	window = glfwCreateWindow(settings.viewportSize.x, settings.viewportSize.y, "OIT Onlab", NULL, NULL);	//windowed mode
 
 	if (!window)
 		return false;

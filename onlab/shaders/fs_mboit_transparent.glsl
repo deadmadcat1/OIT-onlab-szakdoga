@@ -17,8 +17,9 @@ uniform float wrapping_zone_param;
 
 uniform sampler2D depthSampler;
 
-uniform sampler2D moment012;
-uniform sampler2D moment3456;
+uniform sampler2D totalAbsorbance;
+uniform sampler2D moment1;
+uniform sampler2D moment23;
 
 in vec3 wLightDir[8];
 in vec4 wPos;
@@ -26,7 +27,6 @@ in vec3 wNormal;
 in vec3 wView;
 
 layout(location = 0) out vec4 transparentTarget;
-layout(location = 1) out float totalTransmittance;
 
 vec2 c_conj(vec2 Z){
 	return vec2(Z.x,-Z.y);
@@ -171,28 +171,28 @@ vec3 getRootWeightFactor(vec2 reference_point, mat3x2 root_parameters){
 	);
 }
 
-float computeTransmittance(vec3 b_012, vec4 b_3456, float depth, float bias, float beta){
+float computeAbsorbance(mat3x2 b, float depth, float bias, float beta){
 	float bias_compl = 1.0f - bias;
-	mat4x2 b = {
+	mat4x2 bw = {
 		vec2(1.0f, 0.0f) + bias,
-		b_012.yz * bias_compl,
-		b_3456.xy * bias_compl,
-		b_3456.zw * bias_compl
+		b[0] * bias_compl,
+		b[1] * bias_compl,
+		b[2] * bias_compl
 	};
 	// Compute a Cholesky factorization of the Toeplitz matrix
-	float D00 = b[0].x;
+	float D00 = bw[0].x;
 	float InvD00 = 1.0f / D00;
-	vec2 L10 = (b[1]) * InvD00;
-	float D11 = (b[0] - D00 * c_mul(L10, c_conj(L10))).x;
+	vec2 L10 = (bw[1]) * InvD00;
+	float D11 = (bw[0] - D00 * c_mul(L10, c_conj(L10))).x;
 	float InvD11 = 1.0f / D11;
-	vec2 L20 = (b[2]) * InvD00;
-	vec2 L21 = (b[1] - D00 * c_mul(L20, c_conj(L10))) * InvD11;
-	float D22 = (b[0] - D00 * c_mul(L20, c_conj(L20)) - D11 * c_mul(L21, c_conj(L21))).x;
+	vec2 L20 = (bw[2]) * InvD00;
+	vec2 L21 = (bw[1] - D00 * c_mul(L20, c_conj(L10))) * InvD11;
+	float D22 = (bw[0] - D00 * c_mul(L20, c_conj(L20)) - D11 * c_mul(L21, c_conj(L21))).x;
 	float InvD22 = 1.0f / D22;
-	vec2 L30 = (b[3]) * InvD00;
-	vec2 L31 = (b[2] - D00 * c_mul(L30, c_conj(L10))) * InvD11;
-	vec2 L32 = (b[1] - D00 * c_mul(L30, c_conj(L20)) - D11 * c_mul(L31, c_conj(L21))) * InvD22;
-	float D33 = (b[0] - D00 * c_mul(L30, c_conj(L30)) - D11 * c_mul(L31, c_conj(L31)) - D22 * c_mul(L32, c_conj(L32))).x;
+	vec2 L30 = (bw[3]) * InvD00;
+	vec2 L31 = (bw[2] - D00 * c_mul(L30, c_conj(L10))) * InvD11;
+	vec2 L32 = (bw[1] - D00 * c_mul(L30, c_conj(L20)) - D11 * c_mul(L31, c_conj(L21))) * InvD22;
+	float D33 = (bw[0] - D00 * c_mul(L30, c_conj(L30)) - D11 * c_mul(L31, c_conj(L31)) - D22 * c_mul(L32, c_conj(L32))).x;
 	float InvD33 = 1.0f / D33;
 	// Solve a linear system to get the relevant polynomial
 	vec2 circle_point = depthToFourierBasisFunc(depth);
@@ -250,13 +250,13 @@ float computeTransmittance(vec3 b_012, vec4 b_3456, float depth, float bias, flo
 	polynomial[0] = f1[0] - c_mul(polynomial[0], z[0]);
 
 	float weight_sum = 0;
-	weight_sum += c_mul(b[0], polynomial[0]).x;
-	weight_sum += c_mul(b[1], polynomial[1]).x;
-	weight_sum += c_mul(b[2], polynomial[2]).x;
-	weight_sum += c_mul(b[3], polynomial[3]).x;
+	weight_sum += c_mul(bw[0], polynomial[0]).x;
+	weight_sum += c_mul(bw[1], polynomial[1]).x;
+	weight_sum += c_mul(bw[2], polynomial[2]).x;
+	weight_sum += c_mul(bw[3], polynomial[3]).x;
 	// Turn the normalized absorbance into transmittance
 	//return isnan(weight_sum)?1.0f:0.0f;
-	return exp(-b_012.x * weight_sum);
+	return weight_sum;
 }
 
 vec3 shade(vec3 normal, vec3 lightDir, vec3 viewDir,
@@ -277,15 +277,18 @@ void main(void){
 		discard;
 	}
 
-	vec3 b_012 = texelFetch(moment012, texCoord, 0).rgb;
-	if (b_012.x == 0.0f) {
+	float b_0 = texelFetch(totalAbsorbance, texCoord, 0).r;
+	if (b_0 == 0.0f) {
 		discard;
 	}
 
-	vec4 b_3456 = texelFetch(moment3456, texCoord, 0);
-	b_012.yz /= b_012.x;
-	b_3456 /= b_012.x;
-	float T_z_f = computeTransmittance(b_012, b_3456, fragDepth, 0.0000008f, 0.25f);
+	mat3x2 b;
+	vec4 b_3456 = texelFetch(moment23, texCoord, 0);
+	b[0] = texelFetch(moment1, texCoord, 0).rg;
+	b[1] = b_3456.xy;
+	b[2] = b_3456.zw;
+	b /= b_0;
+	float T_z_f = exp(-b_0 * computeAbsorbance(b, fragDepth, 0.0000008f, 0.25f));
 
 	transparentTarget = vec4(0.0f, 0.0f, 0.0f, 0.0f);
 	for (int i = 0; i < nLights; i++){
@@ -299,5 +302,4 @@ void main(void){
 
 	transparentTarget.a = material.alpha * T_z_f;
 	transparentTarget.rgb *= transparentTarget.a;
-	totalTransmittance = exp(-b_012.x);
 } 
