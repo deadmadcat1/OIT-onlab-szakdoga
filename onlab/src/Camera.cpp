@@ -10,8 +10,15 @@ void Camera::bindUniforms(std::shared_ptr<GPUProgram> program) {
 
 	program->activate();
 	program->setUniform("camera.wPos", &position);
+<<<<<<< HEAD
 	glm::mat4 VP = Proj * View;
 	program->setUniform("camera.VP", &VP);
+=======
+	program->setUniform("camera.V", &View);
+	program->setUniform("camera.P", &Proj);
+	program->setUniform("camera.near", _fp);
+	program->setUniform("camera.far", _bp);
+>>>>>>> 27bc4f4 (new repo init)
 }
 
 void Camera::setParams(float vfov, float aratio, float fp, float bp) {

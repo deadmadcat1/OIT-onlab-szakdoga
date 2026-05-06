@@ -17,15 +17,24 @@ using TextureParams = struct TextureParams {
 };
 
 class Texture {
+<<<<<<< HEAD
   unsigned int textureID = 0;
 
+=======
+protected:
+  unsigned int textureID = 0;
+>>>>>>> 27bc4f4 (new repo init)
 public:
   unsigned int getID();
   unsigned int getID() const;
   bool create(const std::string &path, const TextureParams opt);
+<<<<<<< HEAD
   bool create(unsigned int width, unsigned int height,
               unsigned int internalFormat, unsigned int format,
               unsigned int type = GL_UNSIGNED_BYTE, const void *data = nullptr,
               const TextureParams opt = {});
+=======
+  bool create(GLenum target, unsigned int mipmapLevels, GLenum internalFormat, unsigned int width, unsigned int height, unsigned int depth, const TextureParams opt = {});
+>>>>>>> 27bc4f4 (new repo init)
   ~Texture();
 };

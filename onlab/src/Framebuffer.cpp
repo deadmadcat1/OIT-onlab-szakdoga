@@ -2,6 +2,7 @@
 #include <iostream>
 
 unsigned int Framebuffer::getID() {
+<<<<<<< HEAD
 	return framebufferID;
 }
 
@@ -15,13 +16,39 @@ bool Framebuffer::create(const std::unordered_map<std::string, TargetParams>& ta
 	if (!framebufferID) {
 		std::cerr << "Framebuffer creation failed!" << std::endl;
 		glDeleteFramebuffers(1, &framebufferID);
+=======
+	return _framebufferID;
+}
+
+bool Framebuffer::create(glm::uvec2 dimensions, const std::unordered_map<std::string, TargetParams>& targetParams) {
+	if (_framebufferID > 0) {
+		std::cerr << "Framebuffer " << _framebufferID << " already exists, make a new one!" << std::endl;
+		return false;
+	}
+
+	glGenFramebuffers(1, &_framebufferID);
+	if (!_framebufferID) {
+		std::cerr << "Framebuffer creation failed!" << std::endl;
+		glDeleteFramebuffers(1, &_framebufferID);
+>>>>>>> 27bc4f4 (new repo init)
 		return false;
 	}
 
 	bool hasDepthTarget = false;
 	for (const auto& tp : targetParams) {
+<<<<<<< HEAD
 		if (tp.second.internalFormat == GL_DEPTH_COMPONENT) {
 			hasDepthTarget = true;
+=======
+		switch(tp.second.internalFormat) {
+			case(GL_DEPTH_COMPONENT):
+			case(GL_DEPTH_COMPONENT32F):
+			case(GL_DEPTH_COMPONENT24):
+			case(GL_DEPTH_COMPONENT16):
+			case(GL_DEPTH_STENCIL):
+				hasDepthTarget = true;
+				break;
+>>>>>>> 27bc4f4 (new repo init)
 		}
 	}
 
@@ -29,18 +56,58 @@ bool Framebuffer::create(const std::unordered_map<std::string, TargetParams>& ta
 	int maxColorAttachments = 0;	//would be better to create a factory that manages this, but idc
 	glGetIntegerv(GL_MAX_COLOR_ATTACHMENTS, &maxColorAttachments);
 	if (targetCount > (unsigned int)maxColorAttachments - 1) {
+<<<<<<< HEAD
 		std::cerr << "Framebuffer " << framebufferID << " cannot store " << targetCount << " color attachments, only "<< maxColorAttachments<< "!" << std::endl;
 		return false;
 	}
 
+=======
+		std::cerr << "Framebuffer " << _framebufferID << " cannot store " << targetCount << " color attachments, only "<< maxColorAttachments<< "!" << std::endl;
+		return false;
+	}
+
+	_dimensions = dimensions;
+>>>>>>> 27bc4f4 (new repo init)
 	_targetParams = targetParams;
 	createTargets();
 	attachTextures();
 
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if (status != GL_FRAMEBUFFER_COMPLETE) {
+<<<<<<< HEAD
 		std::cerr << "Framebuffer incomplete!" << std::endl;
 		glDeleteFramebuffers(1, &framebufferID);
+=======
+		std::string error;
+		switch(status) {
+			case GL_FRAMEBUFFER_UNDEFINED:
+				error = "GL_FRAMEBUFFER_UNDEFINED";
+				break;
+			case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+				error = "GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT";
+				break;
+			case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+				error = "GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT";
+				break;
+			case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+				error = "GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER";
+				break;
+			case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
+				error = "GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER";
+				break;
+			case GL_FRAMEBUFFER_UNSUPPORTED:
+				error = "GL_FRAMEBUFFER_UNSUPPORTED";
+				break;
+			case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
+				error = "GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE";
+				break;
+			case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS:
+				error = "GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS";
+				break;
+		}
+		std::cerr << "Framebuffer " << _framebufferID << " reports error: " << error << "!" << std::endl;
+		glDeleteFramebuffers(1, &_framebufferID);
+>>>>>>> 27bc4f4 (new repo init)
 		return false;
 	}
 
@@ -52,18 +119,27 @@ bool Framebuffer::create(const std::unordered_map<std::string, TargetParams>& ta
 void Framebuffer::createTargets() {
 	for (const auto& t : _targetParams) {
 		auto colorTarget = std::make_unique<Texture>();
+<<<<<<< HEAD
 		colorTarget->create(t.second.width, t.second.height, t.second.internalFormat, t.second.format, t.second.type, t.second.data, TextureParams(GL_LINEAR));
+=======
+		colorTarget->create(t.second.target, t.second.mipmapLevels, t.second.internalFormat, _dimensions.x, _dimensions.y, t.second.depth, TextureParams(GL_LINEAR));
+>>>>>>> 27bc4f4 (new repo init)
 		_targets.emplace(t.first, std::move(colorTarget));
 	}
 }
 
 void Framebuffer::attachTextures() {
+<<<<<<< HEAD
 	glBindFramebuffer(GL_FRAMEBUFFER, framebufferID);
+=======
+	glBindFramebuffer(GL_FRAMEBUFFER, _framebufferID);
+>>>>>>> 27bc4f4 (new repo init)
 
 	GLenum attach;
 	std::vector<GLenum> attachments;
 	int i = 0;
 	for (const auto& t : _targets) {
+<<<<<<< HEAD
 		if (_targetParams[t.first].internalFormat == GL_DEPTH_COMPONENT) {
 			attach = GL_DEPTH_ATTACHMENT;
 		} else {
@@ -72,12 +148,33 @@ void Framebuffer::attachTextures() {
 			i++;
 		}
 		glFramebufferTexture2D(GL_FRAMEBUFFER, attach, GL_TEXTURE_2D, t.second->getID(), 0);
+=======
+		switch(_targetParams[t.first].internalFormat) {
+			case(GL_DEPTH_COMPONENT):
+			case(GL_DEPTH_COMPONENT32F):
+			case(GL_DEPTH_COMPONENT24):
+			case(GL_DEPTH_COMPONENT16):
+			case(GL_DEPTH_STENCIL):
+				attach = GL_DEPTH_ATTACHMENT;
+				break;
+			default:
+				attach = GL_COLOR_ATTACHMENT0 + (unsigned int)i;
+				attachments.push_back(attach);
+				i++;
+				break;
+		}
+		glFramebufferTexture(GL_FRAMEBUFFER, attach,  t.second->getID(), 0);
+>>>>>>> 27bc4f4 (new repo init)
 	}
 	glDrawBuffers((unsigned int)attachments.size(), attachments.data());
 }
 
 void Framebuffer::bind() {
+<<<<<<< HEAD
 	glBindFramebuffer(GL_FRAMEBUFFER, framebufferID);
+=======
+	glBindFramebuffer(GL_FRAMEBUFFER, _framebufferID);
+>>>>>>> 27bc4f4 (new repo init)
 }
 
 void Framebuffer::bindUniforms(const std::shared_ptr<GPUProgram>& program) {
@@ -88,7 +185,11 @@ void Framebuffer::bindUniforms(const std::shared_ptr<GPUProgram>& program) {
 			program->setUniform(n, _targets[n].get(), (unsigned int)i);
 		}
 		//else {
+<<<<<<< HEAD
 		//	std::cout << "Framebuffer " << framebufferID << " does not produce " << n << "!" << std::endl;
+=======
+		//	std::cout << "Framebuffer " << _framebufferID << " does not produce " << n << "!" << std::endl;
+>>>>>>> 27bc4f4 (new repo init)
 		//}
 		i++;
 	}
@@ -100,18 +201,27 @@ Texture* Framebuffer::getTarget(std::string name) {
 
 Framebuffer::~Framebuffer() {
 	_targets.clear();
+<<<<<<< HEAD
 	glDeleteFramebuffers(1, &framebufferID);
+=======
+	glDeleteFramebuffers(1, &_framebufferID);
+>>>>>>> 27bc4f4 (new repo init)
 }
 
 void Framebuffer::resize(glm::uvec2 newsize) {
 	_targets.clear();
 
+<<<<<<< HEAD
 	for (auto& tp : _targetParams) {
 		tp.second.width = newsize.x;
 		tp.second.height = newsize.y;
 	}
 	createTargets();
 
+=======
+	_dimensions = newsize;
+	createTargets();
+>>>>>>> 27bc4f4 (new repo init)
 	attachTextures();
 
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);

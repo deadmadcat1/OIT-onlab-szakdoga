@@ -61,6 +61,7 @@ bool Texture::create(const std::string& path, const TextureParams opt) {
 }
 
 bool Texture::create(
+<<<<<<< HEAD
 	unsigned int width,
 	unsigned int height,
 	unsigned int internalFormat,
@@ -69,12 +70,22 @@ bool Texture::create(
 	const void * data,
 	const TextureParams opt)
 {
+=======
+	GLenum target,
+	unsigned int mipmapLevels,
+	GLenum internalFormat,
+	unsigned int width,
+	unsigned int height,
+	unsigned int depth,
+	const TextureParams opt) {
+>>>>>>> 27bc4f4 (new repo init)
 	if (textureID > 0) {
 		std::cerr << "Texture " << textureID << " already exists, make a new one!" << std::endl;
 		return false;
 	}
 	glGenTextures(1, &textureID);
 	if (!textureID) {
+<<<<<<< HEAD
 		std::cerr << "Render Target Texture creation failed!" << std::endl;
 		return false;
 	}
@@ -88,6 +99,35 @@ bool Texture::create(
 	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, data);
 
 	glBindTexture(GL_TEXTURE_2D, 0);
+=======
+		std::cerr << "Texture creation failed!" << std::endl;
+		return false;
+	}
+	GLint maxLayers;
+	glGetIntegerv(GL_MAX_ARRAY_TEXTURE_LAYERS, &maxLayers);
+	if (target == GL_TEXTURE_2D_ARRAY && depth > (unsigned int)maxLayers) {
+		std::cerr << "Maximum supported texture array length is only: " << maxLayers << "!" << std::endl;
+		return false;
+	}
+
+	glBindTexture(target, textureID);
+	
+	glTexParameteri(target, GL_TEXTURE_WRAP_S, opt._wrap_s);
+	glTexParameteri(target, GL_TEXTURE_WRAP_T, opt._wrap_t);
+	if (target == GL_TEXTURE_3D) {
+		glTexParameteri(target, GL_TEXTURE_WRAP_R, opt._wrap_r);
+	}
+	glTexParameteri(target, GL_TEXTURE_MIN_FILTER, opt._min_filter);
+	glTexParameteri(target, GL_TEXTURE_MAG_FILTER, opt._mag_filter);
+
+	if (target == GL_TEXTURE_2D_ARRAY || target == GL_TEXTURE_3D) {
+		glTexStorage3D(target, mipmapLevels, internalFormat, width, height, depth);
+	} else {
+		glTexStorage2D(target, mipmapLevels, internalFormat, width, height);
+	}
+
+	glBindTexture(target, 0);
+>>>>>>> 27bc4f4 (new repo init)
 	return true;
 }
 

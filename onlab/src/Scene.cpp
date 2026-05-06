@@ -64,6 +64,7 @@ bool Scene::setMakeShaderPrograms() {
   successToggle success(true);
   auto fullscreenQuadVS = std::make_shared<Shader>(GL_VERTEX_SHADER);
   auto fullscreenQuadFS = std::make_shared<Shader>(GL_FRAGMENT_SHADER);
+<<<<<<< HEAD
   auto vertexShader = std::make_shared<Shader>(GL_VERTEX_SHADER);
   auto phongShader = std::make_shared<Shader>(GL_FRAGMENT_SHADER);
   auto depthPeel = std::make_shared<Shader>(GL_FRAGMENT_SHADER);
@@ -72,10 +73,29 @@ bool Scene::setMakeShaderPrograms() {
   auto MBOITTransparentPass = std::make_shared<Shader>(GL_FRAGMENT_SHADER);
   auto MBOITCompositor = std::make_shared<Shader>(GL_FRAGMENT_SHADER);
 
+=======
+
+  auto vertexShader = std::make_shared<Shader>(GL_VERTEX_SHADER);
+  auto phongShader = std::make_shared<Shader>(GL_FRAGMENT_SHADER);
+
+  auto depthPeel = std::make_shared<Shader>(GL_FRAGMENT_SHADER);
+  auto depthPeelCompositor = std::make_shared<Shader>(GL_FRAGMENT_SHADER);
+
+  auto MBOITMomentGen = std::make_shared<Shader>(GL_FRAGMENT_SHADER);
+  auto MBOITShadingPass = std::make_shared<Shader>(GL_FRAGMENT_SHADER);
+  auto MBOITCompositor = std::make_shared<Shader>(GL_FRAGMENT_SHADER);
+
+  auto WaveletTransparentDepthPass = std::make_shared<Shader>(GL_FRAGMENT_SHADER);
+  auto WaveletCoefficientGen = std::make_shared<Shader>(GL_FRAGMENT_SHADER);
+  auto WaveletShadingPass = std::make_shared<Shader>(GL_FRAGMENT_SHADER);
+  auto WaveletCompositor = std::make_shared<Shader>(GL_FRAGMENT_SHADER);
+
+>>>>>>> 27bc4f4 (new repo init)
   depthPeel->addDefine("#define DEPTH_PEEL_ENABLED");
 
   success = fullscreenQuadVS->create("./shaders/vs_FSTQ.glsl");
   success = fullscreenQuadFS->create("./shaders/fs_FSTQ.glsl");
+<<<<<<< HEAD
   success = vertexShader->create("./shaders/vs_transform.glsl");
   success = phongShader->create("./shaders/fs_maxblinn.glsl");
   success = depthPeel->create("./shaders/fs_maxblinn.glsl");
@@ -85,6 +105,24 @@ bool Scene::setMakeShaderPrograms() {
   success = MBOITTransparentPass->create("./shaders/fs_mboit_transparent.glsl");
   success = MBOITCompositor->create("./shaders/fs_mboit_compositor.glsl");
 
+=======
+
+  success = vertexShader->create("./shaders/vs_transform.glsl");
+  success = phongShader->create("./shaders/fs_maxblinn.glsl");
+
+  success = depthPeel->create("./shaders/fs_maxblinn.glsl");
+  success = depthPeelCompositor->create("./shaders/fs_depthpeel_compositor.glsl");
+
+  success = MBOITMomentGen->create("./shaders/fs_mboit_momentgen.glsl");
+  success = MBOITShadingPass->create("./shaders/fs_mboit_maxblinn.glsl");
+  success = MBOITCompositor->create("./shaders/fs_mboit_compositor.glsl");
+
+  success = WaveletTransparentDepthPass->create("./shaders/fs_wave_transparentz.glsl");
+  success = WaveletCoefficientGen->create("./shaders/fs_wave_coefficientgen.glsl");
+  success = WaveletShadingPass->create("./shaders/fs_wave_maxblinn.glsl");
+  success = WaveletCompositor->create("./shaders/fs_wave_compositor.glsl");
+
+>>>>>>> 27bc4f4 (new repo init)
   if (!success)
     return false;
 
@@ -110,10 +148,17 @@ bool Scene::setMakeShaderPrograms() {
   MBOITMomentGenProgram->addShader(MBOITMomentGen);
   success = MBOITMomentGenProgram->create({"depthSampler"});
 
+<<<<<<< HEAD
   auto MBOITTransparentPassProgram = std::make_shared<GPUProgram>();
   MBOITTransparentPassProgram->addShader(vertexShader);
   MBOITTransparentPassProgram->addShader(MBOITTransparentPass);
   success = MBOITTransparentPassProgram->create({"totalAbsorbance", "moment1", "moment23", "depthSampler"});
+=======
+  auto MBOITShadingPassProgram = std::make_shared<GPUProgram>();
+  MBOITShadingPassProgram->addShader(vertexShader);
+  MBOITShadingPassProgram->addShader(MBOITShadingPass);
+  success = MBOITShadingPassProgram->create({"totalAbsorbance", "moment1", "moment23", "depthSampler"});
+>>>>>>> 27bc4f4 (new repo init)
 
   auto MBOITCompositorProgram = std::make_shared<GPUProgram>();
   MBOITCompositorProgram->addShader(fullscreenQuadVS);
@@ -121,6 +166,31 @@ bool Scene::setMakeShaderPrograms() {
   success = MBOITCompositorProgram->create(
       {"opaqueTarget", "transparentTarget", "totalAbsorbance"});
 
+<<<<<<< HEAD
+=======
+	auto WaveletTransparentDepthPassProgram = std::make_shared<GPUProgram>();
+  WaveletTransparentDepthPassProgram->addShader(vertexShader);
+	WaveletTransparentDepthPassProgram->addShader(WaveletTransparentDepthPass);
+  success = WaveletTransparentDepthPassProgram->create({});
+
+	auto WaveletCoefficientGenProgram = std::make_shared<GPUProgram>();
+  WaveletCoefficientGenProgram->addShader(vertexShader);
+	WaveletCoefficientGenProgram->addShader(WaveletCoefficientGen);
+  success = WaveletCoefficientGenProgram->create({});
+
+	auto WaveletShadingPassProgram= std::make_shared<GPUProgram>();
+  WaveletShadingPassProgram->addShader(vertexShader);
+	WaveletShadingPassProgram->addShader(WaveletShadingPass);
+  success = WaveletShadingPassProgram->create(
+			{"coeff1","coeff2","coeff3","coeff4","coeff5", "depthSampler"});
+
+	auto WaveletCompositorProgram = std::make_shared<GPUProgram>();
+  WaveletCompositorProgram->addShader(fullscreenQuadVS);
+	WaveletCompositorProgram->addShader(WaveletCompositor);
+  success = WaveletCompositorProgram->create(
+      {"opaqueTarget", "transparentTarget"});
+
+>>>>>>> 27bc4f4 (new repo init)
   auto FSTQProgram = std::make_shared<GPUProgram>();
   FSTQProgram->addShader(fullscreenQuadVS);
   FSTQProgram->addShader(fullscreenQuadFS);
@@ -138,22 +208,33 @@ bool Scene::setMakeShaderPrograms() {
   success =
       shaderPrograms.emplace("MBOITMomentGen", MBOITMomentGenProgram).second;
   success = shaderPrograms
+<<<<<<< HEAD
                 .emplace("MBOITTransparentPass", MBOITTransparentPassProgram)
+=======
+                .emplace("MBOITShadingPass", MBOITShadingPassProgram)
+>>>>>>> 27bc4f4 (new repo init)
                 .second;
   success =
       shaderPrograms.emplace("MBOITCompositor", MBOITCompositorProgram).second;
   return success;
 }
 
+<<<<<<< HEAD
 bool Scene::setCreateFramebuffer(
     const std::string &name,
     const std::unordered_map<std::string, TargetParams> &targetParams) {
   auto fbuf = std::make_shared<Framebuffer>();
   return (fbuf->create(targetParams) ? framebuffers.emplace(name, fbuf).second
+=======
+bool Scene::setCreateFramebuffer(const std::string &name, const std::unordered_map<std::string, TargetParams> &targetParams) {
+  auto fbuf = std::make_shared<Framebuffer>();
+  return (fbuf->create(_settings.viewportSize, targetParams) ? framebuffers.emplace(name, fbuf).second
+>>>>>>> 27bc4f4 (new repo init)
                                      : false);
 }
 
 bool Scene::setMakeFramebuffers() {
+<<<<<<< HEAD
 	//TODO: figure out better formats to store textures in
   auto rgba_u =
       TargetParams(_settings.renderResolution.x, _settings.renderResolution.y,
@@ -170,6 +251,20 @@ bool Scene::setMakeFramebuffers() {
   auto d = TargetParams(_settings.renderResolution.x,
                         _settings.renderResolution.y, GL_DEPTH_COMPONENT,
                         GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, nullptr);
+=======
+  auto rgba_u =
+      TargetParams(GL_TEXTURE_2D, 1, GL_RGBA8);
+  auto rgba_s =
+      TargetParams(GL_TEXTURE_2D, 1, GL_RGBA8_SNORM);
+  auto rg_s =
+      TargetParams(GL_TEXTURE_2D, 1, GL_RG8_SNORM);
+  auto r_u =
+      TargetParams(GL_TEXTURE_2D, 1, GL_R8);
+  auto d = 
+      TargetParams(GL_TEXTURE_2D, 1, GL_DEPTH_COMPONENT32F);
+  auto rgb9e5 = 
+      TargetParams(GL_TEXTURE_2D, 1, GL_RGB8);
+>>>>>>> 27bc4f4 (new repo init)
   using FramebufferParameters = struct {
     std::string name;
     std::unordered_map<std::string, TargetParams> params;
@@ -183,7 +278,22 @@ bool Scene::setMakeFramebuffers() {
        {"depthPeelPass4", {{"peel4", rgba_u}, {"depthSampler", d}}},
        {"MBOITOpaque", {{"opaqueTarget", rgba_u}, {"depthSampler", d}}},
        {"MBOITMoments", {{"totalAbsorbance", r_u}, {"moment1", rg_s}, {"moment23", rgba_s}}},
+<<<<<<< HEAD
        {"MBOITTransparent",{{"transparentTarget", rgba_u}}}
+=======
+       {"MBOITShaded",{{"transparentTarget", rgba_u}}},
+			 //TODO: maybe just both in one?
+       {"WaveletOpaque", {{"opaqueTarget", rgba_u}, {"depthSampler", d}}},
+       //{"WaveletTransparent", { {"depthTransparent", d}}},
+       {"WaveletCoefficients", { 
+				 {"coeff1", rgb9e5},
+				 {"coeff2", rgb9e5},
+				 {"coeff3", rgb9e5},
+				 {"coeff4", rgb9e5},
+				 {"coeff5", rgb9e5}
+				 }},
+       {"WaveletShaded",{{"transparentTarget", rgba_u}}}
+>>>>>>> 27bc4f4 (new repo init)
 			 });
   for (const FramebufferParameters &fbuf : fbufs) {
     if (!setCreateFramebuffer(fbuf.name, fbuf.params))
@@ -420,7 +530,10 @@ void Scene::renderDepthPeeling() {
 }
 
 void Scene::renderMBOIT() {
+<<<<<<< HEAD
   // TODO
+=======
+>>>>>>> 27bc4f4 (new repo init)
 #ifdef DRAW_WIREFRAME
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 #endif
@@ -474,8 +587,13 @@ void Scene::renderMBOIT() {
     t->draw();
   }
   // Produce image from moments
+<<<<<<< HEAD
   std::cout << "Beginning MBOIT Transparent pass" << std::endl;
   program = shaderPrograms["MBOITTransparentPass"];
+=======
+  std::cout << "Beginning MBOIT Shading pass" << std::endl;
+  program = shaderPrograms["MBOITShadingPass"];
+>>>>>>> 27bc4f4 (new repo init)
   program->activate();
 
   camera->bindUniforms(program);
@@ -488,7 +606,11 @@ void Scene::renderMBOIT() {
 
   framebuffer->bindUniforms(program);
   framebuffers["MBOITOpaque"]->bindUniforms(program);
+<<<<<<< HEAD
   framebuffer = framebuffers["MBOITTransparent"];
+=======
+  framebuffer = framebuffers["MBOITShaded"];
+>>>>>>> 27bc4f4 (new repo init)
   framebuffer->bind();
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -510,7 +632,11 @@ void Scene::renderMBOIT() {
   program->activate();
   framebuffers["MBOITOpaque"]->bindUniforms(program);
   framebuffers["MBOITMoments"]->bindUniforms(program);
+<<<<<<< HEAD
   framebuffers["MBOITTransparent"]->bindUniforms(program);
+=======
+  framebuffers["MBOITShaded"]->bindUniforms(program);
+>>>>>>> 27bc4f4 (new repo init)
   framebuffers["finalOutput"]->bind();
 
   glClearColor(0.0f, 1.0f, 1.0f, 0.0f);
@@ -521,9 +647,108 @@ void Scene::renderMBOIT() {
 
 void Scene::renderWavelet() {
   // TODO
+<<<<<<< HEAD
   glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   fullscreenTexturedQuad->draw();
+=======
+#ifdef DRAW_WIREFRAME
+  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+#endif
+  glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+  // Opaque pre-pass
+  std::cout << "Beginning Wavelet Opaque pass" << std::endl;
+  auto program = shaderPrograms["phongBlinn"];
+  program->activate();
+
+  camera->bindUniforms(program);
+
+  program->setUniform("nLights", (int)lights.size());
+  for (const auto &l : lights) {
+    l->bindUniforms(program);
+  }
+
+  auto framebuffer = framebuffers["WaveletOpaque"];
+  framebuffer->bind();
+
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glEnable(GL_DEPTH_TEST);
+
+  for (const auto &o : opaqueObjects) {
+    o->bindUniforms(program);
+    o->draw();
+  }
+  glDisable(GL_DEPTH_TEST);
+  // Calc necessary parameter for wrapping zone because of trig moments
+  auto wrapping_zone_param = (float)M_PI * 0.95f;
+  // Gather moments
+  std::cout << "Beginning Wavelet Coefficient Generation pass" << std::endl;
+  program = shaderPrograms["WaveletCoefficientGen"];
+  program->activate();
+
+  camera->bindUniforms(program);
+
+  program->setUniform("wrapping_zone_param", wrapping_zone_param);
+
+  framebuffer->bindUniforms(program);
+  framebuffer = framebuffers["WaveletCoefficients"];
+  framebuffer->bind();
+
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glEnable(GL_BLEND);
+  // additive blending enabled
+  glBlendEquation(GL_FUNC_ADD);
+  glBlendFunc(GL_ONE, GL_ONE);
+
+  for (const auto &t : transparentObjects) {
+    t->bindUniforms(program);
+    t->draw();
+  }
+  // Produce image from moments
+  std::cout << "Beginning Wavelet Shading pass" << std::endl;
+  program = shaderPrograms["WaveletShadingPass"];
+  program->activate();
+
+  camera->bindUniforms(program);
+
+  program->setUniform("nLights", (int)lights.size());
+  for (const auto &l : lights) {
+    l->bindUniforms(program);
+  }
+  program->setUniform("wrapping_zone_param", wrapping_zone_param);
+
+  framebuffer->bindUniforms(program);
+  framebuffers["WaveletOpaque"]->bindUniforms(program);
+  framebuffer = framebuffers["WaveletShaded"];
+  framebuffer->bind();
+
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  for (const auto &t : transparentObjects) {
+    t->bindUniforms(program);
+    t->draw();
+  }
+  // glDisable(GL_DEPTH_TEST);
+  // additive blending disabled
+  glBlendEquation(GL_FUNC_ADD);
+  glBlendFunc(GL_ONE, GL_ZERO);
+  glDisable(GL_BLEND);
+#ifdef DRAW_WIREFRAME
+  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+#endif
+  std::cout << "Beginning Wavelet Composite pass" << std::endl;
+  program = shaderPrograms["WaveletCompositor"];
+  program->activate();
+  framebuffers["WaveletOpaque"]->bindUniforms(program);
+  framebuffers["WaveletCoefficients"]->bindUniforms(program);
+  framebuffers["WaveletShaded"]->bindUniforms(program);
+  framebuffers["finalOutput"]->bind();
+
+  glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  fullscreenTexturedQuad->draw();
+  glDisable(GL_DEPTH_TEST);
+>>>>>>> 27bc4f4 (new repo init)
 }
 
 void Scene::animate(float dt) {
@@ -544,6 +769,10 @@ void Scene::seedRNG() {
 
 void Scene::notifyResize(glm::uvec2 newsize) {
   camera->setParams(73.0f, (float)newsize.x / (float)newsize.y);
+<<<<<<< HEAD
+=======
+	_settings.viewportSize = newsize;
+>>>>>>> 27bc4f4 (new repo init)
   for (auto &fb : framebuffers) {
     fb.second->resize(newsize);
   }
