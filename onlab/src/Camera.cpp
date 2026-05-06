@@ -3,22 +3,16 @@
 #include <glm/exponential.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
-void Camera::bindUniforms(std::shared_ptr<GPUProgram> program) {
-	glm::mat4 View = glm::lookAt(position, lookat, viewup);
+void Camera::bindUniforms(std::shared_ptr<GPUProgram> program) { glm::mat4 View = glm::lookAt(position, lookat, viewup);
 	
 	glm::mat4 Proj = glm::perspective(glm::radians(_vfov), _aratio, _fp, _bp);
 
 	program->activate();
 	program->setUniform("camera.wPos", &position);
-<<<<<<< HEAD
-	glm::mat4 VP = Proj * View;
-	program->setUniform("camera.VP", &VP);
-=======
 	program->setUniform("camera.V", &View);
 	program->setUniform("camera.P", &Proj);
 	program->setUniform("camera.near", _fp);
 	program->setUniform("camera.far", _bp);
->>>>>>> 27bc4f4 (new repo init)
 }
 
 void Camera::setParams(float vfov, float aratio, float fp, float bp) {

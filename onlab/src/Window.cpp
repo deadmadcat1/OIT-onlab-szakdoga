@@ -32,8 +32,6 @@ bool Window::create() {
 
 	std::cout << "OpenGL version: " << (const char*)glGetString(GL_VERSION) << std::endl;
 	std::cout << "GLSL version: " << (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
-<<<<<<< HEAD
-=======
 	//GLint info;
 	//glGetInternalformativ(GL_TEXTURE_2D, GL_RGB9_E5, GL_COLOR_RENDERABLE, sizeof(GLint), &info);
 
@@ -41,16 +39,11 @@ bool Window::create() {
 	//	return info == GL_TRUE ? "OK" : "KO";
 	//}() << std::endl;
 	//return false;
->>>>>>> 27bc4f4 (new repo init)
 
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetCursorPosCallback(window, mouseMove_callback);
 	glfwSetMouseButtonCallback(window, mousePress_callback);
-<<<<<<< HEAD
-	//glfwSetFramebufferSizeCallback(window, resize_callback);
-=======
 	glfwSetFramebufferSizeCallback(window, resize_callback);
->>>>>>> 27bc4f4 (new repo init)
 	//glfwSetScrollCallback(window, mouseScroll_callback);
 
 	glfwSwapInterval(1);
@@ -86,11 +79,7 @@ Window::~Window() {
 
 void Window::resize_callback(int width, int height) {
 	_settings.viewportSize = glm::uvec2(width, height);
-<<<<<<< HEAD
-	scene->notifyResize(settings.viewportSize);
-=======
 	scene->notifyResize(_settings.viewportSize);
->>>>>>> 27bc4f4 (new repo init)
 }
 void Window::key_callback(int key, int scancode __attribute__((unused)), int action, int mods __attribute__((unused)) ) {
 	if (action == GLFW_PRESS) {

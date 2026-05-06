@@ -61,16 +61,6 @@ bool Texture::create(const std::string& path, const TextureParams opt) {
 }
 
 bool Texture::create(
-<<<<<<< HEAD
-	unsigned int width,
-	unsigned int height,
-	unsigned int internalFormat,
-	unsigned int format,
-	unsigned int type,
-	const void * data,
-	const TextureParams opt)
-{
-=======
 	GLenum target,
 	unsigned int mipmapLevels,
 	GLenum internalFormat,
@@ -78,28 +68,12 @@ bool Texture::create(
 	unsigned int height,
 	unsigned int depth,
 	const TextureParams opt) {
->>>>>>> 27bc4f4 (new repo init)
 	if (textureID > 0) {
 		std::cerr << "Texture " << textureID << " already exists, make a new one!" << std::endl;
 		return false;
 	}
 	glGenTextures(1, &textureID);
 	if (!textureID) {
-<<<<<<< HEAD
-		std::cerr << "Render Target Texture creation failed!" << std::endl;
-		return false;
-	}
-	glBindTexture(GL_TEXTURE_2D, textureID);
-	
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, opt._wrap_s);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, opt._wrap_t);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, opt._min_filter);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, opt._mag_filter);
-
-	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, format, type, data);
-
-	glBindTexture(GL_TEXTURE_2D, 0);
-=======
 		std::cerr << "Texture creation failed!" << std::endl;
 		return false;
 	}
@@ -127,7 +101,6 @@ bool Texture::create(
 	}
 
 	glBindTexture(target, 0);
->>>>>>> 27bc4f4 (new repo init)
 	return true;
 }
 
