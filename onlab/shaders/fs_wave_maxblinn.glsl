@@ -39,14 +39,15 @@ layout(location = 0) out vec4 fragColor;
 
 vec3 unpack_rgb9e5(uint packed_val) {
 	//	https://registry.khronos.org/OpenGL/extensions/EXT/EXT_texture_shared_exponent.txt
-	int exponent = int((packed_val & 0x1F)) - 24;
+	int exponent = int((packed_val & 0x1F)) - 15;
 	float scale = exp2(exponent);
 	return scale * vec3(/*r*/packed_val >> 23, /*g*/(packed_val >> 14) & 0x1FF, /*b*/(packed_val >> 5) & 0x1FF);
 }
 
 float linearize(float z){
-	float z_ndc = fma(z, 2.0f, -1.0f);
-	return (2.0f * camera.near * camera.far) / (camera.far + camera.near - z_ndc * (camera.far - camera.near));
+	float z_ndc = z * 2.0f - 1.0f;
+	float linear = camera.P[3][2] / (camera.P[2][2] + z_ndc);
+	return (linear - camera.near) / (camera.far - camera.near);
 }
 
 float scalingFunction(float z) {
@@ -55,7 +56,7 @@ float scalingFunction(float z) {
 
 float haar(uint scale, uint translation, float t){
 	float expo = exp2(scale);
-	float disc = fma(expo, t, -translation);
+	float disc = expo * t - translation;
 	float norm = exp2(-(scale / 2.0f));
 	return (disc < 0.0f || disc > 1.0f) ? 0.0f : norm * ((disc < 0.5f) ? disc : 1.0f - disc);
 }

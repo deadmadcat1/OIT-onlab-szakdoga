@@ -86,7 +86,7 @@ bool Framebuffer::create(glm::uvec2 dimensions, const std::unordered_map<std::st
 void Framebuffer::createTargets() {
 	for (const auto& t : _targetParams) {
 		auto colorTarget = std::make_unique<Texture>();
-		colorTarget->create(t.second.target, t.second.mipmapLevels, t.second.internalFormat, _dimensions.x, _dimensions.y, t.second.depth, TextureParams(GL_LINEAR));
+		colorTarget->create(t.second.target, t.second.mipmapLevels, t.second.internalFormat, _dimensions.x, _dimensions.y, t.second.depth, t.second.textureParams);
 		_targets.emplace(t.first, std::move(colorTarget));
 	}
 }

@@ -25,7 +25,7 @@ uint pack_rgb9e5(vec3 color) {
 
   //  Components red, green, and blue are first clamped (in the process,
   //  mapping NaN to zero) so:
-	vec3 clamped = clamp(color, 0, 32768/* sharedexp_max */);
+	vec3 clamped = clamp(color * 32768, 0, 32768/* sharedexp_max */);
 
   //  For the RGB9_E5_EXT format, N=9, Emax=31, and B=15.
 
@@ -47,13 +47,14 @@ uint pack_rgb9e5(vec3 color) {
 }
 
 float linearize(float z){
-	float z_ndc = fma(z, 2.0f, -1.0f);
-	return (2.0f * camera.near * camera.far) / (camera.far + camera.near - z_ndc * (camera.far - camera.near));
+	float z_ndc = z * 2.0f - 1.0f;
+	float linear = camera.P[3][2] / (camera.P[2][2] + z_ndc);
+	return (linear - camera.near) / (camera.far - camera.near);
 }
 
 float haar(uint scale, uint translation, float t){
 	float expo = exp2(scale);
-	float disc = fma(expo, t, -translation);
+	float disc = expo * t - translation;
 	float norm = exp2(-(scale / 2.0f));
 	return (disc < 0.0f || disc > 1.0f) ? 0.0f : norm * ((disc < 0.5f) ? disc : 1.0f - disc);
 }

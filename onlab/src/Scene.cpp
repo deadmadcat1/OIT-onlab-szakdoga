@@ -198,7 +198,7 @@ bool Scene::setMakeFramebuffers() {
   auto d = 
       TargetParams(GL_TEXTURE_2D, 1, GL_DEPTH_COMPONENT32F);
   auto r32ui = 
-      TargetParams(GL_TEXTURE_2D, 1, GL_R32UI);
+      TargetParams(GL_TEXTURE_2D, 1, GL_R32UI, TextureParams(GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST));
   using FramebufferParameters = struct {
     std::string name;
     std::unordered_map<std::string, TargetParams> params;
@@ -215,7 +215,7 @@ bool Scene::setMakeFramebuffers() {
        {"MBOITShaded",{{"transparentTarget", rgba_u}}},
 			 //TODO: maybe just both in one?
        {"WaveletOpaque", {{"opaqueTarget", rgba_u}, {"depthSampler", d}}},
-       //{"WaveletTransparent", { {"depthTransparent", d}}},
+       {"WaveletTransparent", { {"depthTransparent", d}}},
        {"WaveletCoefficients", { 
 				 {"coeff1", r32ui},
 				 {"coeff2", r32ui},
@@ -605,10 +605,9 @@ void Scene::renderWavelet() {
 
   for (const auto &t : transparentObjects) {
     t->bindUniforms(program);
-		std::cout << "drawing transparent obj" << std::endl;
     t->draw();
   }
-  // Produce image from moments
+  // Produce image from coefficients
   std::cout << "Beginning Wavelet Shading pass" << std::endl;
   program = shaderPrograms["WaveletShading"];
   program->activate();

@@ -11,12 +11,13 @@ struct TargetParams {
   unsigned int target;
   unsigned int mipmapLevels;
   unsigned int internalFormat;
+	TextureParams textureParams;
   unsigned int depth;
   TargetParams(unsigned int target, unsigned int mipmapLevels,
-               unsigned int internalFormat, unsigned int depth = 0)
+               unsigned int internalFormat, TextureParams textureParams = TextureParams(GL_LINEAR), unsigned int depth = 0)
       : target(target), mipmapLevels(mipmapLevels),
         internalFormat(internalFormat),
-        depth(depth) {}
+        textureParams(textureParams), depth(depth) {}
   TargetParams() {}
 };
 
