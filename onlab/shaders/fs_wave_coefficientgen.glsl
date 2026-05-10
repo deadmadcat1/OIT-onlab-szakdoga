@@ -14,51 +14,68 @@ uniform struct {
 	float far;
 } camera;
 
-layout(location = 0) out vec3 coeff1;
-layout(location = 1) out vec3 coeff2;
-layout(location = 2) out vec3 coeff3;
-layout(location = 3) out vec3 coeff4;
-layout(location = 4) out vec3 coeff5;
+layout(location = 0) out uint coeff1;
+layout(location = 1) out uint coeff2;
+layout(location = 2) out uint coeff3;
+layout(location = 3) out uint coeff4;
+layout(location = 4) out uint coeff5;
+
+uint pack_rgb9e5(vec3 color) {
+	//	https://registry.khronos.org/OpenGL/extensions/EXT/EXT_texture_shared_exponent.txt
+
+  //  Components red, green, and blue are first clamped (in the process,
+  //  mapping NaN to zero) so:
+	vec3 clamped = clamp(color, 0, 32768/* sharedexp_max */);
+
+  //  For the RGB9_E5_EXT format, N=9, Emax=31, and B=15.
+
+  //  The largest clamped component, max_c, is determined:
+  float max_c = max(clamped.r, max(clamped.g, clamped.b));
+
+  //  A preliminary shared exponent is computed:
+  int exp_shared = max(-16, int(floor(log2(max_c)))) + 16;
+
+  //  A refined shared exponent is then computed as:
+	float denom = exp2(exp_shared - 24);
+  uint max_s = int(floor(max_c / denom + 0.5f));
+	exp_shared += (max_s == 512) ? 1 : 0;
+
+  //  These integers values in the range 0 to 2^N-1 are then computed:
+	uvec3 packed_val = uvec3(floor(clamped / denom + 0.5f));
+
+	return (packed_val.r << 23) | (packed_val.g << 14) | (packed_val.b << 5) | (exp_shared & 0x1F);
+}
 
 float linearize(float z){
-	float z_ndc = z * 2.0 - 1.0f;
+	float z_ndc = fma(z, 2.0f, -1.0f);
 	return (2.0f * camera.near * camera.far) / (camera.far + camera.near - z_ndc * (camera.far - camera.near));
 }
 
 float haar(uint scale, uint translation, float t){
-	uint expo = 1 << scale;
-	float disc = expo * t - translation;
+	float expo = exp2(scale);
+	float disc = fma(expo, t, -translation);
 	float norm = exp2(-(scale / 2.0f));
 	return (disc < 0.0f || disc > 1.0f) ? 0.0f : norm * ((disc < 0.5f) ? disc : 1.0f - disc);
 }
 
 void main(void) {
 	float linearZ = linearize(gl_FragCoord.z);
-	coeff1.r = 1.0f - linearZ;
-	coeff1.gb = vec2(haar(1, 0, linearZ), haar(1,1,linearZ));
-	coeff2.rgb = vec3(
-			haar(2, 0, linearZ),
-			haar(2, 1, linearZ),
-			haar(2, 2, linearZ)
-		);
-	coeff3.r = haar(2, 3, linearZ);
-	coeff3.gb = vec2(
-			haar(3, 0, linearZ),
-			haar(3, 1, linearZ)
-		);
-	coeff4.rgb = vec3(
-			haar(3, 2, linearZ),
-			haar(3, 3, linearZ),
-			haar(3, 4, linearZ)
-		);
-	coeff5.rgb = vec3(
-			haar(3, 5, linearZ),
-			haar(3, 6, linearZ),
-			haar(3, 7, linearZ)
-		);
-	coeff1 *= material.alpha;
-	coeff2 *= material.alpha;
-	coeff3 *= material.alpha;
-	coeff4 *= material.alpha;
-	coeff5 *= material.alpha;
+	vec3 coefficients[5];
+	uint packed_val[5];
+
+	coefficients[0] = vec3(1.0f - linearZ, haar(1,0,linearZ), haar(1,1,linearZ));
+	coefficients[1] = vec3(haar(2,0,linearZ), haar(2,1,linearZ), haar(2,2,linearZ));
+	coefficients[2] = vec3(haar(2,3,linearZ), haar(3,0,linearZ), haar(3,1,linearZ));
+	coefficients[3] = vec3(haar(3,2,linearZ), haar(3,3,linearZ), haar(3,4,linearZ));
+	coefficients[4] = vec3(haar(3,5,linearZ), haar(3,6,linearZ), haar(3,7,linearZ));
+
+	for (int i = 0; i < 5; i++) {
+		packed_val[i] = pack_rgb9e5(coefficients[i] * material.alpha);
+	}
+
+	coeff1 = packed_val[0];
+	coeff2 = packed_val[1];
+	coeff3 = packed_val[2];
+	coeff4 = packed_val[3];
+	coeff5 = packed_val[4];
 }

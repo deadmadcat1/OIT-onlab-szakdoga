@@ -29,6 +29,10 @@ public:
 
 	void setUniform(const std::string& name, float f);
 
+	void setUniform(const std::string& name, glm::uvec2 ui);
+
+	void setUniform(const std::string& name, unsigned int uix, unsigned int uiy);
+
 	void setUniform(const std::string& name, const glm::vec2* const v);
 
 	void setUniform(const std::string& name, const glm::vec3* const v);

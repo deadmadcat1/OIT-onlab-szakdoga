@@ -169,16 +169,14 @@ bool Scene::setMakeShaderPrograms() {
   success = shaderPrograms.emplace("FSTQ", FSTQProgram).second;
   success = shaderPrograms.emplace("phongBlinn", alphaBlendProgram).second;
   success = shaderPrograms.emplace("depthPeel", depthPeelProgram).second;
-  success =
-      shaderPrograms.emplace("depthPeelCompositor", depthPeelCompositorProgram)
-          .second;
-  success =
-      shaderPrograms.emplace("MBOITMomentGen", MBOITMomentGenProgram).second;
-  success = shaderPrograms
-                .emplace("MBOITShadingPass", MBOITShadingPassProgram)
-                .second;
-  success =
-      shaderPrograms.emplace("MBOITCompositor", MBOITCompositorProgram).second;
+  success = shaderPrograms.emplace("depthPeelCompositor", depthPeelCompositorProgram).second;
+  success = shaderPrograms.emplace("MBOITMomentGen", MBOITMomentGenProgram).second;
+  success = shaderPrograms.emplace("MBOITShading", MBOITShadingPassProgram).second;
+  success = shaderPrograms.emplace("MBOITCompositor", MBOITCompositorProgram).second;
+  success = shaderPrograms.emplace("WaveletTransparentDepth", WaveletTransparentDepthPassProgram).second;
+  success = shaderPrograms.emplace("WaveletCoefficientGen", WaveletCoefficientGenProgram).second;
+  success = shaderPrograms.emplace("WaveletShading", WaveletShadingPassProgram).second;
+  success = shaderPrograms.emplace("WaveletCompositor", WaveletCompositorProgram).second;
   return success;
 }
 
@@ -199,8 +197,8 @@ bool Scene::setMakeFramebuffers() {
       TargetParams(GL_TEXTURE_2D, 1, GL_R8);
   auto d = 
       TargetParams(GL_TEXTURE_2D, 1, GL_DEPTH_COMPONENT32F);
-  auto rgb9e5 = 
-      TargetParams(GL_TEXTURE_2D, 1, GL_RGB8);
+  auto r32ui = 
+      TargetParams(GL_TEXTURE_2D, 1, GL_R32UI);
   using FramebufferParameters = struct {
     std::string name;
     std::unordered_map<std::string, TargetParams> params;
@@ -219,11 +217,11 @@ bool Scene::setMakeFramebuffers() {
        {"WaveletOpaque", {{"opaqueTarget", rgba_u}, {"depthSampler", d}}},
        //{"WaveletTransparent", { {"depthTransparent", d}}},
        {"WaveletCoefficients", { 
-				 {"coeff1", rgb9e5},
-				 {"coeff2", rgb9e5},
-				 {"coeff3", rgb9e5},
-				 {"coeff4", rgb9e5},
-				 {"coeff5", rgb9e5}
+				 {"coeff1", r32ui},
+				 {"coeff2", r32ui},
+				 {"coeff3", r32ui},
+				 {"coeff4", r32ui},
+				 {"coeff5", r32ui}
 				 }},
        {"WaveletShaded",{{"transparentTarget", rgba_u}}}
 			 });
@@ -516,7 +514,7 @@ void Scene::renderMBOIT() {
   }
   // Produce image from moments
   std::cout << "Beginning MBOIT Shading pass" << std::endl;
-  program = shaderPrograms["MBOITShadingPass"];
+  program = shaderPrograms["MBOITShading"];
   program->activate();
 
   camera->bindUniforms(program);
@@ -589,18 +587,13 @@ void Scene::renderWavelet() {
     o->draw();
   }
   glDisable(GL_DEPTH_TEST);
-  // Calc necessary parameter for wrapping zone because of trig moments
-  auto wrapping_zone_param = (float)M_PI * 0.95f;
-  // Gather moments
+  // Compute coefficients
   std::cout << "Beginning Wavelet Coefficient Generation pass" << std::endl;
   program = shaderPrograms["WaveletCoefficientGen"];
   program->activate();
 
   camera->bindUniforms(program);
 
-  program->setUniform("wrapping_zone_param", wrapping_zone_param);
-
-  framebuffer->bindUniforms(program);
   framebuffer = framebuffers["WaveletCoefficients"];
   framebuffer->bind();
 
@@ -612,11 +605,12 @@ void Scene::renderWavelet() {
 
   for (const auto &t : transparentObjects) {
     t->bindUniforms(program);
+		std::cout << "drawing transparent obj" << std::endl;
     t->draw();
   }
   // Produce image from moments
   std::cout << "Beginning Wavelet Shading pass" << std::endl;
-  program = shaderPrograms["WaveletShadingPass"];
+  program = shaderPrograms["WaveletShading"];
   program->activate();
 
   camera->bindUniforms(program);
@@ -625,7 +619,8 @@ void Scene::renderWavelet() {
   for (const auto &l : lights) {
     l->bindUniforms(program);
   }
-  program->setUniform("wrapping_zone_param", wrapping_zone_param);
+
+  program->setUniform("viewportSize", _settings.viewportSize);
 
   framebuffer->bindUniforms(program);
   framebuffers["WaveletOpaque"]->bindUniforms(program);
@@ -650,7 +645,7 @@ void Scene::renderWavelet() {
   program = shaderPrograms["WaveletCompositor"];
   program->activate();
   framebuffers["WaveletOpaque"]->bindUniforms(program);
-  framebuffers["WaveletCoefficients"]->bindUniforms(program);
+  //framebuffers["WaveletCoefficients"]->bindUniforms(program);
   framebuffers["WaveletShaded"]->bindUniforms(program);
   framebuffers["finalOutput"]->bind();
 

@@ -80,6 +80,16 @@ void GPUProgram::setUniform(const std::string& name, float f) {
 	if (location >= 0) glUniform1f(location, f);
 }
 
+void GPUProgram::setUniform(const std::string& name, glm::uvec2 ui) {
+	int location = getLocation(name);
+	if (location >= 0) glUniform2ui(location, ui.x, ui.y);
+}
+
+void GPUProgram::setUniform(const std::string& name, unsigned int uix, unsigned int uiy) {
+	int location = getLocation(name);
+	if (location >= 0) glUniform2ui(location, uix, uiy);
+}
+
 void GPUProgram::setUniform(const std::string& name, const glm::vec2* const v) {
 	int location = getLocation(name);
 	if (location >= 0) glUniform2fv(location, 1, &v->x);

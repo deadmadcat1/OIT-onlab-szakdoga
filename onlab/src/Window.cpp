@@ -33,9 +33,9 @@ bool Window::create() {
 	std::cout << "OpenGL version: " << (const char*)glGetString(GL_VERSION) << std::endl;
 	std::cout << "GLSL version: " << (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
 	//GLint info;
-	//glGetInternalformativ(GL_TEXTURE_2D, GL_RGB9_E5, GL_COLOR_RENDERABLE, sizeof(GLint), &info);
+	//glGetInternalformativ(GL_TEXTURE_2D, GL_R32UI, GL_COLOR_RENDERABLE, sizeof(GLint), &info);
 
-	//std::cout << "RGB9E5: " << [&info](){
+	//std::cout << "R32UI: " << [&info](){
 	//	return info == GL_TRUE ? "OK" : "KO";
 	//}() << std::endl;
 	//return false;
@@ -81,6 +81,7 @@ void Window::resize_callback(int width, int height) {
 	_settings.viewportSize = glm::uvec2(width, height);
 	scene->notifyResize(_settings.viewportSize);
 }
+
 void Window::key_callback(int key, int scancode __attribute__((unused)), int action, int mods __attribute__((unused)) ) {
 	if (action == GLFW_PRESS) {
 		switch (key) {
@@ -110,6 +111,7 @@ void Window::key_callback(int key, int scancode __attribute__((unused)), int act
 		}
 	}
 }
+
 void Window::mouseMove_callback(double xpos, double ypos) {
 	if (mouseDragState) {
 		glm::vec2 normCoord = screen2NDC(xpos, ypos);
@@ -144,6 +146,7 @@ void Window::mousePress_callback(int button, int action, int mods __attribute__(
 		}
 	}
 }
+
 //void Window::mouseScroll_callback(double xoffset, double yoffset) {
 //	return;
 //}
