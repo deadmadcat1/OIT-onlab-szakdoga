@@ -19,6 +19,7 @@ bool Scene::set() {
   seedRNG();
 
   camera = std::make_unique<Camera>();
+	camera->setParams(_settings.camera.vfov, (float)_settings.viewportSize.x / (float)_settings.viewportSize.y);
   camera->translate(_settings.camera.startingPos);
 
   setMakeLights(_settings.lights.maxAmount);
@@ -144,19 +145,19 @@ bool Scene::setMakeShaderPrograms() {
 	auto WaveletCoefficientGenProgram = std::make_shared<GPUProgram>();
   WaveletCoefficientGenProgram->addShader(vertexShader);
 	WaveletCoefficientGenProgram->addShader(WaveletCoefficientGen);
-  success = WaveletCoefficientGenProgram->create({});
+  success = WaveletCoefficientGenProgram->create({"depthTransparent"});
 
 	auto WaveletShadingPassProgram= std::make_shared<GPUProgram>();
   WaveletShadingPassProgram->addShader(vertexShader);
 	WaveletShadingPassProgram->addShader(WaveletShadingPass);
   success = WaveletShadingPassProgram->create(
-			{"coeff1","coeff2","coeff3","coeff4","coeff5", "depthSampler"});
+			{"coeff1","coeff2","coeff3","coeff4","coeff5", "depthTransparent", "depthOpaque"});
 
 	auto WaveletCompositorProgram = std::make_shared<GPUProgram>();
   WaveletCompositorProgram->addShader(fullscreenQuadVS);
 	WaveletCompositorProgram->addShader(WaveletCompositor);
   success = WaveletCompositorProgram->create(
-      {"opaqueTarget", "transparentTarget"});
+      {"opaqueTarget", "transparentTarget", "coeff1"});
 
   auto FSTQProgram = std::make_shared<GPUProgram>();
   FSTQProgram->addShader(fullscreenQuadVS);
@@ -214,8 +215,8 @@ bool Scene::setMakeFramebuffers() {
        {"MBOITMoments", {{"totalAbsorbance", r_u}, {"moment1", rg_s}, {"moment23", rgba_s}}},
        {"MBOITShaded",{{"transparentTarget", rgba_u}}},
 			 //TODO: maybe just both in one?
-       {"WaveletOpaque", {{"opaqueTarget", rgba_u}, {"depthSampler", d}}},
-       {"WaveletTransparent", { {"depthTransparent", d}}},
+       {"WaveletOpaque", {{"opaqueTarget", rgba_u}, {"depthOpaque", d}}},
+       {"WaveletTransparentDepth", { {"depthTransparent", d}}},
        {"WaveletCoefficients", { 
 				 {"coeff1", r32ui},
 				 {"coeff2", r32ui},
@@ -587,6 +588,32 @@ void Scene::renderWavelet() {
     o->draw();
   }
   glDisable(GL_DEPTH_TEST);
+	//depth buffer of transparents for tight depth bound
+  std::cout << "Beginning Wavelet Transparent Depth pass" << std::endl;
+  program = shaderPrograms["WaveletTransparentDepth"];
+  program->activate();
+
+  camera->bindUniforms(program);
+
+  framebuffer = framebuffers["WaveletTransparentDepth"];
+  framebuffer->bind();
+
+	glClearDepth(0.0f);
+  glClear(GL_DEPTH_BUFFER_BIT);
+	glClearDepth(1.0f);
+  glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_GREATER);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_FRONT);
+
+  for (const auto &t : transparentObjects) {
+    t->bindUniforms(program);
+    t->draw();
+  }
+	glCullFace(GL_BACK);
+	glDisable(GL_CULL_FACE);
+	glDepthFunc(GL_LESS);
+  glDisable(GL_DEPTH_TEST);
   // Compute coefficients
   std::cout << "Beginning Wavelet Coefficient Generation pass" << std::endl;
   program = shaderPrograms["WaveletCoefficientGen"];
@@ -594,10 +621,13 @@ void Scene::renderWavelet() {
 
   camera->bindUniforms(program);
 
+  program->setUniform("viewportSize", _settings.viewportSize);
+
+	framebuffer->bindUniforms(program);
   framebuffer = framebuffers["WaveletCoefficients"];
   framebuffer->bind();
 
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT);
   glEnable(GL_BLEND);
   // additive blending enabled
   glBlendEquation(GL_FUNC_ADD);
@@ -623,10 +653,11 @@ void Scene::renderWavelet() {
 
   framebuffer->bindUniforms(program);
   framebuffers["WaveletOpaque"]->bindUniforms(program);
+  framebuffers["WaveletTransparentDepth"]->bindUniforms(program);
   framebuffer = framebuffers["WaveletShaded"];
   framebuffer->bind();
 
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT);
 
   for (const auto &t : transparentObjects) {
     t->bindUniforms(program);
@@ -644,14 +675,13 @@ void Scene::renderWavelet() {
   program = shaderPrograms["WaveletCompositor"];
   program->activate();
   framebuffers["WaveletOpaque"]->bindUniforms(program);
-  //framebuffers["WaveletCoefficients"]->bindUniforms(program);
+  framebuffers["WaveletCoefficients"]->bindUniforms(program);
   framebuffers["WaveletShaded"]->bindUniforms(program);
   framebuffers["finalOutput"]->bind();
 
   glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT);
   fullscreenTexturedQuad->draw();
-  glDisable(GL_DEPTH_TEST);
 }
 
 void Scene::animate(float dt) {
@@ -671,7 +701,7 @@ void Scene::seedRNG() {
 }
 
 void Scene::notifyResize(glm::uvec2 newsize) {
-  camera->setParams(73.0f, (float)newsize.x / (float)newsize.y);
+  camera->setParams(_settings.camera.vfov, (float)newsize.x / (float)newsize.y);
 	_settings.viewportSize = newsize;
   for (auto &fb : framebuffers) {
     fb.second->resize(newsize);

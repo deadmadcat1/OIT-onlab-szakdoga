@@ -14,6 +14,10 @@ uniform struct {
 	float far;
 } camera;
 
+uniform sampler2D depthTransparent;
+
+uniform uvec2 viewportSize;
+
 layout(location = 0) out uint coeff1;
 layout(location = 1) out uint coeff2;
 layout(location = 2) out uint coeff3;
@@ -46,10 +50,12 @@ uint pack_rgb9e5(vec3 color) {
 	return (packed_val.r << 23) | (packed_val.g << 14) | (packed_val.b << 5) | (exp_shared & 0x1F);
 }
 
-float linearize(float z){
+float linearize(float z, float maxz){
 	float z_ndc = z * 2.0f - 1.0f;
+	float maxz_ndc = maxz * 2.0f - 1.0f;
 	float linear = camera.P[3][2] / (camera.P[2][2] + z_ndc);
-	return (linear - camera.near) / (camera.far - camera.near);
+	float linear_max = camera.P[3][2] / (camera.P[2][2] + maxz_ndc);
+	return (linear - camera.near) / (linear_max - camera.near);
 }
 
 float haar(uint scale, uint translation, float t){
@@ -60,7 +66,9 @@ float haar(uint scale, uint translation, float t){
 }
 
 void main(void) {
-	float linearZ = linearize(gl_FragCoord.z);
+  vec2 fragCoord = gl_FragCoord.xy / viewportSize;
+	float maxZ = texture(depthTransparent, fragCoord).r;
+	float linearZ = linearize(gl_FragCoord.z, maxZ);
 	vec3 coefficients[5];
 	uint packed_val[5];
 

@@ -21,7 +21,8 @@ uniform struct {
   float alpha, shine;
 } material;
 
-uniform sampler2D depthSampler;
+uniform sampler2D depthTransparent;
+uniform sampler2D depthOpaque;
 uniform usampler2D coeff1;
 uniform usampler2D coeff2;
 uniform usampler2D coeff3;
@@ -44,10 +45,12 @@ vec3 unpack_rgb9e5(uint packed_val) {
 	return scale * vec3(/*r*/packed_val >> 23, /*g*/(packed_val >> 14) & 0x1FF, /*b*/(packed_val >> 5) & 0x1FF);
 }
 
-float linearize(float z){
+float linearize(float z, float maxz){
 	float z_ndc = z * 2.0f - 1.0f;
+	float maxz_ndc = maxz * 2.0f - 1.0f;
 	float linear = camera.P[3][2] / (camera.P[2][2] + z_ndc);
-	return (linear - camera.near) / (camera.far - camera.near);
+	float linear_max = camera.P[3][2] / (camera.P[2][2] + maxz_ndc);
+	return (linear - camera.near) / (linear_max - camera.near);
 }
 
 float scalingFunction(float z) {
@@ -73,7 +76,7 @@ vec3 shade(vec3 normal, vec3 lightDir, vec3 viewDir,
 
 void main(void) {
   vec2 fragCoord = gl_FragCoord.xy / viewportSize;
-  float clipDepth = texture(depthSampler, fragCoord).r;
+  float clipDepth = texture(depthOpaque, fragCoord).r;
   if (gl_FragCoord.z >= clipDepth) {
     discard;
   }
@@ -90,7 +93,8 @@ void main(void) {
   vec4 scale3Coeff1 = vec4(coeff3Raw.gb, coeff4Raw.rg);
 	vec4 scale3Coeff2 = vec4(coeff4Raw.b, coeff5Raw);
 
-  float linearZ = linearize(gl_FragCoord.z);
+	float maxZ = texture(depthTransparent, fragCoord).r;
+  float linearZ = linearize(gl_FragCoord.z, maxZ);
   float highPassFactor =
     dot(scale1Coeff, vec2(
         haar(1, 0, linearZ),

@@ -10,6 +10,7 @@ struct Settings {
 		unsigned int layerCount = 4;
 	} depthPeeling;
 	struct {
+		float vfov = 73.0f;
 		glm::vec3 startingPos = glm::vec3(0.0f, 8.0f, 16.0f);
 		float orbitLockout = 1.0f;
 	} camera;
