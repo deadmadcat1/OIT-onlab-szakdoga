@@ -82,7 +82,7 @@ void Window::resize_callback(int width, int height) {
 	scene->notifyResize(_settings.viewportSize);
 }
 
-void Window::key_callback(int key, int scancode __attribute__((unused)), int action, int mods __attribute__((unused)) ) {
+void Window::key_callback(int key, int scancode, int action, int mods) {
 	if (action == GLFW_PRESS) {
 		switch (key) {
 		case GLFW_KEY_Q:
@@ -120,7 +120,7 @@ void Window::mouseMove_callback(double xpos, double ypos) {
 	}
 }
 
-void Window::mousePress_callback(int button, int action, int mods __attribute__((unused))) {
+void Window::mousePress_callback(int button, int action, int mods) {
 	if (action == GLFW_PRESS) {
 		switch (button) {
 		case GLFW_MOUSE_BUTTON_1:

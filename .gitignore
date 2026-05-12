@@ -33,7 +33,6 @@
 
 #etc.
 *.suo
-*.vcxproj*
 .vs
 /onlab/.vs
 /onlab/onlab/*
