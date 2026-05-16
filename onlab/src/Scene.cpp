@@ -214,7 +214,6 @@ bool Scene::setMakeFramebuffers() {
        {"MBOITOpaque", {{"opaqueTarget", rgba_u}, {"depthSampler", d}}},
        {"MBOITMoments", {{"totalAbsorbance", r_u}, {"moment1", rg_s}, {"moment23", rgba_s}}},
        {"MBOITShaded",{{"transparentTarget", rgba_u}}},
-			 //TODO: maybe just both in one?
        {"WaveletOpaque", {{"opaqueTarget", rgba_u}, {"depthOpaque", d}}},
        {"WaveletTransparentDepth", { {"depthTransparent", d}}},
        {"WaveletCoefficients", { 
@@ -255,7 +254,7 @@ bool Scene::setMakeOpaqueObjects() {
   for (int i = 0; i < 6; i++) {
     auto wall = std::make_unique<Object>(boxMaterial, plane);
 	//TODO: ->settings
-    wall->scale(glm::vec3(boxSize, boxSize, 1.0f));
+    wall->scale(glm::vec3(boxSize + 0.01f, boxSize + 0.01f, 1.0f));
     box.push_back(std::move(wall));
   }
   box[0]->rotate(glm::vec3(90.0f, 0.0f, 0.0f));
@@ -299,7 +298,7 @@ bool Scene::setMakeTransparentObjects() {
     auto color = glm::vec3(_0_1_rand(rng), _0_1_rand(rng), _0_1_rand(rng));
     ballMaterial->kd = color;
     ballMaterial->ka = color;
-    ballMaterial->alpha = _0_1_rand(rng) * 0.95f;
+    ballMaterial->alpha = _0_1_rand(rng) * 0.6f + 0.1f;
     ballMaterial->ks =
         glm::vec3(_0_1_rand(rng), _0_1_rand(rng), _0_1_rand(rng));
     ballMaterial->shine = _0_1_rand(rng);
@@ -345,11 +344,7 @@ void Scene::renderAlphaBlend() {
 #ifdef DRAW_WIREFRAME
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 #endif
-  framebuffers["finalOutput"]->bind();
-
   glClearColor(0.0f, 0.0f, 1.0f, 0.0f);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
   auto program = shaderPrograms["phongBlinn"];
   program->activate();
 
@@ -360,20 +355,25 @@ void Scene::renderAlphaBlend() {
     l->bindUniforms(program);
   }
 
+  framebuffers["finalOutput"]->bind();
+
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
   glEnable(GL_DEPTH_TEST);
   for (const auto &o : opaqueObjects) {
     o->bindUniforms(program);
     o->draw();
   }
   glDisable(GL_DEPTH_TEST);
+
   glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
   for (const auto &t : transparentObjects) {
     t->bindUniforms(program);
     t->draw();
   }
-  glDisable(GL_BLEND);
   glBlendFunc(GL_ONE, GL_ZERO);
+  glDisable(GL_BLEND);
 #ifdef DRAW_WIREFRAME
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 #endif
@@ -383,6 +383,7 @@ void Scene::renderDepthPeeling() {
 #ifdef DRAW_WIREFRAME
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 #endif
+  glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
   auto program = shaderPrograms["phongBlinn"];
   program->activate();
 
@@ -394,11 +395,9 @@ void Scene::renderDepthPeeling() {
   }
 
   glEnable(GL_DEPTH_TEST);
-  glDisable(GL_BLEND);
   auto framebuffer = framebuffers["depthPeelPass1"];
   framebuffer->bind();
 
-  glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   for (const auto &o : opaqueObjects) {
@@ -418,7 +417,7 @@ void Scene::renderDepthPeeling() {
   for (const auto &l : lights) {
     l->bindUniforms(program);
   }
-  for (int i = 1; i < 4 /*settings.depthPeelCount*/; i++) {
+  for (unsigned int i = 1; i < _settings.depthPeeling.layerCount; i++) {
     framebuffer->bindUniforms(program);
 
     framebuffer = framebuffers["depthPeelPass" + std::to_string(i + 1)];
@@ -435,28 +434,21 @@ void Scene::renderDepthPeeling() {
       t->draw();
     }
   }
-  glEnable(GL_BLEND);
+  glDisable(GL_DEPTH_TEST);
 #ifdef DRAW_WIREFRAME
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 #endif
   program = shaderPrograms["depthPeelCompositor"];
   program->activate();
 
-  for (int i = 0; i < 4 /*settings.depthPeelCount*/; i++) {
+  for (unsigned int i = 0; i < _settings.depthPeeling.layerCount; i++) {
     framebuffers["depthPeelPass" + std::to_string(i + 1)]->bindUniforms(
         program);
-    // auto layer =
-    //     framebuffers["depthPeelPass" + std::to_string(i +
-    //     1)]->getColorTarget(
-    //         0);
-    // program->setUniform("colorSampler" + std::to_string(i + 1), layer, i +
-    // 1);
   }
 
   framebuffers["finalOutput"]->bind();
   glClearColor(0.0f, 1.0f, 0.0f, 0.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glDisable(GL_DEPTH_TEST);
   fullscreenTexturedQuad->draw();
 }
 
@@ -465,8 +457,8 @@ void Scene::renderMBOIT() {
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 #endif
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	
   // Opaque pre-pass
-  std::cout << "Beginning MBOIT Opaque pass" << std::endl;
   auto program = shaderPrograms["phongBlinn"];
   program->activate();
 
@@ -481,17 +473,18 @@ void Scene::renderMBOIT() {
   framebuffer->bind();
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glEnable(GL_DEPTH_TEST);
 
+  glEnable(GL_DEPTH_TEST);
   for (const auto &o : opaqueObjects) {
     o->bindUniforms(program);
     o->draw();
   }
   glDisable(GL_DEPTH_TEST);
-  // Calc necessary parameter for wrapping zone because of trig moments
+	
+		// Calc necessary parameter for wrapping zone because of trig moments
   auto wrapping_zone_param = (float)M_PI * 0.95f;
+	
   // Gather moments
-  std::cout << "Beginning MBOIT MomentGen pass" << std::endl;
   program = shaderPrograms["MBOITMomentGen"];
   program->activate();
 
@@ -504,17 +497,15 @@ void Scene::renderMBOIT() {
   framebuffer->bind();
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glEnable(GL_BLEND);
-  // additive blending enabled
-  glBlendEquation(GL_FUNC_ADD);
-  glBlendFunc(GL_ONE, GL_ONE);
 
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_ONE, GL_ONE);
   for (const auto &t : transparentObjects) {
     t->bindUniforms(program);
     t->draw();
   }
+	
   // Produce image from moments
-  std::cout << "Beginning MBOIT Shading pass" << std::endl;
   program = shaderPrograms["MBOITShading"];
   program->activate();
 
@@ -537,15 +528,13 @@ void Scene::renderMBOIT() {
     t->bindUniforms(program);
     t->draw();
   }
-  // glDisable(GL_DEPTH_TEST);
-  // additive blending disabled
-  glBlendEquation(GL_FUNC_ADD);
   glBlendFunc(GL_ONE, GL_ZERO);
   glDisable(GL_BLEND);
 #ifdef DRAW_WIREFRAME
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 #endif
-  std::cout << "Beginning MBOIT Composite pass" << std::endl;
+
+	//Composite transparent and opaque object images
   program = shaderPrograms["MBOITCompositor"];
   program->activate();
   framebuffers["MBOITOpaque"]->bindUniforms(program);
@@ -556,7 +545,6 @@ void Scene::renderMBOIT() {
   glClearColor(0.0f, 1.0f, 1.0f, 0.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   fullscreenTexturedQuad->draw();
-  glDisable(GL_DEPTH_TEST);
 }
 
 void Scene::renderWavelet() {
@@ -565,8 +553,8 @@ void Scene::renderWavelet() {
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 #endif
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	
   // Opaque pre-pass
-  std::cout << "Beginning Wavelet Opaque pass" << std::endl;
   auto program = shaderPrograms["phongBlinn"];
   program->activate();
 
@@ -581,15 +569,15 @@ void Scene::renderWavelet() {
   framebuffer->bind();
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glEnable(GL_DEPTH_TEST);
 
+  glEnable(GL_DEPTH_TEST);
   for (const auto &o : opaqueObjects) {
     o->bindUniforms(program);
     o->draw();
   }
   glDisable(GL_DEPTH_TEST);
+	
 	//depth buffer of transparents for tight depth bound
-  std::cout << "Beginning Wavelet Transparent Depth pass" << std::endl;
   program = shaderPrograms["WaveletTransparentDepth"];
   program->activate();
 
@@ -601,11 +589,11 @@ void Scene::renderWavelet() {
 	glClearDepth(0.0f);
   glClear(GL_DEPTH_BUFFER_BIT);
 	glClearDepth(1.0f);
+
   glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_GREATER);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_FRONT);
-
   for (const auto &t : transparentObjects) {
     t->bindUniforms(program);
     t->draw();
@@ -614,8 +602,8 @@ void Scene::renderWavelet() {
 	glDisable(GL_CULL_FACE);
 	glDepthFunc(GL_LESS);
   glDisable(GL_DEPTH_TEST);
+	
   // Compute coefficients
-  std::cout << "Beginning Wavelet Coefficient Generation pass" << std::endl;
   program = shaderPrograms["WaveletCoefficientGen"];
   program->activate();
 
@@ -628,17 +616,16 @@ void Scene::renderWavelet() {
   framebuffer->bind();
 
   glClear(GL_COLOR_BUFFER_BIT);
+	
+		// additive blending enabled
   glEnable(GL_BLEND);
-  // additive blending enabled
-  glBlendEquation(GL_FUNC_ADD);
   glBlendFunc(GL_ONE, GL_ONE);
-
   for (const auto &t : transparentObjects) {
     t->bindUniforms(program);
     t->draw();
   }
+
   // Produce image from coefficients
-  std::cout << "Beginning Wavelet Shading pass" << std::endl;
   program = shaderPrograms["WaveletShading"];
   program->activate();
 
@@ -663,15 +650,14 @@ void Scene::renderWavelet() {
     t->bindUniforms(program);
     t->draw();
   }
-  // glDisable(GL_DEPTH_TEST);
-  // additive blending disabled
-  glBlendEquation(GL_FUNC_ADD);
+		// additive blending disabled
   glBlendFunc(GL_ONE, GL_ZERO);
   glDisable(GL_BLEND);
 #ifdef DRAW_WIREFRAME
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 #endif
-  std::cout << "Beginning Wavelet Composite pass" << std::endl;
+
+	//Composite transparent and opaque object images
   program = shaderPrograms["WaveletCompositor"];
   program->activate();
   framebuffers["WaveletOpaque"]->bindUniforms(program);

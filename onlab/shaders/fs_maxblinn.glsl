@@ -49,7 +49,5 @@ void main(void){
 								Le, material.kd, material.ks, material.shine);
 	}
 	fragColor.a = material.alpha;
-#ifdef DEPTH_PEEL_ENABLED
 	fragColor.rgb *= fragColor.a;
-#endif
 }

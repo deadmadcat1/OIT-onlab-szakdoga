@@ -41,7 +41,7 @@ layout(location = 0) out vec4 fragColor;
 vec3 unpack_rgb9e5(uint packed_val) {
 	//	https://registry.khronos.org/OpenGL/extensions/EXT/EXT_texture_shared_exponent.txt
 	int exponent = int((packed_val & 0x1F)) - 15;
-	float scale = exp2(exponent);
+	float scale = 1 << exponent;
 	return scale * vec3(/*r*/packed_val >> 23, /*g*/(packed_val >> 14) & 0x1FF, /*b*/(packed_val >> 5) & 0x1FF);
 }
 
@@ -67,7 +67,7 @@ float haar(uint scale, uint translation, float t){
 vec3 shade(vec3 normal, vec3 lightDir, vec3 viewDir,
   vec3 Le, vec3 kd, vec3 ks, float shine) {
   float cosa = abs(dot(normal, lightDir));
-  float cosb = dot(normal, viewDir);
+  float cosb = abs(dot(normal, viewDir));
   vec3 halfway = normalize(lightDir + viewDir);
   float cosd = abs(dot(normal, halfway));
 
@@ -120,7 +120,8 @@ void main(void) {
     ));
   float absorbance = scalingCoeff * scalingFunction(linearZ) - highPassFactor;
 
-  fragColor = vec4(0, 0, 0, 1);
+  //fragColor = vec4(wPos.xyz, 1);
+	fragColor = vec4(0,0,0,1);
   for (int i = 0; i < nLights; i++) {
     vec3 powerDensity = lights[i].Le * ((lights[i].pos.w == 0.0f) ? 1.0f : 1.0f / (4.0f * 3.1415926f));
     vec3 Le = powerDensity / dot(abs(wLightDir[i]), abs(wLightDir[i]));

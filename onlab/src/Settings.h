@@ -5,7 +5,6 @@
 struct Settings {
 	glm::uvec2 viewportSize = glm::uvec2(1920, 1080);
   glm::uvec2 renderResolution = glm::uvec2(1920, 1080);
-  unsigned int depthPeel_layerCount = 4;
 	struct {
 		unsigned int layerCount = 4;
 	} depthPeeling;

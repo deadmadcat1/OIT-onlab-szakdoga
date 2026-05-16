@@ -29,23 +29,26 @@ uint pack_rgb9e5(vec3 color) {
 
   //  Components red, green, and blue are first clamped (in the process,
   //  mapping NaN to zero) so:
-	vec3 clamped = clamp(color * 32768, 0, 32768/* sharedexp_max */);
+	uvec3 clamped = uvec3(clamp(color * 65408, 0, 65408/* sharedexp_max */));
 
   //  For the RGB9_E5_EXT format, N=9, Emax=31, and B=15.
 
   //  The largest clamped component, max_c, is determined:
-  float max_c = max(clamped.r, max(clamped.g, clamped.b));
+  uint max_c = max(clamped.r, max(clamped.g, clamped.b));
 
   //  A preliminary shared exponent is computed:
   int exp_shared = max(-16, int(floor(log2(max_c)))) + 16;
 
   //  A refined shared exponent is then computed as:
-	float denom = exp2(exp_shared - 24);
-  uint max_s = int(floor(max_c / denom + 0.5f));
-	exp_shared += (max_s == 512) ? 1 : 0;
+	float denom = 1 / (1 << (exp_shared - 24));
+  int max_s = int(floor(max_c * denom + 0.5f));
+	if (max_s == 512) {
+		denom *= 2;
+		exp_shared += 1;
+	}
 
   //  These integers values in the range 0 to 2^N-1 are then computed:
-	uvec3 packed_val = uvec3(floor(clamped / denom + 0.5f));
+	uvec3 packed_val = uvec3(floor(clamped * denom + 0.5f));
 
 	return (packed_val.r << 23) | (packed_val.g << 14) | (packed_val.b << 5) | (exp_shared & 0x1F);
 }
